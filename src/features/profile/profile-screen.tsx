@@ -88,7 +88,7 @@ export function ProfileScreen() {
             variant="choice"
             value={prefs.uiLanguage}
             options={UI_LANGUAGES}
-            onChange={(uiLanguage: UiLanguage) => (setPrefs((p) => ({ ...p, uiLanguage })), setSaved(false))}
+            onChange={(value: UiLanguage) => (setPrefs((p) => ({ ...p, uiLanguage: value })), setSaved(false))}
           />
         </Field>
         <Field label={t('profile.explanationLanguage')}>
@@ -96,7 +96,7 @@ export function ProfileScreen() {
             variant="choice"
             value={prefs.definitionLanguage}
             options={UI_LANGUAGES}
-            onChange={(definitionLanguage: UiLanguage) => (setPrefs((p) => ({ ...p, definitionLanguage })), setSaved(false))}
+            onChange={(value: UiLanguage) => (setPrefs((p) => ({ ...p, definitionLanguage: value })), setSaved(false))}
           />
         </Field>
         <Field label={t('profile.script')}>
@@ -107,7 +107,7 @@ export function ProfileScreen() {
               { value: 'cyrl', label: t('profile.cyrillic') },
               { value: 'latn', label: t('profile.latin') },
             ]}
-            onChange={(script: Script) => (setPrefs((p) => ({ ...p, script })), setSaved(false))}
+            onChange={(value: Script) => (setPrefs((p) => ({ ...p, script: value })), setSaved(false))}
           />
         </Field>
         <Button
