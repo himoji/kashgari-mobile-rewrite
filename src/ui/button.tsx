@@ -52,10 +52,12 @@ export function Button({ label: text, icon, loading, variant, size, block, disab
       disabled={disabled || loading}
       className={cn(button({ variant, size, block }), (disabled || loading) && 'opacity-50', className)}
       style={v === 'primary' ? gradient('sheen') : undefined}
+      // The small size is 36pt tall; the slop makes its touch area 44pt.
+      hitSlop={size === 'sm' ? 4 : undefined}
       {...props}
     >
       {loading ? <ActivityIndicator color={iconColor[v]} /> : icon ? <Icon name={icon} size={16} color={iconColor[v]} /> : null}
-      <Text className={cn('font-body-semibold text-[13px] leading-[18px]', size === 'lg' && 'text-[14px]', label[v])} numberOfLines={1}>
+      <Text className={cn('font-body-semibold text-[13px] leading-[18px]', size === 'lg' && 'text-[14px]', label[v])} numberOfLines={1} maxFontSizeMultiplier={1.3}>
         {text}
       </Text>
     </Pressable>

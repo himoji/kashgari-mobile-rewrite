@@ -93,6 +93,7 @@ export function BlockRow({ block, index, label, onMenu }: { block: Block; index:
         accessibilityRole="button"
         accessibilityLabel={t('assign.blockMenu')}
         onPress={onMenu}
+        hitSlop={{ top: 5, bottom: 5 }}
         className="h-[34px] w-11 items-center justify-center rounded-[9px] bg-[#f6f8fc] active:opacity-70"
       >
         <Text className="font-body text-[20px] leading-[30px] text-[#95a5bb]">⋯</Text>

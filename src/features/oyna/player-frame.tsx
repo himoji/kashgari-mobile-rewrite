@@ -206,7 +206,7 @@ export function ConfirmSubmit({ visible, loading, onCancel, onConfirm }: { visib
             <View className="mb-5 h-1 w-10 self-center rounded bg-[#dce1eb]" />
             <View className="mb-3 flex-row items-center justify-between gap-3">
               <Text className="flex-1 font-body-medium text-[20px] leading-[26px]">{t('oyna.confirmSubmit')}</Text>
-              <Pressable accessibilityRole="button" accessibilityLabel={t('oyna.cancel')} onPress={onCancel} className="press h-[34px] w-[34px] items-center justify-center rounded-tile bg-track">
+              <Pressable accessibilityRole="button" accessibilityLabel={t('oyna.cancel')} onPress={onCancel} hitSlop={5} className="press h-[34px] w-[34px] items-center justify-center rounded-tile bg-track">
                 <Icon name="close" size={18} color={colors.muted} />
               </Pressable>
             </View>

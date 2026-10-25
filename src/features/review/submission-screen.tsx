@@ -309,6 +309,7 @@ function Review({
               accessibilityLabel={t(label)}
               disabled={!target}
               onPress={() => go(target)}
+              hitSlop={{ top: 6, bottom: 6 }}
               className="h-8 w-11 items-center justify-center rounded-[9px] bg-[#f3f7fc] active:opacity-80"
             >
               <Icon name={icon} size={15} color={target ? colors.ink : '#c4ccd8'} />

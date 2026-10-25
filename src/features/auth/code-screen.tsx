@@ -96,6 +96,7 @@ export function CodeScreen() {
         textContentType="oneTimeCode"
         autoComplete="sms-otp"
         maxLength={6}
+        maxFontSizeMultiplier={1.3}
         autoFocus
         aria-invalid={!!error}
         className={cn('h-[52px] rounded-control bg-surface px-3.5 font-body text-[20px] tracking-[6px] text-ink', error && 'border border-late')}

@@ -303,7 +303,7 @@ export function AssignScreen() {
                 <Text className="font-body-bold text-[14px] leading-[21px]">{name}</Text>
                 <Text className="font-body text-[12px] leading-[18px] text-[#8592a5]">{t('assign.sections', { count: blocks.length })}</Text>
               </View>
-              <Pressable accessibilityRole="button" onPress={() => setStage(2)} className="press p-[5px]">
+              <Pressable accessibilityRole="button" onPress={() => setStage(2)} hitSlop={8} className="press p-[5px]">
                 <Text className="font-body text-[12px] leading-[18px] text-[#1877f2]">{t('assign.edit')}</Text>
               </Pressable>
             </View>

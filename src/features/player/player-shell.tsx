@@ -136,6 +136,7 @@ export function ConfirmSheet({
                 accessibilityRole="button"
                 accessibilityLabel={t('common.actions.close')}
                 onPress={onClose}
+                hitSlop={6}
                 className="press h-8 w-8 items-center justify-center rounded-tile bg-[#f3f6fb] active:opacity-70"
               >
                 <Icon name="close" size={16} color={colors.muted} />

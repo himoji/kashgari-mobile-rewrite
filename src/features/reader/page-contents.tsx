@@ -65,6 +65,7 @@ export function PageContents({ visible, pages, page, onSelect, onClose }: Props)
                 accessibilityRole="button"
                 accessibilityLabel={t('common.actions.close')}
                 onPress={onClose}
+                hitSlop={6}
                 className="h-8 w-8 items-center justify-center rounded-full bg-[#f3f6fa] active:opacity-80"
               >
                 <Icon name="close" size={16} color={colors.subtle} />

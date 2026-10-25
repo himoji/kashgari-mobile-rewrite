@@ -65,11 +65,11 @@ export function SegmentedTabs<T extends string>({ value, options, onChange, vari
             }}
             className={cn('press items-center justify-center rounded-[9px]', item[variant])}
           >
-            <Text numberOfLines={1} className={label(variant, selected)}>
+            <Text numberOfLines={1} maxFontSizeMultiplier={1.3} className={label(variant, selected)}>
               {o.label}
             </Text>
             {o.count != null ? (
-              <Text className={cn('ml-[6px] text-[11px] text-body', selected ? 'font-body-semibold' : 'font-body-medium')}>{o.count}</Text>
+              <Text maxFontSizeMultiplier={1.3} className={cn('ml-[6px] text-[11px] text-body', selected ? 'font-body-semibold' : 'font-body-medium')}>{o.count}</Text>
             ) : null}
           </Pressable>
         );

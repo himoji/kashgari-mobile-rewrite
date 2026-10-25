@@ -63,6 +63,7 @@ export function PillTabBar({ state, descriptors, navigation, parents = {} }: Bot
               <Text
                 className={cn('font-body text-[10px] leading-[13px]', focused ? 'font-body-medium text-white' : 'text-primary-strong')}
                 numberOfLines={1}
+                maxFontSizeMultiplier={1.3}
               >
                 {label}
               </Text>
