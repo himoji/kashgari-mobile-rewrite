@@ -1,0 +1,142 @@
+type Query {
+  lesson(id: ID!): Lesson
+  leftLesson(studentId: ID!): Boolean!
+}
+
+type Mutation {
+  createLesson(
+    grade: Int!
+    section: Int!
+    name: String!
+    classId: ID!
+    studentIds: [ID!]!
+    opensAt: Int!
+  ): Lesson
+  createLessonFromPremade(
+    classId: ID!
+    studentIds: [ID!]!
+    lessonId: ID!
+    opensAt: Int!
+  ): Lesson
+  updateLesson(data: LessonUpdateInput!): Boolean!
+  addLessonActivity(lessonId: ID!, type: ActivityType!): Boolean!
+  deleteLessonActivity(lessonId: ID!, index: Int!): Boolean!
+  deleteLesson(id: ID!): ID
+}
+
+type Lesson {
+  id: ID!
+  name: String!
+  description: String!
+  thumbnail(size: ImageSize! = W1024, url: Boolean! = false): String
+  activities: [LessonActivity!]!
+  activitiesType: [LessonActivityType!]!
+  students: [Student!]!
+  visible: Boolean!
+  opensAt: Int!
+  grade: Int!
+  section: Int!
+  number: Int
+  submission(studentId: ID!): LessonSubmission
+  submissions: [LessonSubmission!]!
+  #   plan: <TODO>
+  #   summary: <TODISCUSS>
+}
+
+input LessonUpdateInput {
+  lessonId: ID!
+  studentIdsToAdd: [ID!]
+  studentIdsToRemove: [ID!]
+  permutation: [Int!]
+  opensAt: Int
+  visible: Boolean
+}
+
+union LessonActivity =
+  | TextActivity
+  | ZhazylymActivity
+  | OynaActivity
+  | DurysActivity
+  | LessonGameActivity
+  | PhysicalActivityActivity
+
+enum LessonActivityType {
+  oqylym
+  tyndalym
+  zhazylym
+  miniStory
+  quizlet
+  wordle
+  wordGame
+  lesson_game
+  durys_assignment
+  physical_activity
+}
+
+type TextActivity {
+  text: Text
+  moduleName: String!
+  estTimeText: Float!
+  estTimeGames: Float!
+  allStudentsSubmitted: Boolean!
+}
+
+type ZhazylymActivity {
+  zhazylym: Zhazylym
+  estTime: Float!
+}
+
+type OynaActivity {
+  game: OynaGame
+  estTime: Float!
+  allStudentsSubmitted: Boolean!
+}
+
+type DurysActivity {
+  assignment: DurysAssignment
+  estTime: Float!
+}
+
+type LessonGameActivity {
+  lessonGame(studentId: ID): LessonGame
+  estTime: Float!
+}
+
+type PhysicalActivityActivity {
+  physicalActivity: PhysicalActivity
+  estTime: Float!
+}
+
+union LessonGame = BattleshipGame | InfiniteRunnerGame
+
+enum ActivityType {
+  OQYLYM
+  TYNDALYM
+  ZHAZYLYM
+  OYNA
+  LESSON_GAME
+  DURYS
+  PHYSICAL
+}
+
+enum TextActivityModule {
+  Oqylym
+  Tyndalym
+}
+
+type LessonSubmission {
+  lesson: Lesson!
+  student: Student!
+  createdAt: Int
+  submissions: [LessonActivitySubmission]!
+  averageAmongAssignments: Float
+}
+
+union LessonActivitySubmission =
+  | Submission
+  | ZhazylymSubmission
+  | OynaSubmissionMiniStory
+  | OynaSubmissionQuizlet
+  | OynaSubmissionWordle
+  | OynaSubmissionWordGame
+  | DurysSubmission

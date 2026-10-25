@@ -1,0 +1,30 @@
+type Mutation {
+  logCreate(data: LogInput!): Boolean!
+  addStudentLogCreate(data: AddStudentLogInput!): Boolean!
+}
+
+input LogInput {
+  prefix: String!
+  text: String!
+}
+
+input AddStudentLogInput {
+  appLanguage: AppLanguage!
+  accountId: String!
+  classId: String!
+  studentName: String!
+  client: ClientType!
+  description: String
+}
+
+enum AppLanguage {
+  kk
+  en
+  fr
+  ru
+}
+
+enum ClientType {
+  web
+  app
+}

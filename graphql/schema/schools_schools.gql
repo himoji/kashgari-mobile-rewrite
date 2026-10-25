@@ -1,0 +1,10 @@
+type Query {
+  school(id: ID!): School
+}
+
+type School {
+  id: ID!
+  name: String!
+  teachers: [Teacher!]!
+  principals: [Principal!]!
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Rankings",
+  "tabs": { "schools": "Schools", "classes": "Classes", "students": "Students" },
+  "scope": "Regional ranking",
+  "prizes": "Prize places: 1–3",
+  "schoolsNotReady": "The school ranking is in development.",
+  "own": { "schools": "Your school", "classes": "Your class", "students": "Your position" },
+  "allPlaces": "Full ranking",
+  "points": "Points",
+  "you": "You",
+  "topThree": "Top three",
+  "empty": "The ranking is empty for now"
+}

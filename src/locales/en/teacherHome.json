@@ -1,0 +1,9 @@
+{
+  "greeting": "Hello, {{name}}!",
+  "assign": "Assign work",
+  "review": "Review answers",
+  "answers_one": "{{count}} answer",
+  "answers_other": "{{count}} answers",
+  "noAnswers": "No new answers",
+  "grades": "View grades"
+}

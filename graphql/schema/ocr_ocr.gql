@@ -1,0 +1,9 @@
+type Query {
+  scanTextLambda(image: String!): String
+  scanTextLambdaWithImages(image: String!): [OcrLinePair!]
+}
+
+type OcrLinePair {
+  image: String!
+  line: String!
+}

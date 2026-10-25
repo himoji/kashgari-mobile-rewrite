@@ -1,0 +1,11 @@
+{
+  "appName": "Oqu Dana Tiin",
+  "roles": { "student": "Student", "teacher": "Teacher", "parent": "Parent", "principal": "Principal" },
+  "tabs": { "home": "Home", "league": "League", "school": "School", "profile": "Profile", "materials": "Materials", "classes": "Classes", "children": "Children" },
+  "actions": { "save": "Save", "cancel": "Cancel", "close": "Close", "back": "Back", "next": "Continue", "previous": "Previous", "retry": "Retry", "continue": "Continue", "open": "Open", "done": "Done", "signOut": "Sign out", "results": "Results" },
+  "states": { "loading": "Loading…", "empty": "Nothing here yet", "error": "Something went wrong", "offline": "No internet connection" },
+  "notReady": { "title": "Coming soon", "body": "This feature is still being built." },
+  "status": { "done": "Done", "todo": "To do", "late": "Overdue", "graded": "Graded", "pending": "Awaiting review" },
+  "periods": { "days": "Days", "weeks": "Weeks", "months": "Months", "all": "All time" },
+  "modules": { "OQYLYM": "Reading", "TYNDALYM": "Listening", "OYNA": "Games", "DURYS": "Grammar" }
+}

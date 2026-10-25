@@ -1,0 +1,22 @@
+type Query {
+  class(id: ID!): Class
+}
+
+type Mutation {
+  addClass(teacherId: ID!, letter: String!, grade: Int): Class
+  deleteClass(id: ID!): ID
+  renameClassLetter(classId: ID!, letter: String!): Boolean!
+}
+
+type Class {
+  id: ID!
+  grade: Int
+  letter: String!
+  teacher: Teacher!
+  students: [Student!]!
+  assignments: [Assignment!]!
+  zhazylymAssignments: [Zhazylym!]!
+  oynaGames: [OynaGame!]!
+  durysAssignments: [DurysAssignment!]!
+  lessons: [Lesson!]!
+}

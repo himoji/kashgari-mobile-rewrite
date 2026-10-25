@@ -1,0 +1,66 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "react",
+    "react-perf",
+    "import"
+  ],
+  "settings": {
+    "react": {
+      "version": "19.2"
+    }
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react-perf/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-array-as-prop": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
+    "react/no-unstable-nested-components": [
+      "warn",
+      {
+        "allowAsProps": true
+      }
+    ],
+    "react/style-prop-object": "off",
+    "import/no-named-as-default-member": "off",
+    "no-underscore-dangle": [
+      "warn",
+      {
+        "allow": [
+          "__typename"
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/_layout.tsx"
+      ],
+      "rules": {
+        "import/no-unassigned-import": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "src/graphql/**",
+    "*.js",
+    "*.mjs",
+    "node_modules/**"
+  ]
+}

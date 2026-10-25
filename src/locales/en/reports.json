@@ -1,0 +1,33 @@
+{
+  "title": "Reports",
+  "periods": {
+    "week": "This week",
+    "month": "This month",
+    "quarter": "This quarter",
+    "allTime": "All time"
+  },
+  "period": "Period",
+  "class": "Class",
+  "allClasses": "All classes",
+  "activeStudents": "Active students",
+  "workAssigned": "Work assigned",
+  "averageScore": "Average score",
+  "submissions": "Submissions",
+  "moduleUsage": "Module usage",
+  "modules": {
+    "reading": "Reading",
+    "listening": "Listening",
+    "grammar": "Grammar",
+    "game": "Games",
+    "writing": "Writing"
+  },
+  "schoolPerformance": "School performance",
+  "engagement": "App engagement",
+  "appClicks": "App interactions",
+  "appClicksHint": "How many times students tapped words.",
+  "members": "Members",
+  "students": "Students",
+  "teachers": "Teachers",
+  "memberHint": "Teachers and students connected to the school.",
+  "back": "School"
+}

@@ -1,0 +1,18 @@
+{
+  "title": "My words",
+  "saved": "Saved",
+  "emptyTitle": "Save your first word",
+  "emptyBody": "Tap a word while reading to save it.",
+  "startReading": "Start reading",
+  "practise": "Practise words",
+  "notReady": "Saved words are not stored on the server yet.",
+  "practiceTitle": "Word practice",
+  "noPractice": "No words to practise",
+  "word": "Word",
+  "meaning": "Meaning",
+  "flip": "Flip card",
+  "listen": "Listen",
+  "previous": "Previous",
+  "nextWord": "Next word",
+  "finish": "Done"
+}

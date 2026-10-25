@@ -1,0 +1,58 @@
+type Query {
+  word(wordCyrillic: String!, metadata: WordMetadata): Word
+  allWordForms(word: String!): [String!]!
+}
+
+type Mutation {
+  requestDefinition(word: String!): Boolean
+}
+
+input WordMetadata {
+  studentId: ID!
+  assignmentId: ID!
+}
+
+type Word {
+  id: ID!
+  url: String!
+  level: Level!
+  imageDefinition: Int
+  imageUrl(size: ImageSize! = W1024): String
+  sponsor: Sponsor
+  definitions: [Definition!]!
+  timesClicked: Int!
+}
+
+enum Level {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+type Sponsor {
+  name: String
+  instagramTag: String
+}
+
+type Definition {
+  id: ID!
+  text: String!
+  textAlt: String
+  textRussian: String!
+  order: Int!
+  partOfSpeech: String!
+  translationRussian: String!
+  translationEnglish: String!
+  examples: [Example!]!
+}
+
+type Example {
+  id: ID!
+  text: String!
+  textAlt: String
+  textRussian: String!
+  order: Int!
+  differentPartOfSpeech: Boolean
+}

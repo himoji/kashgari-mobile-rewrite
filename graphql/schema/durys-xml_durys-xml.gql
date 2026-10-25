@@ -1,0 +1,21 @@
+type Query {
+  allDurysTitles: [DurysTitle!]!
+  durysTitle(id: ID!): DurysTitle
+}
+
+type Mutation {
+  createDurysTitle(title: String!): DurysTitle
+  updateDurysTitle(id: ID!, title: String!): Boolean!
+  deleteDurysTitle(id: ID!, force: Boolean): Boolean!
+  saveXml(id: ID!, xml: String!, index: Int!): Boolean!
+  saveXmlArray(id: ID!, xml: [String!]!, index: Int!): Boolean!
+  updateXml(id: ID!, xml: String!, index: Int!): Boolean!
+  deleteXml(id: ID!, index: Int!): Boolean!
+}
+
+type DurysTitle {
+  id: ID!
+  title: String!
+  xmls: [String!]!
+  assignments(classId: ID!): [DurysAssignment!]!
+}

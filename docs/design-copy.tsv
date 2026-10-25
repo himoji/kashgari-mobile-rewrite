@@ -1,0 +1,442 @@
+key	kk	ru	en
+teacher	Мұғалім	Учитель	Teacher
+student	Оқушы	Ученик	Student
+principal	Директор	Директор	Principal
+overview	Басты бет	Обзор	Overview
+classes	Сыныптар	Классы	Classes
+library	Материалдар	Материалы	Library
+assignments	Тапсырмалар	Задания	Assignments
+lessons	Сабақтар	Уроки	Lessons
+gradebook	Бағалар	Оценки	Gradebook
+messages	Хабарламалар	Сообщения	Messages
+reports	Есептер	Отчёты	Reports
+teachers	Мұғалімдер	Учителя	Teachers
+help	Көмек	Помощь	Help
+settings	Параметрлер	Настройки	Settings
+profile	Профиль	Профиль	Profile
+homeGreeting	Сәлем, Айгүл!	Здравствуйте, Айгуль!	Hello, Aigul!
+studentGreeting	Сәлем, Аружан!	Привет, Аружан!	Hello, Aruzhan!
+principalGreeting	Мектебіңіздегі қазақ тілі	Казахский в вашей школе	Kazakh at your school
+today	Бүгін	Сегодня	Today
+week	Осы апта	Эта неделя	This week
+month	Осы ай	Этот месяц	This month
+quarter	Осы тоқсан	Эта четверть	This quarter
+allTime	Барлық кезең	Всё время	All time
+school	Мектеп	Школа	School
+class	Сынып	Класс	Class
+grade	Сынып деңгейі	Параллель	Grade
+section	Бөлім	Раздел	Section
+level	Тіл деңгейі	Уровень языка	Language level
+reading	Оқылым	Чтение	Reading
+listening	Тыңдалым	Аудирование	Listening
+game	Ойындар	Игры	Games
+grammar	Грамматика	Грамматика	Grammar
+writing	Жазылым	Письмо	Writing
+physical	Дене белсенділігі	Физическая активность	Physical activity
+battleship	Кеме соғысы	Морской бой	Battleship
+lesson	Сабақ	Урок	Lesson
+assignment	Тапсырма	Задание	Assignment
+create	Құру	Создать	Create
+createWork	Жаңа жұмыс	Новая работа	Create work
+createAssignment	Тапсырма құру	Создать задание	Create assignment
+createLesson	Сабақ құру	Создать урок	Create lesson
+createClass	Сынып құру	Создать класс	Create class
+edit	Өңдеу	Редактировать	Edit
+save	Сақтау	Сохранить	Save
+saveChanges	Өзгерістерді сақтау	Сохранить изменения	Save changes
+saved	Сақталды	Сохранено	Saved
+cancel	Бас тарту	Отмена	Cancel
+close	Жабу	Закрыть	Close
+back	Артқа	Назад	Back
+next	Әрі қарай	Далее	Continue
+previous	Алдыңғы	Предыдущий	Previous
+preview	Алдын ала қарау	Предпросмотр	Preview
+open	Ашу	Открыть	Open
+viewAll	Барлығын көру	Посмотреть все	View all
+viewResults	Нәтижелерді көру	Посмотреть результаты	View results
+viewProgress	Үлгерімді көру	Посмотреть прогресс	View progress
+assign	Тағайындау	Назначить	Assign
+publish	Жариялау	Опубликовать	Publish
+published	Жарияланған	Опубликовано	Published
+draft	Жоба	Черновик	Draft
+scheduled	Жоспарланған	Запланировано	Scheduled
+hidden	Жасырылған	Скрыто	Hidden
+hide	Жасыру	Скрыть	Hide
+show	Көрсету	Показать	Show
+delete	Жою	Удалить	Delete
+rename	Атауын өзгерту	Переименовать	Rename
+copyCode	Сынып кодын көшіру	Скопировать код класса	Copy class code
+codeCopied	Сынып коды көшірілді	Код класса скопирован	Class code copied
+joinCode	Қосылу коды	Код подключения	Join code
+students	Оқушылар	Ученики	Students
+studentCount	оқушы	учеников	students
+allStudents	Бүкіл сынып	Весь класс	Whole class
+selectedStudents	Таңдалған оқушылар	Выбранные ученики	Selected students
+selectAll	Барлығын таңдау	Выбрать всех	Select all
+recipients	Кімге тағайындалады	Получатели	Recipients
+classOnly	Бұл тапсырма бүкіл таңдалған сыныпқа беріледі.	Это задание назначается всему выбранному классу.	This assignment goes to the whole selected class.
+recipientHint	Жеке оқушыларға жұмыс беру үшін сабақ құрыңыз.	Для работы с отдельными учениками создайте урок.	Create a lesson to assign work to selected students.
+name	Атау	Название	Name
+classLetter	Сынып әрпі немесе атауы	Буква или название класса	Class letter or name
+gradeOptional	Сынып деңгейі (міндетті емес)	Параллель (необязательно)	Grade (optional)
+search	Іздеу	Поиск	Search
+searchMaterials	Материалдарды іздеу	Поиск материалов	Search materials
+all	Барлығы	Все	All
+allModules	Барлық модульдер	Все модули	All modules
+allLevels	Барлық деңгейлер	Все уровни	All levels
+allGrades	Барлық сынып деңгейлері	Все параллели	All grades
+newWork	Жаңа тапсырмалар	Новые задания	New work
+completed	Орындалған	Выполнено	Completed
+inProgress	Орындалуда	В процессе	In progress
+notStarted	Басталмаған	Не начато	Not started
+notSubmitted	Тапсырылмаған	Не сдано	Not submitted
+needsReview	Тексеру қажет	Нужна проверка	Needs review
+waitingGrade	Бағалауды күтуде	Ожидает оценки	Awaiting grade
+late	Кеш тапсырылған	Сдано поздно	Submitted late
+overdue	Мерзімі өтті	Просрочено	Overdue
+deadline	Тапсыру мерзімі	Срок сдачи	Deadline
+opensAt	Ашылу күні	Дата открытия	Opening date
+duration	Уақыт шегі	Ограничение времени	Time limit
+minutes	минут	минут	minutes
+min	мин	мин	min
+points	ұпай	баллы	points
+score	Нәтиже	Результат	Score
+attempt	Талпыныс	Попытка	Attempt
+attempts	Талпыныстар	Попытки	Attempts
+attemptHistory	Талпыныстар тарихы	История попыток	Attempt history
+allowLate	Мерзімнен кейін тапсыруға рұқсат беру	Разрешить сдачу после срока	Allow late submissions
+lateHint	Кеш тапсырылған жұмыс арнайы белгіленеді.	Поздняя сдача будет отмечена отдельно.	Late work is clearly labelled.
+retrySettings	Қайта орындау параметрлері	Настройки повторных попыток	Retry settings
+allowRetry	Қайта орындауға рұқсат беру	Разрешить повторные попытки	Allow retries
+maxAttempts	Талпыныстар саны	Количество попыток	Maximum attempts
+scoreRule	Есепке алынатын нәтиже	Учитываемый результат	Score to use
+bestScore	Ең жоғары нәтиже	Лучший результат	Best score
+latestScore	Соңғы нәтиже	Последний результат	Latest score
+firstScore	Алғашқы нәтиже	Первый результат	First score
+historyHint	Алдыңғы талпыныстар сақталады. Есепке алынатын нәтиже ғана өзгереді.	Предыдущие попытки сохраняются. Меняется только учитываемый результат.	All previous attempts are kept. Only the score used in reports changes.
+workType	Жұмыс түрі	Тип работы	Work type
+homework	Үй / сынып жұмысы	Домашняя / классная работа	Homework / classwork
+assessment	Бақылау жұмысы	Контрольная работа	Assessment
+listeningMode	Тыңдау тәсілі	Режим прослушивания	Listening mode
+individual	Жеке тыңдау	Индивидуально	Listen individually
+withClass	Сыныппен бірге	Вместе с классом	Listen with class
+source	Материал	Материал	Material
+exerciseSettings	Жаттығулар	Упражнения	Exercises
+assignmentSettings	Тағайындау	Назначение	Assignment settings
+review	Тексеру	Проверка	Review
+fromLibrary	Материалдар қорынан	Из библиотеки	From library
+ownText	Өз мәтінім	Свой текст	My own text
+aiText	ЖИ арқылы құру	Создать с ИИ	Create with AI
+upload	Файл жүктеу	Загрузить файл	Upload file
+uploadHint	TXT немесе сурет таңдаңыз. DOCX мазмұнын мәтін өрісіне көшіріңіз.	Выберите TXT или изображение. Текст из DOCX вставьте в поле.	Choose TXT or an image. Paste DOCX content into the text field.
+text	Мәтін	Текст	Text
+topic	Тақырып	Тема	Topic
+keywords	Тірек сөздер	Ключевые слова	Keywords
+generate	Құрастыру	Сгенерировать	Generate
+generating	Құрастырылуда…	Генерация…	Generating…
+generateExercises	Жаттығулар құрастыру	Сгенерировать упражнения	Generate exercises
+editExercises	Жаттығуларды өңдеу	Редактировать упражнения	Edit exercises
+words	Сөздер	Слова	Words
+cards	Флешкарточкалар	Карточки	Flashcards
+match	Сәйкестендіру	Соответствия	Word matching
+shuffle	Аралас әріптер	Собрать слово	Word shuffle
+complete	Бос орынды толтыру	Пропущенное слово	Missing word
+mcq	Жауапты таңдау	Выбор ответа	Multiple choice
+tf	Шын / жалған	Верно / неверно	True / false
+grid	Сөз торы	Поиск слов	Word search
+crossword	Кроссворд	Кроссворд	Crossword
+frq	Ашық сұрақ	Открытый вопрос	Open response
+quizlet	Естесөз	Игра с карточками	Card match
+wordle	Сөзді тап	Угадай слово	Wordle
+ministory	Шағын әңгіме	Мини-история	Mini Story
+newwords	Жаңа сөздер	Новые слова	New Words
+gameType	Ойын түрі	Тип игры	Game type
+chooseWords	Сөздерді таңдаңыз	Выберите слова	Choose words
+wordLimits	Ойын түріне қарай сөздер саны мен уақыт өзгереді.	Количество слов и время зависят от игры.	Word count and timing depend on the game.
+writingPrompt	Жазылым тапсырмасы	Задание на письмо	Writing prompt
+wordBased	Сөздер бойынша	По словам	Using words
+imageBased	Суреттер бойынша	По изображениям	Using images
+images	Суреттер	Изображения	Images
+instructions	Нұсқаулық	Инструкция	Instructions
+addActivity	Белсенділік қосу	Добавить активность	Add activity
+activity	Белсенділік	Активность	Activity
+activityOrder	Сабақ реті	Порядок урока	Lesson sequence
+estimatedTime	Жоспарланған уақыт	Планируемое время	Estimated time
+moveUp	Жоғары жылжыту	Переместить выше	Move up
+moveDown	Төмен жылжыту	Переместить ниже	Move down
+lessonPlan	Сабақ жоспары	План урока	Lesson plan
+emptyLesson	Бос сабақ	Пустой урок	Start from scratch
+readyLesson	Дайын сабақ	Готовый урок	Ready-made lesson
+aiLesson	ЖИ көмегімен сабақ	Урок с помощью ИИ	AI lesson
+lessonHint	Бір сабаққа бірнеше белсенділікті біріктіріңіз.	Объедините несколько активностей в один урок.	Bring several activities together in one lesson.
+assignmentHint	Бір материалға негізделген қысқа жұмыс беріңіз.	Назначьте короткую работу на основе одного материала.	Assign a shorter piece of work based on one material.
+editPublished	Жарияланған жұмысты өңдеу	Редактирование опубликованной работы	Edit published work
+editPublishedHint	Өңдеу кезінде жұмыс жасырылып, тапсырылған жауаптар сақталады. Соңында қайта жариялаңыз.	Во время редактирования работа будет скрыта, ответы сохранятся. Затем опубликуйте её снова.	Editing hides the work and preserves submissions. Publish it again when ready.
+publishHint	Жұмыс таңдалған оқушыларға ашылу күнінен бастап көрінеді.	Работа станет видна выбранным ученикам с даты открытия.	Selected students can see the work from its opening date.
+readyPublish	Жариялауға дайын	Готово к публикации	Ready to publish
+workSaved	Жұмыс сақталды	Работа сохранена	Work saved
+workPublished	Жұмыс жарияланды	Работа опубликована	Work published
+confirmDelete	Жоюды растау	Подтвердить удаление	Confirm deletion
+deleteHint	Осы жұмысты жою керек пе? Бұл әрекеттен кейін оны демода қайта қалпына келтіре алмайсыз.	Удалить эту работу? В демо это действие нельзя отменить.	Delete this work? This cannot be undone in the demo.
+classDeleteHint	Сынып пен оған қатысты жұмыстар осы демодан жойылады.	Класс и связанные работы будут удалены из демо.	The class and its related work will be removed from this demo.
+emptyTitle	Әзірге ештеңе жоқ	Здесь пока ничего нет	Nothing here yet
+emptyHint	Материал қосыңыз немесе басқа сүзгіні таңдаңыз.	Добавьте материал или выберите другой фильтр.	Add material or choose another filter.
+clearFilters	Сүзгілерді тазалау	Сбросить фильтры	Clear filters
+start	Бастау	Начать	Start
+continue	Жалғастыру	Продолжить	Continue
+submit	Жауаптарды тапсыру	Отправить ответы	Submit answers
+submitted	Жауаптар тапсырылды	Ответы отправлены	Answers submitted
+finish	Аяқтау	Завершить	Finish
+check	Тексеру	Проверить	Check
+correct	Дұрыс!	Верно!	Correct!
+incorrect	Қайта ойланып көріңіз	Попробуйте ещё раз	Try again
+question	Сұрақ	Вопрос	Question
+answer	Жауап	Ответ	Answer
+correctAnswer	Дұрыс жауап	Правильный ответ	Correct answer
+writeAnswer	Жауабыңызды жазыңыз	Напишите ответ	Write your answer
+returnText	Мәтінге оралу	Вернуться к тексту	Back to text
+nextActivity	Келесі белсенділік	Следующая активность	Next activity
+finishActivity	Алдымен осы белсенділікті аяқтаңыз.	Сначала завершите эту активность.	Finish this activity before continuing.
+showAnswers	Жауаптарды көрсету	Показать ответы	Show answers
+hideAnswers	Жауаптарды жасыру	Скрыть ответы	Hide answers
+studentPreview	Оқушы көрінісі	Вид ученика	Student preview
+finishPreview	Қарауды аяқтау	Закончить просмотр	Finish preview
+readingSize	Мәтін өлшемі	Размер текста	Reading size
+definition	Сөз мағынасы	Значение слова	Word meaning
+pronunciation	Айтылуын тыңдау	Послушать произношение	Hear pronunciation
+moreDefinitions	Қосымша мағыналар	Другие значения	More definitions
+explanationLanguage	Түсіндірме тілі	Язык объяснений	Explanation language
+playAudio	Аудионы ойнату	Воспроизвести аудио	Play audio
+pauseAudio	Кідірту	Пауза	Pause audio
+audioUnavailable	Қазақша дауыс қолжетімсіз. Мәтін транскриптін оқи аласыз.	Казахский голос недоступен. Можно прочитать транскрипт.	A Kazakh voice is unavailable. You can read the transcript.
+transcript	Транскрипт	Транскрипт	Transcript
+showTranscript	Транскриптті көрсету	Показать транскрипт	Show transcript
+flipCard	Карточканы аудару	Перевернуть карточку	Flip card
+learnWords	Сөздерді үйрену	Изучить слова	Learn words
+practice	Жаттығу	Практика	Practice
+storyHint	Таңдалған сөздерді пайдаланып, қысқа әңгіме жазыңыз.	Напишите короткую историю, используя выбранные слова.	Write a short story using the selected words.
+wordCount	Сөз саны	Количество слов	Word count
+wordsUsed	Қолданылған сөздер	Использованные слова	Words used
+wordleHint	Қазақ сөзін табыңыз. Дұрыс әріп жасыл, басқа орында тұрған әріп сары болып белгіленеді.	Угадайте казахское слово. Зелёный — верная буква на своём месте, жёлтый — на другом.	Guess the Kazakh word. Green is the right letter and position; yellow is another position.
+guess	Болжамды тексеру	Проверить слово	Check guess
+matchHint	Сөзді таңдап, оның аудармасын табыңыз.	Выберите слово, затем его перевод.	Choose a word, then its translation.
+searchHint	АЛМА, БАҚ және СУ сөздерін тордан табыңыз.	Найдите в сетке слова АЛМА, БАҚ и СУ.	Find АЛМА, БАҚ and СУ in the grid.
+leaderboard	Жетістік кестесі	Таблица лидеров	Leaderboard
+place	Орын	Место	Place
+time	Уақыт	Время	Time
+resultGreeting	Жарайсың, Аружан!	Отличная работа, Аружан!	Well done, Aruzhan!
+resultHint	Нәтиже сақталды. Жазбаша жауаптарды мұғалім тексереді.	Результат сохранён. Письменные ответы проверит учитель.	Your result is saved. Your teacher will review written answers.
+retry	Қайта орындау	Попробовать снова	Try again
+retryUnavailable	Мұғалімнің параметрлері бойынша жаңа талпыныс қолжетімсіз.	Новая попытка недоступна по настройкам учителя.	Another attempt is unavailable under the teacher’s settings.
+reviewAnswers	Жауаптарды қарау	Посмотреть ответы	Review answers
+returnAssignments	Тапсырмаларға оралу	К заданиям	Back to assignments
+feedback	Мұғалім пікірі	Комментарий учителя	Teacher feedback
+gradeResponse	Жауапты бағалау	Оценить ответ	Grade response
+sendFeedback	Бағаны сақтау	Сохранить оценку	Save grade
+submission	Тапсырылған жұмыс	Сданная работа	Submission
+submissions	Тапсырылған жұмыстар	Сданные работы	Submissions
+completion	Орындалуы	Выполнение	Completion
+averageScore	Орташа нәтиже	Средний результат	Average score
+activeStudents	Белсенді оқушылар	Активные ученики	Active students
+activeTeachers	Белсенді мұғалімдер	Активные учителя	Active teachers
+workAssigned	Берілген жұмыстар	Назначенные работы	Work assigned
+needsAttention	Назар аудару қажет	Требует внимания	Needs attention
+nextLesson	Келесі сабақ	Следующий урок	Next lesson
+prepareLesson	Сабақты дайындау	Подготовить урок	Prepare lesson
+teacherSubtitle	Сыныптарыңыз, сабақтарыңыз және оқушылардың келесі қадамы.	Ваши классы, уроки и следующий шаг учеников.	Your classes, lessons, and your students’ next step.
+studentSubtitle	Бүгін қазақ тілінде тағы бір қадам жаса.	Сделай ещё один шаг в изучении казахского.	Take another step in learning Kazakh today.
+principalSubtitle	Белсенділік, оқу нәтижелері және мұғалімдер жұмысы бір жерде.	Активность, результаты обучения и работа учителей в одном месте.	Participation, learning results, and teacher activity in one place.
+continueLearning	Оқуды жалғастыр	Продолжить обучение	Continue learning
+heroTeacher	Әр оқушыға түсінікті сабақ.	Урок, понятный каждому ученику.	A lesson every student can follow.
+heroTeacherHint	Дайын материалды таңдаңыз немесе өз сабағыңызды құрыңыз.	Выберите готовый материал или создайте свой урок.	Choose ready-made material or build your own lesson.
+heroStudent	Кішкентай қадам. Жаңа сөздер.	Маленький шаг. Новые слова.	A small step. New words.
+heroStudentHint	Алдымен сөздерді үйрен, содан кейін мәтіннен тауып көр.	Сначала изучи слова, затем найди их в тексте.	Learn the words, then find them in the text.
+classSubtitle	Сыныпты таңдаңыз, кодты бөлісіңіз және оқушылардың жұмысын қараңыз.	Выберите класс, поделитесь кодом и просмотрите работу учеников.	Choose a class, share its code, and see students’ work.
+librarySubtitle	Қазақша мәтіндер, грамматика және дайын сабақтар.	Казахские тексты, грамматика и готовые уроки.	Kazakh texts, grammar, and ready-made lessons.
+assignmentsSubtitle	Жұмыстарды дайындаңыз, тағайындаңыз және орындалуын бақылаңыз.	Готовьте, назначайте работы и следите за выполнением.	Prepare and assign work, then follow completion.
+lessonsSubtitle	Бір тақырыпты бірнеше белсенділік арқылы түсіндіріңіз.	Раскройте одну тему через несколько активностей.	Explore one topic through several activities.
+gradebookSubtitle	Нәтижелерді салыстырыңыз және әр оқушының жауаптарын ашыңыз.	Сравните результаты и откройте ответы каждого ученика.	Compare results and open each student’s answers.
+messagesSubtitle	Сыныппен және жеке оқушылармен оқу туралы сөйлесіңіз.	Обсуждайте обучение с классом и отдельными учениками.	Talk about learning with your class and individual students.
+reportsSubtitle	Таңдалған кезеңдегі оқу белсенділігі мен нәтижелер.	Учебная активность и результаты за выбранный период.	Learning activity and results for the selected period.
+teachersSubtitle	Мектеп мұғалімдерінің сыныптары мен белсенділігі.	Классы и активность учителей школы.	Your school’s teachers, classes, and participation.
+sendMessage	Хабарлама жіберу	Отправить сообщение	Send message
+messagePlaceholder	Хабарлама жазыңыз…	Напишите сообщение…	Write a message…
+messageSent	Хабарлама жіберілді	Сообщение отправлено	Message sent
+newMessage	Жаңа хабарлама	Новое сообщение	New message
+to	Кімге	Кому	To
+subject	Тақырып	Тема	Subject
+studentProgress	Оқушы үлгерімі	Прогресс ученика	Student progress
+recentWork	Соңғы жұмыстар	Последние работы	Recent work
+moduleUsage	Модульдерді пайдалану	Использование модулей	Module usage
+teacherActivity	Мұғалімдер белсенділігі	Активность учителей	Teacher activity
+schoolPerformance	Мектеп үлгерімі	Успеваемость школы	School performance
+engagement	Қатысу белсенділігі	Активность в приложении	App engagement
+appClicks	Қолданба әрекеттері	Действия в приложении	App interactions
+period	Кезең	Период	Period
+export	CSV жүктеу	Скачать CSV	Download CSV
+members	Қатысушылар	Участники	Members
+contacts	Байланыс деректері	Контакты	Contact details
+joinClass	Сыныпқа қосылу	Присоединиться к классу	Join class
+leaveClass	Сыныптан шығу	Покинуть класс	Leave class
+leaveHint	Қайта қосылу үшін сынып коды керек болады.	Чтобы вернуться, потребуется код класса.	You’ll need the class code to return.
+yourName	Атыңыз	Ваше имя	Your name
+interfaceLanguage	Интерфейс тілі	Язык интерфейса	Interface language
+script	Қазақша жазу	Казахское письмо	Kazakh script
+cyrillic	Кирилл	Кириллица	Cyrillic
+latin	Латын	Латиница	Latin
+account	Аккаунт	Аккаунт	Account
+signOut	Шығу	Выйти	Sign out
+signIn	Кіру	Войти	Sign in
+continueGoogle	Google арқылы кіру	Войти через Google	Continue with Google
+continueApple	Apple арқылы кіру	Войти через Apple	Continue with Apple
+continueYandex	Yandex арқылы кіру	Войти через Yandex	Continue with Yandex
+phone	Телефон нөмірі	Номер телефона	Phone number
+sendCode	Код жіберу	Отправить код	Send code
+verificationCode	Растау коды	Код подтверждения	Verification code
+verify	Растау	Подтвердить	Verify
+or	немесе	или	or
+demo	Демо ашу	Открыть демо	Open demo
+privacy	Құпиялылық	Конфиденциальность	Privacy
+agreement	Пайдаланушы келісімі	Пользовательское соглашение	User agreement
+roles	Рөлді таңдау	Выбор роли	Choose role
+reset	Демоны бастапқы күйге келтіру	Сбросить демо	Reset demo
+resetHint	Демодағы барлық өзгерістер жойылып, бастапқы деректер қалпына келеді.	Все изменения демо будут удалены, исходные данные восстановятся.	All demo changes will be removed and the sample data restored.
+required	Бұл өрісті толтырыңыз.	Заполните это поле.	Complete this field.
+invalidCode	Бұл кодпен сынып табылмады.	Класс с этим кодом не найден.	No class was found with this code.
+helpSubtitle	Сынып, сабақ және тапсырма арасындағы айырмашылықты түсініңіз.	Разберитесь в классах, уроках и заданиях.	Understand classes, lessons, and assignments.
+helpLesson	Сабақ бірнеше белсенділіктен тұрады. Алдымен сынып пен оқушыларды таңдаңыз, кейін материал қосыңыз және жариялаңыз.	Урок состоит из нескольких активностей. Выберите класс и учеников, добавьте материал и опубликуйте.	A lesson combines activities. Choose a class and students, add material, then publish.
+helpAssignment	Тапсырма бір материалға негізделеді. Материал, жаттығулар, мерзім және талпыныс параметрлерін таңдаңыз.	Задание основано на одном материале. Выберите материал, упражнения, срок и настройки попыток.	An assignment uses one material. Choose content, exercises, a deadline, and attempt settings.
+helpResults	Жауаптары бар жаттығулар автоматты тексеріледі. Ашық жауаптарды мұғалім бағалайды. Барлық талпыныстар сақталады.	Упражнения с правильными ответами проверяются автоматически. Открытые ответы оценивает учитель. Все попытки сохраняются.	Objective exercises are checked automatically. Teachers grade open responses. All attempts are kept.
+helpPrincipal	Директор мектеп көрсеткіштерін көреді. Сынып пен мұғалімге өтіп, тапсырылған жұмыстарды қарай алады.	Директор видит показатели школы, может открыть учителя, класс и сданные работы.	Principals view school reporting and drill down into teachers, classes, and submissions.
+helpStudent	Жаңа жұмыстарды ашып, материалды оқыңыз немесе тыңдаңыз. Жаттығуларды орындап, жауаптарды тапсырыңыз.	Откройте новую работу, прочитайте или прослушайте материал, выполните упражнения и отправьте ответы.	Open new work, read or listen to the material, complete exercises, then submit your answers.
+helpLate	Мұғалім рұқсат берсе, мерзімнен кейін тапсыруға болады. Мұндай жұмыс кеш тапсырылған деп белгіленеді.	Если учитель разрешил, работу можно сдать после срока. Она будет отмечена как поздняя.	If your teacher allows it, you can submit after the deadline. It will be marked late.
+helpStaff	OCR суреттен мәтін шығарады. Saira грамматика мен стиль түзетулерін жинап, тексереді.	OCR извлекает текст из изображений. Saira собирает и проверяет грамматические и стилистические исправления.	OCR extracts text from images. Saira collects and reviews grammar and style corrections.
+staffTools	Қызметкерлер құралдары	Инструменты сотрудников	Staff tools
+staffHint	Бұл аймақ мектеп рөлдерінен бөлек қызметкерлер жұмысын көрсетеді.	Эта область показывает работу сотрудников отдельно от школьных ролей.	This area shows staff workflows separately from school-role permissions.
+ocr	Суреттен мәтін	Распознавание текста	Image to text
+corrections	Түзетулер	Коррекции	Corrections
+crm	Мектептер және байланыстар	Школы и контакты	Schools & contacts
+collector	Жинаушы	Сборщик	Collector
+reviewer	Тексеруші	Проверяющий	Reviewer
+approver	Бекітуші	Утверждающий	Approver
+administrator	Әкімші	Администратор	Administrator
+queue	Кезек	Очередь	Queue
+approve	Бекіту	Утвердить	Approve
+reportIssue	Мәселені белгілеу	Сообщить о проблеме	Flag issue
+approved	Бекітілген	Утверждено	Approved
+flagged	Белгіленген	Отмечено	Flagged
+pending	Күтуде	Ожидает	Pending
+original	Бастапқы мәтін	Исходный текст	Original text
+correction	Түзету	Исправление	Correction
+customerStage	Мәртебе	Этап	Stage
+onboarding	Іске қосылуда	Подключение	Onboarding
+active	Белсенді	Активно	Active
+contactName	Байланыс тұлғасы	Контактное лицо	Contact person
+addContact	Байланыс қосу	Добавить контакт	Add contact
+staffRole	Қызметкер рөлі	Роль сотрудника	Staff role
+bonuses	Бонустар	Бонусы	Bonuses
+transactions	Транзакциялар	Транзакции	Transactions
+amount	Сома	Сумма	Amount
+status	Мәртебе	Статус	Status
+payment	Төлем	Платёж	Payment
+sourceReview	Мәтінді тексеру	Проверка текста	Text review
+sampleExtract	Үлгі мәтінді шығару	Извлечь пример текста	Extract sample text
+proposed	Ұсынылған мүмкіндік	Предлагаемая функция	Proposed feature
+sampleData	Үлгі деректер	Пример данных	Sample data
+noMatchingResults	Сәйкес нәтиже жоқ	Совпадений нет	No matching results
+notifications	Хабарландырулар	Уведомления	Notifications
+notificationHint	Тапсыру және бағалау туралы жаңалықтар.	Обновления о сдаче и оценках.	Updates about submissions and grades.
+selectMaterial	Материалды таңдау	Выбрать материал	Choose material
+chooseModule	Модульді таңдау	Выберите модуль	Choose module
+chooseWork	Жұмыс түрін таңдаңыз	Выберите вид работы	Choose your work
+lessonObjective	Сабақ мақсаты	Цель урока	Lesson objective
+lessonObjectiveText	Оқушылар табиғат туралы мәтінді түсініп, жаңа сөздерді сөйлемде қолданады.	Ученики понимают текст о природе и используют новые слова в предложениях.	Students understand a text about nature and use new words in sentences.
+planIntro	Кіріспе және тірек сөздер	Введение и ключевые слова	Introduction and vocabulary
+planMain	Негізгі материал және жаттығулар	Основной материал и упражнения	Core material and exercises
+planReflect	Қорытынды және кері байланыс	Итоги и обратная связь	Reflection and feedback
+roster	Оқушылар тізімі	Список учеников	Student roster
+joinHint	Мұғалімнен сынып кодын сұраңыз.	Попросите код класса у учителя.	Ask your teacher for the class code.
+noClass	Сыныпқа қосылыңыз	Присоединитесь к классу	Join a class
+notOpen	Бұл жұмыс әлі ашылған жоқ.	Эта работа ещё не открыта.	This work has not opened yet.
+selected	Таңдалды	Выбрано	Selected
+select	Таңдау	Выбрать	Select
+saveDraft	Жоба ретінде сақтау	Сохранить черновик	Save draft
+learnedWords	Үйренген сөздер	Изученные слова	Words learned
+nextStep	Келесі қадам	Следующий шаг	Next step
+practiceGrammar	Грамматиканы қайталау	Повторить грамматику	Practise grammar
+addWord	Сөз қосу	Добавить слово	Add word
+translation	Аударма	Перевод	Translation
+reportSaved	Есеп жүктелді	Отчёт скачан	Report downloaded
+memberHint	Мектепке тіркелген мұғалімдер мен оқушылар.	Учителя и ученики, подключённые к школе.	Teachers and students connected to the school.
+noQuestions	Жаттығу таңдаңыз	Выберите упражнение	Choose an exercise
+selectExerciseHint	Кемінде бір жаттығуды таңдаңыз.	Выберите хотя бы одно упражнение.	Choose at least one exercise.
+photo	Сурет	Изображение	Image
+imageHint	Суретті сипаттаңыз: табиғат, адамдар және олардың әрекеті.	Опишите изображение: природу, людей и их действия.	Describe the image: nature, people, and their actions.
+confirmSubmit	Жұмысты тапсыру керек пе?	Отправить работу?	Submit this work?
+confirmSubmitHint	Жауаптарыңыз осы талпынысқа сақталады.	Ответы будут сохранены в этой попытке.	Your answers will be saved for this attempt.
+newVersion	Жаңа нұсқа	Новая версия	New version
+versionHint	Алдыңғы тапсырылған жауаптар бұрынғы нұсқамен сақталады.	Предыдущие ответы сохранятся с прежней версией.	Existing submissions keep their original version.
+read	Оқу	Читать	Read
+listen	Тыңдау	Слушать	Listen
+activityCompleted	Белсенділік аяқталды	Активность завершена	Activity completed
+unlimited	Шектеусіз	Без ограничений	Unlimited
+uploadImage	Сурет жүктеу	Загрузить изображение	Upload image
+wrongFile	Бұл файл түрі қолдау таппайды.	Этот тип файла не поддерживается.	This file type is unsupported.
+extractHint	Сурет көрсетілді. Үлгі мәтінді шығарып, оны өңдей аласыз.	Изображение показано. Можно извлечь и отредактировать пример текста.	Image displayed. You can extract and edit sample text.
+markRead	Оқылды деп белгілеу	Отметить прочитанным	Mark as read
+noMessages	Әзірге хабарлама жоқ	Сообщений пока нет	No messages yet
+feedbackHint	Жауаптың мазмұны мен сөз қолдануына назар аударыңыз.	Оцените содержание ответа и использование слов.	Review the response’s meaning and vocabulary.
+chooseStudent	Оқушыны таңдаңыз	Выберите ученика	Choose student
+optional	Міндетті емес	Необязательно	Optional
+filter	Сүзгі	Фильтр	Filter
+activityHint	Осы бөлімнің мазмұны мен уақытын өңдеңіз.	Настройте содержание и время этого раздела.	Edit this activity’s content and timing.
+noPermission	Бұл рөлде бұл әрекет қолжетімсіз.	Это действие недоступно для этой роли.	This action is unavailable for this role.
+addSchool	Мектеп қосу	Добавить школу	Add school
+phoneHint	Демода растау коды: 123456	Код подтверждения в демо: 123456	Demo verification code: 123456
+welcome	Қазақ тілін бірге үйренейік.	Изучаем казахский вместе.	Learn Kazakh together.
+welcomeHint	Сабақтар, жаңа сөздер және мектептегі әр күнге арналған жаттығулар.	Уроки, новые слова и практика на каждый школьный день.	Lessons, new words, and practice for every school day.
+module	Оқу бағыты	Направление	Learning module
+date	Күні	Дата	Date
+results	Нәтижелер	Результаты	Results
+explanation	Түсіндірме	Объяснение	Explanation
+join	Қосылу	Присоединиться	Join
+code	Растау коды	Код подтверждения	Verification code
+copied	Код көшірілді	Код скопирован	Code copied
+deleteClass	Сыныпты жою	Удалить класс	Delete class
+deleteClassHint	Бос сыныпты жоюға болады. Оқушылар мен тапсырмалары бар сынып сақталады.	Можно удалить пустой класс. Класс с учениками и заданиями сохраняется.	You can delete an empty class. Classes with students or work are retained.
+classNotEmpty	Бұл сыныпта оқушылар немесе тапсырмалар бар.	В классе есть ученики или задания.	This class contains students or work.
+deleteWorkHint	Жұмыс тізімнен алынады. Бұрынғы жауаптар мен бағалар сақталады.	Работа будет удалена из списка. Ранее отправленные ответы и оценки сохранятся.	Remove work from the list. Existing submissions and scores are preserved.
+demoCode	Демо сынып кодтары: DT7A және DT5B.	Коды демо-классов: DT7A и DT5B.	Demo class codes: DT7A and DT5B.
+demoOTP	Демода растау коды: 123456.	Код подтверждения в демо: 123456.	Demo verification code: 123456.
+fileTooLarge	4 МБ-тан кіші файл таңдаңыз.	Выберите файл меньше 4 МБ.	Choose a file smaller than 4 MB.
+generated	Жаттығулар дайын. Оларды тексеріп, өңдеңіз.	Упражнения готовы. Проверьте и отредактируйте их.	Exercises are ready. Review and edit them.
+imported	Файл жүктелді.	Файл загружен.	File imported.
+importFailed	Файлды оқу мүмкін болмады. Мәтінді көшіріп енгізіңіз.	Не удалось прочитать файл. Вставьте текст вручную.	Could not read this file. Paste the text instead.
+kazakhInput	Жауапты қазақ кириллицасымен енгізіңіз.	Введите ответ казахской кириллицей.	Enter your answer in Kazakh Cyrillic.
+legalHint	Мұнда мектепке арналған құпиялық саясаты мен пайдалану шарттары көрсетіледі. Бұл үлгі мәтін.	Здесь будут политика конфиденциальности и условия использования для школы. Сейчас это образец.	School privacy and usage terms belong here. This is sample copy.
+sampleGeneration	Демо мәтін жасалды. Жарияламас бұрын мәтін мен сұрақтарды тексеріңіз.	Демо-текст создан. Проверьте текст и вопросы перед публикацией.	Sample text generated. Review the text and questions before publishing.
+sampleOCR	Демода үлгі мәтін алынды. Қателерін тексеріңіз.	В демо извлечен образец текста. Проверьте ошибки.	Sample text extracted for this demo. Review it for errors.
+tryAgain	Қайта тексеріңіз.	Попробуйте еще раз.	Try again.
+uploadAudio	Аудиофайл жүктеу	Загрузить аудиофайл	Upload audio
+flashcardEditHint	Сөздерді үтірмен бөліңіз. Сөзді қосу не алып тастау карточкалар мен сәйкестендіруді жаңартады.	Разделяйте слова запятыми. Добавление и удаление обновляет карточки и сопоставление.	Separate words with commas. Adding or removing words updates flashcards and matching.
+leaderboard	Сынып рейтингі	Рейтинг класса	Class leaderboard
+rank	Орын	Место	Rank
+reviewed	Тексерілген	Проверено	Reviewed
+tiles	Әріптерден сөз құрау	Составить слово	Build a word
+tilesHint	Әріптерді дұрыс ретпен таңдаңыз.	Выберите буквы в правильном порядке.	Select letters in the correct order.
+captcha	Сөзді тану	Распознать слово	Recognize a word
+captchaHint	Көрсетілген сөзді бос орынсыз енгізіңіз.	Введите показанное слово без пробелов.	Type the displayed word without spaces.
+clear	Тазалау	Очистить	Clear
+pastLines	Бұрынғы жолдар	История строк	Past lines
+reportedLines	Белгіленген жолдар	Отмеченные строки	Reported lines
+unusualLines	Ерекше жолдар	Необычные строки	Unusual lines
+suggestCorrection	Түзету ұсыну	Предложить исправление	Suggest a correction
+lines	Жол саны	Количество строк	Line count
+histogram	Жолдар статистикасы	Статистика строк	Line statistics
+wordBank	Сөздік қоры	Банк слов	Word bank
+word	Сөз	Слово	Word
+addWord	Сөз қосу	Добавить слово	Add word
+russianMeaning	Орысша мағынасы	Значение на русском	Russian meaning
+englishMeaning	Ағылшынша мағынасы	Значение на английском	English meaning
+example	Мысал сөйлем	Пример предложения	Example sentence
+addQuestion	Сұрақ қосу	Добавить вопрос	Add question

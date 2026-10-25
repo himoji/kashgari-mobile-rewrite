@@ -1,0 +1,4 @@
+type Mutation {
+  registerPushToken(token: String!, accountId: String!): Boolean!
+  removePushToken(token: String!, accountId: String!): Boolean!
+}

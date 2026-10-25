@@ -1,0 +1,131 @@
+type Query {
+  zhazylym(id: ID!): Zhazylym
+  zhazylymSubmission(id: ID!): ZhazylymSubmission
+
+  zhazylymAllComics: [ZhazylymComic!]!
+  zhazylymComic(id: ID!): ZhazylymComic
+}
+
+type Mutation {
+  createWordZhazylym(
+    classId: ID!
+    zhazylym: WordZhazylymInput!
+    lessonId: ID
+    index: Int
+  ): Zhazylym
+  createImageZhazylym(
+    classId: ID!
+    zhazylym: ImageZhazylymInput!
+    lessonId: ID
+    index: Int
+  ): ImageZhazylym
+  updateZhazylym(id: ID!, data: WordZhazylymUpdateInput!): Zhazylym
+  deleteZhazylym(id: ID!): ID
+  submitZhazylym(
+    zhazylymId: ID!
+    studentId: ID!
+    data: ZhazylymSubmissionInput!
+  ): ZhazylymSubmission
+  zhazylymGrade(submissionId: ID!, points: Int!): ZhazylymSubmission
+}
+
+interface Zhazylym {
+  id: ID!
+  type: ZhazylymType!
+  name: String!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  opensAt: Int!
+  minWords: Int!
+  submissions: [ZhazylymSubmission!]!
+  submission(studentId: ID!): ZhazylymSubmission
+}
+
+enum ZhazylymType {
+  word
+  image
+}
+
+type WordZhazylym implements Zhazylym {
+  id: ID!
+  type: ZhazylymType!
+  name: String!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  opensAt: Int!
+  words: [String!]!
+  minWords: Int!
+  submissions: [ZhazylymSubmission!]!
+  submission(studentId: ID!): ZhazylymSubmission
+}
+
+type ImageZhazylym implements Zhazylym {
+  id: ID!
+  type: ZhazylymType!
+  name: String!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  opensAt: Int!
+  imagesDownload: [String]!
+  imagesUpload: [String]!
+  minWords: Int!
+  words: [String!]!
+  submissions: [ZhazylymSubmission!]!
+  submission(studentId: ID!): ZhazylymSubmission
+}
+
+# image
+
+input WordZhazylymInput {
+  name: String!
+  minWords: Int
+  deadline: Int!
+  duration: Int
+  words: [String!]!
+  opensAt: Int!
+}
+
+input ImageZhazylymInput {
+  name: String!
+  deadline: Int!
+  duration: Int
+  minWords: Int
+  words: [String!]
+  imageNumber: Int
+  comicId: ID
+  opensAt: Int!
+}
+
+input WordZhazylymUpdateInput {
+  name: String
+  minWords: Int
+  deadline: Int
+  duration: Int
+  words: [String!]
+  opensAt: Int
+}
+
+type ZhazylymSubmission {
+  id: ID!
+  createdAt: Int!
+  student: Student!
+  assignment: Zhazylym!
+  text: String!
+  points: Int
+}
+
+input ZhazylymSubmissionInput {
+  text: String!
+  time: Int!
+}
+
+# comics
+
+type ZhazylymComic {
+  id: ID!
+  name: String!
+  imageUrls: [String]!
+}

@@ -1,0 +1,39 @@
+name: Publish Updates
+on:
+  push:
+    branches:
+      - updates
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run linter
+        run: bun run lint
+  publish-update:
+    name: Publish Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Create .env
+        run: jq -r '.build.production.env | to_entries | map(.key + "='\''" + .value + "'\''\n") | add' eas.json > .env
+      - name: Create google-services.json
+        run: echo ${{ secrets.GOOGLE_SERVICES_JSON }} | base64 -d > google-services.json
+      - name: Install dotenv
+        run: bun i -g dotenv-cli
+      - name: Publish update (android)
+        run: EXPO_TOKEN='${{ secrets.EXPO_TOKEN }}' dotenv -e .env -- bunx eoas@2.3.19 publish --branch main --platform android --nonInteractive
+      # the rewrite ships a new native runtime (Expo SDK 57), so iOS uses its own fingerprint again
+      - name: Publish update (ios)
+        run: EXPO_TOKEN='${{ secrets.EXPO_TOKEN }}' dotenv -e .env -- bunx eoas@2.3.19 publish --branch main --platform ios --nonInteractive

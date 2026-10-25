@@ -1,0 +1,139 @@
+type Query {
+  assignment(id: ID!): Assignment
+  definedWords(query: String!, limit: Int!): [String!]!
+}
+
+type Mutation {
+  createOqylymAssignment(
+    classId: ID!
+    assignment: OqylymAssignmentInput!
+    visible: Boolean! = true
+  ): OqylymAssignment
+  createTyndalymAssignment(
+    classId: ID!
+    assignment: TyndalymAssignmentInput!
+    visible: Boolean! = true
+  ): TyndalymAssignment
+  updateAssignment(assignmentId: ID!, data: AssignmentUpdateInput!): Assignment
+  deleteAssignment(id: ID!): ID
+
+  addFlashcard(data: FlashcardInput!): Boolean!
+  updateFlashcard(data: FlashcardUpdateInput!): Boolean!
+  deleteFlashcard(assignmentId: ID!, word: String!): Boolean!
+}
+
+type Flashcard {
+  word: String!
+  translationKazakh: String
+  translationRussian: String
+  translationEnglish: String
+  textKazakh: String
+}
+
+input FlashcardInput {
+  assignmentId: ID!
+  word: String!
+  translationKazakh: String
+  translationRussian: String
+  translationEnglish: String
+  textKazakh: String
+}
+
+input FlashcardUpdateInput {
+  assignmentId: ID!
+  word: String!
+  translationKazakh: String
+  translationRussian: String
+  translationEnglish: String
+  textKazakh: String
+}
+
+interface Assignment {
+  id: ID!
+  visible: Boolean!
+  type: AssignmentType!
+  name: String!
+  text: Text!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  games(studentId: ID): Games!
+  submissions: [Submission!]!
+  submission(studentId: ID!): Submission
+  hasFlashcards: Boolean!
+  flashcards: [Flashcard!]!
+}
+
+type OqylymAssignment implements Assignment {
+  id: ID!
+  visible: Boolean!
+  type: AssignmentType!
+  name: String!
+  text: OqylymText!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  games(studentId: ID): Games!
+  submissions: [Submission!]!
+  submission(studentId: ID!): Submission
+  hasFlashcards: Boolean!
+  flashcards: [Flashcard!]!
+}
+
+type TyndalymAssignment implements Assignment {
+  id: ID!
+  visible: Boolean!
+  type: AssignmentType!
+  name: String!
+  text: TyndalymText!
+  deadline: Int!
+  duration: Int
+  createdAt: Int!
+  games(studentId: ID): Games!
+  submissions: [Submission!]!
+  submission(studentId: ID!): Submission
+  flashcards: [Flashcard!]!
+  hasFlashcards: Boolean!
+  listenType: TyndalymListenType!
+}
+
+enum TyndalymListenType {
+  ALONE
+  WITH_CLASS
+}
+
+input OqylymAssignmentInput {
+  type: AssignmentType!
+  name: String!
+  textId: ID!
+  deadline: Int!
+  duration: Int
+  games: GamesInput!
+  hasFlashcards: Boolean! = false
+}
+
+input TyndalymAssignmentInput {
+  type: AssignmentType!
+  name: String!
+  textId: ID!
+  deadline: Int!
+  duration: Int
+  games: GamesInput!
+  hasFlashcards: Boolean! = false
+  listenType: TyndalymListenType!
+}
+
+input AssignmentUpdateInput {
+  type: AssignmentType
+  name: String
+  deadline: Int
+  visible: Boolean
+  duration: Int
+  updateDuration: Boolean!
+  games: GamesInput
+}
+
+enum AssignmentType {
+  HW
+  FO
+}

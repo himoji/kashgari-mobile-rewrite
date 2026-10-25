@@ -1,0 +1,3 @@
+type Query {
+  tfmcqHint(text: String!, question: String!, options: [String!]!): String
+}

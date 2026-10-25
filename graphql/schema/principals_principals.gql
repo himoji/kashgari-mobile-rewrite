@@ -1,0 +1,10 @@
+type Query {
+  principal(id: ID!): Principal
+}
+
+type Principal {
+  id: ID!
+  name: String!
+  account: Account!
+  school: School!
+}

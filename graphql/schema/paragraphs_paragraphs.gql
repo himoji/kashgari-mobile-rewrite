@@ -1,0 +1,15 @@
+interface Paragraph {
+  text: String!
+  image: String
+}
+
+type OqylymParagraph implements Paragraph {
+  text: String!
+  image: String
+}
+
+type TyndalymParagraph implements Paragraph {
+  text: String!
+  image: String
+  audioTimestamp: Float
+}

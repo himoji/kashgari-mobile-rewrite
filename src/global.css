@@ -1,0 +1,81 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "nativewind/theme";
+
+@source not "../**/*.md";
+
+/* Design tokens measured from the Donatien prototype (assets/app.css, computed styles). Change them here only. */
+@theme {
+  --color-primary: #3b86ff;
+  --color-primary-strong: #0a74ff;
+  --color-link: #1e7bff;
+  --color-primary-soft: #eaf3ff;
+  --color-tile: #edf5ff;
+  --color-track: #f1f6ff;
+  --color-success: #20996d;
+  --color-success-soft: #e8f6ef;
+  --color-attention: #ff7a1a;
+  --color-attention-soft: #fff0e4;
+  --color-warning: #755400;
+  --color-warning-soft: #fff8d6;
+  --color-danger: #d64848;
+  --color-danger-soft: #fff2f2;
+  --color-late: #a32626;
+  --color-ink: #242631;
+  --color-body: #5b5e6b;
+  --color-meta: #656874;
+  --color-muted: #697387;
+  --color-hint: #7e899b;
+  --color-subtle: #8490a3;
+  --color-line: #edf1f7;
+  --color-field: #dce3ee;
+  --color-canvas: #f6f8fc;
+  --color-surface: #ffffff;
+  --color-highlight: #fff2b8;
+
+  --font-body: Onest_400Regular;
+  --font-body-medium: Onest_500Medium;
+  --font-body-semibold: Onest_600SemiBold;
+  --font-body-bold: Onest_700Bold;
+  --font-reading: GolosText_400Regular;
+  --font-reading-medium: GolosText_500Medium;
+  --font-display: KZDusha;
+  --font-display-latin: KZBip;
+
+  --radius-control: 12px;
+  --radius-tile: 10px;
+  --radius-card: 17px;
+  --radius-sheet: 24px;
+
+  --shadow-panel: 0 2px 6px rgba(36, 38, 49, 0.07);
+  --shadow-card: 0 3px 14px rgba(36, 38, 49, 0.055);
+  --shadow-item: 0 3px 12px rgba(36, 38, 49, 0.055), 0 1px 2px rgba(36, 38, 49, 0.02);
+  --shadow-pill: 0 1px 4px rgba(36, 38, 49, 0.07);
+  --shadow-blue: 0 4px 14px rgba(59, 134, 255, 0.094);
+  --shadow-button: 0 3px 12px rgba(52, 125, 233, 0.11);
+  --shadow-dock: 0 2px 4px rgba(0, 0, 0, 0.07);
+  --shadow-glass: 0 2px 8px rgba(199, 108, 23, 0.07);
+}
+
+/* The diagonal light sweep on every blue surface (buttons, progress cards, active pills). */
+@utility sheen {
+  background-image: linear-gradient(112deg, transparent 8%, rgba(255, 255, 255, 0.19) 29%, rgba(255, 255, 255, 0.04) 49%, transparent 67%);
+}
+
+/* Orange workspace behind every tab: fades to white under the hero. */
+@utility bg-workspace {
+  background-image: linear-gradient(180deg, #ff8d22 0px, #ffbf83 130px, #ffffff 284px);
+}
+
+@utility bg-dock {
+  background-image: linear-gradient(107deg, rgba(255, 255, 255, 0.85) 9.66%, rgba(198, 232, 255, 0.78) 154.53%);
+}
+
+@utility bg-dock-fade {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 60%);
+}
+
+@utility bg-login {
+  background-image: radial-gradient(ellipse at 5% 0%, #fff0df 0, transparent 48%), radial-gradient(ellipse at 100% 100%, #e8f3ff 0, transparent 45%);
+}

@@ -1,0 +1,33 @@
+{
+  "title": "Отчёты",
+  "periods": {
+    "week": "Эта неделя",
+    "month": "Этот месяц",
+    "quarter": "Эта четверть",
+    "allTime": "Всё время"
+  },
+  "period": "Период",
+  "class": "Класс",
+  "allClasses": "Все классы",
+  "activeStudents": "Активные ученики",
+  "workAssigned": "Назначенные работы",
+  "averageScore": "Средний результат",
+  "submissions": "Сданные работы",
+  "moduleUsage": "Использование модулей",
+  "modules": {
+    "reading": "Чтение",
+    "listening": "Аудирование",
+    "grammar": "Грамматика",
+    "game": "Игры",
+    "writing": "Письмо"
+  },
+  "schoolPerformance": "Успеваемость школы",
+  "engagement": "Активность в приложении",
+  "appClicks": "Действия в приложении",
+  "appClicksHint": "Сколько раз ученики нажимали на слова.",
+  "members": "Участники",
+  "students": "Ученики",
+  "teachers": "Учителя",
+  "memberHint": "Учителя и ученики, подключённые к школе.",
+  "back": "Школа"
+}

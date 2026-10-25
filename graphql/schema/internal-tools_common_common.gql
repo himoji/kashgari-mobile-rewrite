@@ -1,0 +1,51 @@
+type Query {
+  adminById(id: ID!): Admin
+  adminByAccount(accountId: ID!): Admin
+  bonusThresholds(start: Int!, end: Int!): [BonusThreshold!]!
+  correctorBonusData(start: Int!, end: Int!): [CorrectorBonusDay!]!
+}
+
+type Mutation {
+  resetBalance(accountId: ID!): Boolean!
+  setBonusThreshold(
+    date: Int!
+    bonusPercent: Int!
+    ocr: Int
+    gek: Int
+    flex: Float
+    flexName: String
+  ): BonusThreshold!
+  copyThresholdFromPrevDay(date: Int!): BonusThreshold
+  deleteBonusThreshold(date: Int!): Boolean!
+  setFlexAmount(accountId: ID!, date: Int!, amount: Float!): Boolean!
+  setBonusForAll(date: Int!, amount: Float!): Boolean!
+  resetPayment(accountId: ID!, date: Int!): Boolean!
+}
+
+type Admin {
+  id: ID!
+}
+
+type BonusThreshold {
+  id: ID!
+  date: Int!
+  ocr: Int
+  gek: Int
+  flex: Float
+  bonusPercent: Int!
+  flexName: String!
+}
+
+type CorrectorBonusDay {
+  accountId: ID!
+  email: String!
+  date: Int!
+  ocrMoney: Float!
+  ocrCount: Int!
+  gekMoney: Float!
+  gekCount: Int!
+  flexAmount: Float!
+  bonusAmount: Float!
+  role: String!
+  isReset: Boolean!
+}

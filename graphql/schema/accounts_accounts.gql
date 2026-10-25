@@ -1,0 +1,67 @@
+type Query {
+  account(id: ID): Account
+}
+
+type Mutation {
+  deleteAccount(id: ID!): ID!
+  updateLanguage(id: ID!, language: Language!): Boolean!
+}
+
+type Account {
+  id: ID!
+  email: String!
+  studentProfile: Student @deprecated(reason: "Use 'studentProfiles'")
+  studentProfiles: [Student!]!
+  teacherProfile: Teacher @deprecated(reason: "Use 'teacherProfiles'")
+  teacherProfiles: [Teacher!]!
+  principalProfiles: [Principal!]!
+  parentProfile: Parent
+  wordValuesByLetter(
+    letter: String!
+    needAdjacent: Boolean! = false
+  ): [WordValueLetterPage!]!
+  wordValuesByLevel(
+    level: Int!
+    wordsPerPage: Int! = 50
+    page: Int! = 1
+  ): WordValueLevelPage!
+  streak: Int!
+  oqylymWordValueChange(start: Int, end: Int): Float!
+  tyndalymWordValueChange(start: Int, end: Int): Float!
+  oynaWordValueChange(start: Int, end: Int): Float!
+  wordValueGraph(period: GraphPeriod!): Graph!
+  bestProgressedWords(start: Int, end: Int, first: Int! = 20): [WordProgress!]!
+  languageLevel: Level!
+  languageContext: Language!
+  internalBalance: Float
+}
+
+enum Language {
+  KZ
+  RU
+  EN
+}
+
+type WordProgress {
+  word: String!
+  progress: Float!
+}
+
+enum GraphPeriod {
+  days
+  weeks
+  months
+  seasons
+  years
+  all
+}
+
+type Point {
+  label: String!
+  y: Float!
+}
+
+type Graph {
+  points: [Point!]!
+  period: GraphPeriod!
+}

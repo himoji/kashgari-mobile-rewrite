@@ -1,0 +1,14 @@
+type RankingEntry {
+  position: RankPosition!
+  acornAmount: Int!
+  account: Account!
+}
+
+type RankPosition {
+  startPos: Int!
+  endPos: Int!
+}
+
+type Query {
+  rankTop(first: Int! = 50): [RankingEntry!]!
+}

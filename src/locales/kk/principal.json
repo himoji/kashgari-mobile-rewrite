@@ -1,0 +1,18 @@
+{
+  "hello": "Сәлем, {{name}}!",
+  "greeting": "Мектебіңіздегі қазақ тілі",
+  "school": "Мектеп",
+  "schoolTitle": "Мектеп",
+  "viewAll": "Барлығын көру",
+  "open": "Ашу",
+  "students": "Оқушылар",
+  "teachers": "Мұғалімдер",
+  "classes": "Сыныптар",
+  "teacher": "Мұғалім",
+  "workAssigned": "Берілген жұмыстар",
+  "teacherActivity": "Мұғалімдер белсенділігі",
+  "active": "Белсенді",
+  "inactive": "Белсенді емес",
+  "noClasses": "Сынып жоқ",
+  "noTeachers": "Әзірге мұғалім жоқ"
+}

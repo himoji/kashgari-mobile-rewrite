@@ -1,0 +1,67 @@
+type Query {
+  statsPoints(filters: [StatsFilter!]!): [StatsPointsResult!]!
+  statsModules(filters: [StatsFilter!]!): [StatsModulesResult!]!
+  statsMembers(filters: [StatsFilter!]!): [StatsMembersResult!]!
+  statsClicks(filters: [StatsFilter!]!): [StatsClicksResult!]!
+}
+
+input StatsFilter {
+  before: Int
+  after: Int
+  schoolId: ID
+  teacherId: ID
+  classId: ID
+  classGrade: Int
+}
+
+type StatsPointsResult {
+  points: Int!
+  maxPoints: Int!
+}
+
+type StatsModulesResult {
+  total: Int!
+  oqylym: Int!
+  tyndalym: Int!
+  oyna: StatsModulesOynaResult!
+}
+
+type StatsModulesOynaResult {
+  total: Int!
+  miniStory: Int!
+  wordle: Int!
+  quizlet: Int!
+  wordGame: Int!
+}
+
+type StatsMembersResult {
+  principals: Int!
+  teachers: Int!
+  students: Int!
+}
+
+type StatsClicksResult {
+  clicks: Int!
+}
+
+enum Module {
+  OQYLYM
+  TYNDALYM
+  OYNA
+  DURYS
+}
+
+union ModuleSubmission =
+  | Submission
+  | OynaSubmissionMiniStory
+  | OynaSubmissionWordle
+  | OynaSubmissionQuizlet
+  | OynaSubmissionWordGame
+  | DurysSubmission
+
+type ModuleStats {
+  module: Module!
+  numberOfAssignments(start: Int, end: Int): Int!
+  submissions(start: Int, end: Int, onlyUnsubmitted: Boolean! = false): [ModuleSubmission!]!
+  star: Boolean!
+}

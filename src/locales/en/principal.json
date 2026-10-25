@@ -1,0 +1,18 @@
+{
+  "hello": "Hello, {{name}}!",
+  "greeting": "Kazakh at your school",
+  "school": "School",
+  "schoolTitle": "School",
+  "viewAll": "View all",
+  "open": "Open",
+  "students": "Students",
+  "teachers": "Teachers",
+  "classes": "Classes",
+  "teacher": "Teacher",
+  "workAssigned": "Work assigned",
+  "teacherActivity": "Teacher activity",
+  "active": "Active",
+  "inactive": "Inactive",
+  "noClasses": "No classes",
+  "noTeachers": "No teachers yet"
+}

@@ -1,0 +1,397 @@
+type generatedWords {
+  word: String!
+}
+
+type Query {
+  miniStorySearchWords(query: String!, limit: Int!): [String!]!
+  miniStoryLastTextsWords(classId: ID!): [String!]!
+  miniStoryGame(id: ID!): OynaGameMiniStory
+  miniStorySubmission(id: ID!): OynaSubmissionMiniStory
+
+  randomWordleWords(words: [String!]! = [], count: Int! = 1): [generatedWords]
+  randomMiniStoryWords(
+    words: [String!]! = []
+    count: Int! = 1
+  ): [generatedWords]
+  randomQuizletWords(words: [String!]! = [], count: Int! = 1): [generatedWords]
+
+  wordleSearchWords(query: String!, limit: Int!): [String!]!
+  wordleLastTextsWords(classId: ID!): [String!]!
+  wordleCheckWord(word: String!): Boolean!
+  wordleGame(id: ID!): OynaGameWordle
+  wordleSubmission(id: ID!): OynaSubmissionWordle
+
+  quizletSearchWords(query: String!, limit: Int!): [OynaGameQuizletWord!]!
+  quizletLastTextsWords(classId: ID!): [OynaGameQuizletWord!]!
+  quizletGame(id: ID!): OynaGameQuizlet
+  quizletSubmission(id: ID!): OynaSubmissionQuizlet
+
+  wordGameSearchWords(query: String!, limit: Int!): [OynaGameWordGameWord!]!
+  wordGameSearchTopics(query: String!, limit: Int!): [Topic!]!
+  wordGameTopicWords(topic: String!): [OynaGameWordGameWord!]!
+  wordGameCheckWord(topic: String!, word: String!): Boolean!
+  wordGameGame(id: ID!): OynaGameWordGame
+  wordGameSubmission(id: ID!): OynaSubmissionWordGame
+  wordGameTopicRecommendations(classId: ID!): [Topic!]!
+  wordGameDefaultTopic(classId: String!): String
+}
+
+type Mutation {
+  miniStoryCreate(
+    classId: ID!
+    data: OynaGameMiniStoryInput!
+    lessonId: ID
+    index: Int
+  ): OynaGameMiniStory
+  miniStoryUpdate(gameId: ID!, data: OynaGameUpdateInput!): OynaGameMiniStory
+  miniStorySubmit(
+    gameId: ID!
+    studentId: ID!
+    data: OynaSubmissionMiniStoryInput!
+  ): OynaSubmissionMiniStory
+  miniStoryGrade(submissionId: ID!, points: Int!): OynaSubmissionMiniStory
+  miniStoryDelete(id: ID!): Boolean
+
+  wordleCreate(
+    classId: ID!
+    data: OynaGameWordleInput!
+    lessonId: ID
+    index: Int
+  ): OynaGameWordle
+  wordleUpdate(gameId: ID!, data: OynaGameUpdateInput!): OynaGameWordle
+  wordleSubmit(
+    gameId: ID!
+    studentId: ID!
+    data: OynaSubmissionWordleInput!
+  ): OynaSubmissionWordle
+  wordleDelete(id: ID!): Boolean
+
+  quizletCreate(
+    classId: ID!
+    data: OynaGameQuizletInput!
+    lessonId: ID
+    index: Int
+  ): OynaGameQuizlet
+  quizletUpdate(gameId: ID!, data: OynaGameUpdateInput!): OynaGameQuizlet
+  quizletSubmit(
+    gameId: ID!
+    studentId: ID!
+    data: OynaSubmissionQuizletInput!
+  ): OynaSubmissionQuizlet
+  quizletDelete(id: ID!): Boolean
+
+  wordGameCreate(
+    classId: ID!
+    data: OynaGameWordGameInput!
+    lessonId: ID
+    index: Int
+  ): OynaGameWordGame
+  wordGameSubmit(
+    gameId: ID!
+    studentId: ID!
+    data: OynaSubmissionWordGameInput!
+  ): OynaSubmissionWordGame
+  wordGameCaptchaCloudSubmit(
+    gameId: ID!
+    studentId: ID!
+    data: WordGameCaptchaCloudInput!
+  ): WordGameCaptchaCloudResult
+  wordGameDelete(id: ID!): Boolean
+}
+
+interface OynaGame {
+  id: ID!
+  name: String!
+  # section: Section!
+  duration: Int!
+  maxPoints: Int!
+  createdAt: Int!
+  submissions: [OynaSubmission!]!
+  submission(studentId: ID!): OynaSubmission
+  oynaActivity: OynaActivity
+}
+
+interface OynaSubmission {
+  id: ID!
+  time: Int!
+  points: Int
+  createdAt: Int!
+  game: OynaGame!
+  student: Student!
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+}
+
+### MINI STORIES ###
+type OynaGameMiniStory implements OynaGame {
+  id: ID!
+  name: String!
+  section: Section!
+  duration: Int!
+  maxPoints: Int!
+  createdAt: Int!
+  words: [String!]!
+  submissions: [OynaSubmissionMiniStory!]!
+  submission(studentId: ID!): OynaSubmissionMiniStory
+  oynaActivity: OynaActivity
+}
+
+input OynaGameMiniStoryInput {
+  duration: Int!
+  words: [String!]!
+  section: SectionInput
+}
+
+input OynaGameUpdateInput {
+  duration: Int
+  wordsToAdd: [String!]!
+  wordsToRemove: [String!]!
+}
+
+type OynaSubmissionMiniStory implements OynaSubmission {
+  id: ID!
+  time: Int!
+  points: Int
+  createdAt: Int!
+  text: String!
+  game: OynaGameMiniStory!
+  student: Student!
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+}
+
+input OynaSubmissionMiniStoryInput {
+  time: Int!
+  text: String!
+}
+
+### WORDLE ###
+type OynaGameWordle implements OynaGame {
+  id: ID!
+  name: String!
+  section: Section!
+  duration: Int!
+  maxPoints: Int!
+  createdAt: Int!
+  words: [String!]!
+  submissions: [OynaSubmissionWordle!]!
+  submission(studentId: ID!): OynaSubmissionWordle
+  oynaActivity: OynaActivity
+}
+
+input OynaGameWordleInput {
+  duration: Int!
+  words: [String!]!
+  section: SectionInput
+}
+
+type OynaSubmissionWordle implements OynaSubmission {
+  id: ID!
+  time: Int!
+  points: Int!
+  createdAt: Int!
+  guesses: [[String!]!]!
+  game: OynaGameWordle!
+  student: Student!
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+  # generateRandomWords: [OynaGameQuizletWord]
+}
+
+input OynaSubmissionWordleInput {
+  time: Int!
+  guesses: [[String!]!]!
+}
+
+### QUIZLET ###
+type OynaGameQuizlet implements OynaGame {
+  id: ID!
+  name: String!
+  section: Section!
+  duration: Int!
+  maxPoints: Int!
+  createdAt: Int!
+  type: OynaGameQuizletType!
+  dataType: OynaGameQuizletDataType!
+  boards: [[OynaGameQuizletWord]!]!
+  submissions: [OynaSubmissionQuizlet!]!
+  submission(studentId: ID!): OynaSubmissionQuizlet
+  oynaActivity: OynaActivity
+}
+
+type OynaGameQuizletWord {
+  word: String!
+  translation: String
+  imageUrl(size: ImageSize! = W1024): String
+}
+
+enum OynaGameQuizletType {
+  OPEN
+  CLOSED
+}
+
+enum OynaGameQuizletDataType {
+  IMAGE
+  TRANSLATION
+}
+
+input OynaGameQuizletInput {
+  duration: Int!
+  type: OynaGameQuizletType!
+  dataType: OynaGameQuizletDataType!
+  words: [String!]!
+  section: SectionInput
+}
+
+type OynaSubmissionQuizlet implements OynaSubmission {
+  id: ID!
+  time: Int!
+  points: Int!
+  createdAt: Int!
+  guessed: [[String!]!]!
+  game: OynaGameQuizlet!
+  student: Student!
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+  # generateRandomWords: [OynaGameQuizletWord]
+}
+
+input OynaSubmissionQuizletInput {
+  time: Int!
+  guessed: [[String!]!]!
+}
+
+input SectionInput {
+  grade: Int!
+  section: Int!
+}
+
+### WORD GAME ###
+type OynaGameWordGame implements OynaGame {
+  id: ID!
+  name: String!
+  topic: Topic!
+  topicName: String
+  duration: Int!
+  maxPoints: Int!
+  createdAt: Int!
+  words: [OynaGameWordGameWord!]!
+  onScreenNum: Int!
+  recognize: WordGameRecognize!
+  drill: WordGameDrill!
+  submissions: [OynaSubmissionWordGame!]!
+  submission(studentId: ID!): OynaSubmissionWordGame
+  oynaActivity: OynaActivity
+}
+
+type OynaGameWordGameWord {
+  word: String!
+  translation: String
+  imageUrl(size: ImageSize! = W1024): String
+}
+
+type WordGameRecognize {
+  shuffle: GameWordShuffle
+  complete: GameWordComplete
+  tiles: GameTiles
+  grid: GameWordGrid
+}
+
+type WordGameDrill {
+  mcq: [WordGameMCQQuestion!]
+  match: [WordGameMatchQuestion!]
+  captcha(studentId: ID!, restart: Boolean! = false): WordGameCaptcha
+}
+
+type WordGameCaptcha {
+  clouds: [WordGameCaptchaCloud!]!
+}
+
+type GameWordComplete {
+  pairs: [GameWordCompletePair!]!
+}
+
+type GameWordCompletePair {
+  word: String!
+  unfinished: String!
+  letters: String!
+}
+
+type GameTiles {
+  tiles: [GameTile!]!
+}
+
+type GameTile {
+  word: String!
+  correct: Boolean!
+}
+
+input OynaGameWordGameInput {
+  duration: Int!
+  topic: String!
+  words: [String!]!
+}
+
+type OynaSubmissionWordGame implements OynaSubmission {
+  id: ID!
+  time: Int!
+  points: Int
+  createdAt: Int!
+  game: OynaGameWordGame!
+  student: Student!
+  mcq: [WordGameMCQQuestionSubmission!]!
+  match: [WordGameMatchQuestionSubmission!]!
+  captcha: WordGameCaptchaSubmission!
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+}
+
+type WordGameMCQQuestion {
+  options: [OynaGameWordGameWord!]!
+}
+
+type WordGameMatchQuestion {
+  word: String!
+  translation: String!
+}
+
+type WordGameCaptchaCloud {
+  word: String!
+}
+
+type WordGameMCQQuestionSubmission {
+  question: WordGameMCQQuestion!
+  answer: String
+}
+
+type WordGameMatchQuestionSubmission {
+  question: WordGameMatchQuestion!
+  answer: String
+}
+
+type WordGameCaptchaSubmission {
+  correctWords: [String!]!
+  studentWords: [String!]!
+}
+
+type WordGameCaptchaCloudResult {
+  correct: Boolean!
+  newCloud: WordGameCaptchaCloud
+  left: Int!
+}
+
+input OynaSubmissionWordGameInput {
+  time: Int
+  mcq: [WordGameMCQQuestionInput!]
+  match: [WordGameMatchQuestionInput!]
+  # captcha
+}
+
+input WordGameMCQQuestionInput {
+  answer: String!
+  studentAnswer: String!
+}
+
+input WordGameMatchQuestionInput {
+  word: String!
+  translation: String!
+}
+
+input WordGameCaptchaCloudInput {
+  word: String!
+}

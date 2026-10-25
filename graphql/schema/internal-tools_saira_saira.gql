@@ -1,0 +1,144 @@
+type Query {
+  internalSairaErrorTags: [String!]!
+  internalSairaStylisticTags: [String!]!
+
+  internalSairaTagStats(start: Int, end: Int): [InternalSairaTagStats!]!
+
+  internalSairaSuspiciousSentences(
+    percentile: Float!
+    start: Int
+    end: Int
+  ): [InternalSairaSentence!]!
+  internalSairaReportedSentences(
+    start: Int
+    end: Int
+  ): [InternalSairaSentence!]!
+
+  internalSairaCorrectors: [InternalSairaCorrector!]!
+  internalSairaCorrector(id: ID!): InternalSairaCorrector
+  internalSairaCorrectorByAccount(accountId: ID!): InternalSairaCorrector
+
+  internalSairaReviewers: [InternalSairaReviewer!]!
+  internalSairaReviewer(id: ID!): InternalSairaReviewer
+  internalSairaReviewerByAccount(accountId: ID!): InternalSairaReviewer
+
+  internalSairaGenerateCorrectionSteps(
+    sentenceId: ID!
+    correction: String!
+  ): [InternalSairaCorrectionStep!]
+
+  sairaGetPages(pageNumber: Int!): [Images!]!
+
+  internalSairaTransactionAggregations(start: Int, end: Int): [InternalSairaTransactionAggregation!]!
+  internalSairaTransactionsByCorrector(correctorId: ID!, start: Int, end: Int): [InternalSairaTransactionDetail!]!
+
+  internalSairaSentenceCounts: InternalSairaSentenceCountsType!
+}
+
+type Mutation {
+  internalSairaSubmitCorrection(
+    sentenceId: ID!
+    correctionSteps: InternalSairaCorrectionStepsInput!
+    correctionTime: Int!
+  ): InternalSairaCorrectionResult
+  internalSairaReviewCorrection(
+    sentenceId: ID!
+    correctionSteps: InternalSairaCorrectionStepsInput
+  ): Boolean!
+  internalSairaReportSentence(id: ID!): Boolean!
+  approverFeedback(
+    imageId: String!
+    approve: Boolean!
+    accountId: String!
+  ): Boolean!
+}
+
+type InternalSairaCorrector {
+  id: ID!
+  email: String!
+  currentText: InternalSairaText
+  moneyMade(start: Int, end: Int): Float!
+  sentencesCorrected(start: Int, end: Int): Int!
+}
+
+type InternalSairaReviewer {
+  id: ID!
+  email: String!
+  currentText: InternalSairaText
+  sentencesReviewed(start: Int, end: Int): Int!
+  textsLeft: Int!
+}
+
+type InternalSairaText {
+  id: ID!
+  sentences: [InternalSairaSentence!]!
+  corrector: InternalSairaCorrector
+  reviewer: InternalSairaReviewer
+}
+
+type InternalSairaSentence {
+  id: ID!
+  text: InternalSairaText!
+  sentence: String!
+  correctSentence: String
+  correctionSteps: InternalSairaCorrectionSteps
+  correctionTime: Int
+  correctedAt: Int
+  reviewed: Boolean!
+  reviewedAt: Int
+  reported: Boolean!
+  reportedAt: Int
+}
+
+type InternalSairaCorrectionSteps {
+  errorCorrections: [InternalSairaCorrectionStep!]!
+  stylisticCorrections: [InternalSairaCorrectionStep!]!
+}
+
+type InternalSairaCorrectionStep {
+  correction: String!
+  tag: String!
+}
+
+input InternalSairaCorrectionStepsInput {
+  errorCorrections: [InternalSairaCorrectionStepInput!]!
+  stylisticCorrections: [InternalSairaCorrectionStepInput!]!
+}
+
+input InternalSairaCorrectionStepInput {
+  correction: String!
+  tag: String!
+}
+
+type InternalSairaCorrectionResult {
+  delta: Float!
+  newBalance: Float!
+}
+
+type InternalSairaTagStats {
+  tag: String!
+  generated: Int!
+  submitted: Int!
+  added: Int!
+  removed: Int!
+}
+
+type InternalSairaTransactionAggregation {
+  correctorId: ID!
+  email: String!
+  totalDelta: Float!
+  transactionCount: Int!
+}
+
+type InternalSairaSentenceCountsType {
+  total: Int!
+  corrected: Int!
+  notcorrected: Int!
+}
+
+type InternalSairaTransactionDetail {
+  id: ID!
+  delta: Float!
+  createdAt: Int!
+  sentenceId: ID!
+}

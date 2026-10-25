@@ -1,0 +1,23 @@
+type Query {
+  # physicalActivitiesAll: [PhysicalActivity!]!
+  physicalActivity(id: ID!): PhysicalActivity
+}
+
+type Mutation {
+  physicalActivityCreate(data: PhysicalActivityInput!): PhysicalActivity
+}
+
+type PhysicalActivity {
+  id: String!
+  title: String
+  description: String
+  estTime: Int!
+}
+
+input PhysicalActivityInput {
+  lessonId: ID!
+  index: Int!
+  title: String
+  description: String
+  estTime: Int!
+}

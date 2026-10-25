@@ -1,0 +1,23 @@
+type Query {
+  sairaCorrections(sentences: [String!]!): [SairaCorrections]!
+}
+
+type Images {
+  image: String!
+  image_id: String!
+}
+
+type SairaCorrections {
+  grammaticalErrors: [SairaGrammaticalError!]!
+  stylisticImprovement: SairaStylisticImprovement
+}
+
+type SairaGrammaticalError {
+  correctedSentence: String!
+  errorTag: String!
+}
+
+type SairaStylisticImprovement {
+  improvedSentence: String!
+  improvementDescription: String!
+}

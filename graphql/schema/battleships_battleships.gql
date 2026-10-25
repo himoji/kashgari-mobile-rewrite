@@ -1,0 +1,131 @@
+type Query {
+  battleshipGame(id: ID!): BattleshipGame
+  battleshipRandomArrangement(
+    mapSize: Int!
+    shipSizes: [Int!]!
+    words: [String!]!
+  ): [Ship!]
+  battleshipWordsByTopic(topic: String!): [String!]!
+}
+
+type Mutation {
+  battleshipCreate(studentId: ID!, words: [String!]!): BattleshipGame
+  battleshipCreateInLesson(
+    lessonId: ID!
+    index: Int!
+    words: [String!]!
+  ): BattleshipGame
+  battleshipFixArrangement(arrangementInput: ArrangementInput!): Boolean!
+  battleshipShoot(gameId: ID!, row: Int!, col: Int!): [BattleshipEvent!]
+  # battleshipUlt(gameId: ID!, letter: String!): [BattleshipEvent!]
+  battleshipAnswerQuestion(
+    gameId: ID!
+    word: String!
+    answer: String!
+  ): BattleshipAnswerEvent
+}
+
+enum MoveType {
+  SHOOT
+  ULT
+}
+
+enum ResultType {
+  MISS
+  HIT
+  SINK
+}
+
+type BattleshipEvent {
+  gameId: ID!
+  moveType: MoveType!
+  resultType: ResultType!
+  isPlayer1: Boolean!
+  status: BattleshipGameStatus!
+  miss: [[Int!]!]!
+  hit: [[Int!]!]!
+  sank: [Ship!]!
+  questions: [BattleshipQuestion!]!
+  pov: [[String!]!]!
+}
+
+type BattleshipAnswerEvent {
+  answer: BattleshipAnswer!
+  computerEvents: [BattleshipEvent!]!
+}
+
+type BattleshipGame {
+  id: ID!
+  mapSize: Int!
+  shipSizes: [Int!]!
+  player1: BattleshipPlayer!
+  player2: BattleshipPlayer!
+  words1: [String!]!
+  words2: [String!]!
+  pov1: [[String!]!]!
+  pov2: [[String!]!]!
+  ulted1: String
+  ulted2: String
+  status: BattleshipGameStatus!
+  currentMove: Int! # 1-indexed
+  ultInfo: UltInfo!
+  newQuestions: [BattleshipQuestion!]! # array because ult might sink multiple ships
+}
+
+type Ship {
+  size: Int!
+  word: String!
+  row: Int!
+  col: Int!
+  direction: ShipDirection!
+}
+
+enum ShipDirection {
+  HORIZONTAL
+  VERTICAL
+}
+
+type BattleshipPlayer {
+  game: BattleshipGame!
+  student: Student # null for vs computer
+  arrangement: [Ship!]!
+}
+
+input ArrangementInput {
+  gameId: ID!
+  arrangement: [ShipInput!]!
+}
+
+input ShipInput {
+  size: Int!
+  word: String!
+  row: Int! # 1-indexed
+  col: Int! # 1-indexed
+  direction: ShipDirection!
+}
+
+enum BattleshipGameStatus {
+  NOT_STARTED
+  PLAYER1_MOVE
+  PLAYER2_MOVE
+  PLAYER1_QUESTION
+  PLAYER2_QUESTION
+  FINISHED
+}
+
+type BattleshipQuestion {
+  word: String!
+  question: String!
+  options: [String!]!
+  answer: BattleshipAnswer
+}
+
+type BattleshipAnswer {
+  playerAnswer: String!
+  correctAnswer: String!
+}
+
+type UltInfo {
+  nextLetters: [String!]!
+  opensAt: Int!
+}

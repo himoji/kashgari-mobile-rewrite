@@ -1,0 +1,18 @@
+{
+  "hello": "Привет, {{name}}!",
+  "greeting": "Казахский в вашей школе",
+  "school": "Школа",
+  "schoolTitle": "Школа",
+  "viewAll": "Посмотреть все",
+  "open": "Открыть",
+  "students": "Ученики",
+  "teachers": "Учителя",
+  "classes": "Классы",
+  "teacher": "Учитель",
+  "workAssigned": "Назначенные работы",
+  "teacherActivity": "Активность учителей",
+  "active": "Активно",
+  "inactive": "Неактивно",
+  "noClasses": "Нет классов",
+  "noTeachers": "Учителей пока нет"
+}

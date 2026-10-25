@@ -1,0 +1,47 @@
+type Query {
+  internalStats(input: InternalStatsInput!): InternalStatsResult!
+  schoolReport: [SchoolReportRow!]!
+}
+
+type SchoolReportRow {
+  language: String!
+  schoolName: String!
+  schoolTeacherCount: Int!
+  schoolStudentCount: Int!
+  schoolSubmissionCount: Int!
+  schoolAssignmentCount: Int!
+  teacherName: String!
+  teacherEmail: String!
+  classId: String!
+  classGrade: Int
+  classLetter: String!
+  classStudentCount: Int!
+  studentId: String!
+  studentName: String!
+  submittedAssignments: Int!
+  oqylymSubmissions: Int!
+  tyndalymSubmissions: Int!
+  oynaSubmissions: Int!
+  submittedLessons: Int!
+}
+
+input InternalStatsInput {
+  activeStudents: Boolean!
+  activeTeachers: Boolean!
+  city: Boolean!
+  textType: Boolean!
+  listenType: Boolean!
+  hasFlashcards: Boolean!
+  type: Boolean!
+  target: Boolean!
+  start: Int!
+  end: Int!
+  languages: Boolean!
+}
+
+type InternalStatsResult {
+  columns: [String!]!
+  rows: [String!]
+  submissionCountsMatrix: [[Int!]!]
+  submissionCountsHist: [Int!]
+}

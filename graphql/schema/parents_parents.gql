@@ -1,0 +1,15 @@
+type Parent {
+  id: ID!
+  name: String!
+  children: [Account!]!
+  account: Account
+}
+
+type Query {
+  parent(id: ID!): Parent
+}
+
+type Mutation {
+  createParentProfile(accountId: ID!, name: String!): Parent
+  addChild(parentId: ID!, studentId: ID!): Boolean!
+}

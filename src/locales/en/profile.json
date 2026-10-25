@@ -1,0 +1,16 @@
+{
+  "title": "Profile",
+  "school": "School",
+  "class": "Class",
+  "phone": "Phone",
+  "languageAndText": "Language and text",
+  "interfaceLanguage": "Interface language",
+  "explanationLanguage": "Explanation language",
+  "script": "Kazakh script",
+  "cyrillic": "Cyrillic",
+  "latin": "Latin",
+  "saveChanges": "Save changes",
+  "saved": "Saved",
+  "switchAccount": "Switch account",
+  "signOut": "Sign out"
+}

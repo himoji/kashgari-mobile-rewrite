@@ -1,0 +1,53 @@
+{
+  "cli": {
+    "version": ">= 16.19.3",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://gql.danatiin.kashgari.kz/",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_SERVER_ID": "569137623763-8e2vecb454dgt3834enpmpk3oicu9fsb.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_IOS_CLIENT_ID": "569137623763-3apn2k7fnui2dvqq22dc73730gb37l6l.apps.googleusercontent.com",
+        "EXPO_PUBLIC_YANDEX_CLIENT_ID": "508bcb7b59e44f5285c97f8421b846c9",
+        "EXPO_PUBLIC_YANDEX_REDIRECT_URI": "oqudanatiin://auth",
+        "EXPO_PUBLIC_RELEASE_CHANNEL": "development",
+        "EXPO_PUBLIC_MODE": "development"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://gql.danatiin.kashgari.kz/",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_SERVER_ID": "569137623763-8e2vecb454dgt3834enpmpk3oicu9fsb.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_IOS_CLIENT_ID": "569137623763-3apn2k7fnui2dvqq22dc73730gb37l6l.apps.googleusercontent.com",
+        "EXPO_PUBLIC_YANDEX_CLIENT_ID": "508bcb7b59e44f5285c97f8421b846c9",
+        "EXPO_PUBLIC_YANDEX_REDIRECT_URI": "oqudanatiin://auth",
+        "EXPO_PUBLIC_RELEASE_CHANNEL": "preview",
+        "EXPO_PUBLIC_MODE": "preview"
+      },
+      "autoIncrement": true
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://gql.danatiin.kashgari.kz/",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_SERVER_ID": "569137623763-8e2vecb454dgt3834enpmpk3oicu9fsb.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_OAUTH_IOS_CLIENT_ID": "569137623763-3apn2k7fnui2dvqq22dc73730gb37l6l.apps.googleusercontent.com",
+        "EXPO_PUBLIC_YANDEX_CLIENT_ID": "508bcb7b59e44f5285c97f8421b846c9",
+        "EXPO_PUBLIC_YANDEX_REDIRECT_URI": "oqudanatiin://auth",
+        "EXPO_PUBLIC_RELEASE_CHANNEL": "production",
+        "EXPO_PUBLIC_MODE": "production"
+      },
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6738261229"
+      }
+    }
+  }
+}

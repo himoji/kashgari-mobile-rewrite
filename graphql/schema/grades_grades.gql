@@ -1,0 +1,10 @@
+type Query {
+  allGrades: [Grade!]!
+  grade(grade: Int!): Grade
+}
+
+type Grade {
+  grade: Int!
+  sections: [Section!]!
+  name: String
+}

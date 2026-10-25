@@ -1,0 +1,4 @@
+enum ImageSize {
+  W256
+  W1024
+}

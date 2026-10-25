@@ -1,0 +1,226 @@
+type Query {
+  generateGames(textId: ID!): Games!
+}
+
+enum GameType {
+  Teacher
+  Student
+}
+
+type Games {
+  wordShuffle(type: GameType!): GameWordShuffle
+  wordMatch(type: GameType!): GameWordMatch
+  complete(type: GameType!): GameComplete
+    @deprecated(reason: "Use 'completeV2'")
+  completeV2(type: GameType!): GameCompleteV2
+  trueFalse(type: GameType!): GameTrueFalse
+  multipleChoice(type: GameType!): GameMultipleChoice
+  freeResponse: GameFreeResponse
+  wordGrid: GameWordGrid
+  crossword(type: GameType!): GameCrossword
+}
+
+input GamesInput {
+  wordShuffle: GameWordShuffleInput
+  wordMatch: GameWordMatchInput
+  complete: GameCompleteInput
+  completeV2: GameCompleteV2Input
+  trueFalse: GameTrueFalseInput
+  multipleChoice: GameMultipleChoiceInput
+  freeResponse: GameFreeResponseInput
+  wordGrid: GameWordGridInput
+  crossword: GameCrosswordInput
+}
+
+# WORD SHUFFLE
+type GameWordShuffle {
+  total: Int!
+  pairs: [GameWordShufflePair!]!
+  studentPairs: [GameWordShufflePair!]!
+}
+
+type GameWordShufflePair {
+  shuffled: String!
+  word: String
+}
+
+input GameWordShuffleInput {
+  pairs: [GameWordShufflePairInput!]!
+}
+
+input GameWordShufflePairInput {
+  shuffled: String!
+  word: String!
+}
+
+# WORD MATCH
+type GameWordMatch {
+  total: Int!
+  pairs: [GameWordMatchPair!]!
+}
+
+type GameWordMatchPair {
+  word: String!
+  translation: String!
+  isStudentQ: Boolean!
+}
+
+input GameWordMatchInput {
+  pairs: [GameWordMatchPairInput!]!
+}
+
+input GameWordMatchPairInput {
+  word: String!
+  translation: String!
+}
+
+# COMPLETE
+type GameComplete {
+  total: Int!
+  sentences: [GameCompleteSentence!]!
+}
+
+type GameCompleteSentence {
+  before: String!
+  after: String!
+  word: String!
+}
+
+input GameCompleteInput {
+  sentences: [GameCompleteSentenceInput!]!
+}
+
+input GameCompleteSentenceInput {
+  before: String!
+  after: String!
+  word: String!
+}
+
+# COMPLETE V2
+type GameCompleteV2 {
+  total: Int!
+  sentences: [GameCompleteV2Sentence!]!
+}
+
+type GameCompleteV2Sentence {
+  before: String!
+  after: String!
+  wordGroup: [String!]!
+}
+
+input GameCompleteV2Input {
+  sentences: [GameCompleteV2SentenceInput!]!
+}
+
+input GameCompleteV2SentenceInput {
+  before: String!
+  after: String!
+  wordGroup: [String!]!
+}
+
+# TRUE/FALSE
+type GameTrueFalse {
+  total: Int!
+  questions: [GameTrueFalseQuestion!]!
+  studentQuestions: [GameTrueFalseQuestion!]!
+}
+
+type GameTrueFalseQuestion {
+  question: String!
+  answer: Boolean
+}
+
+input GameTrueFalseInput {
+  questions: [GameTrueFalseQuestionInput!]!
+}
+
+input GameTrueFalseQuestionInput {
+  question: String!
+  answer: Boolean!
+}
+
+# MULTIPLE CHOICE
+type GameMultipleChoice {
+  total: Int!
+  questions: [GameMultipleChoiceQuestion!]!
+  studentQuestions: [GameMultipleChoiceQuestion!]!
+}
+
+type GameMultipleChoiceQuestion {
+  question: String!
+  options: [String!]!
+}
+
+input GameMultipleChoiceInput {
+  questions: [GameMultipleChoiceQuestionInput!]!
+}
+
+input GameMultipleChoiceQuestionInput {
+  question: String!
+  options: [String!]!
+}
+
+# FREE RESPONSE
+type GameFreeResponse {
+  total: Int!
+  questions: [GameFreeResponseQuestion!]!
+}
+
+type GameFreeResponseQuestion {
+  question: String!
+}
+
+input GameFreeResponseInput {
+  questions: [GameFreeResponseQuestionInput!]!
+}
+
+input GameFreeResponseQuestionInput {
+  question: String!
+}
+
+# WORD GRID
+type GameWordGrid {
+  total: Int!
+  rows: [String!]!
+  wrongWords: [String!]!
+  words: [String!]!
+  # studentWords: [String!]!
+}
+
+input GameWordGridInput {
+  rows: [String!]!
+  words: [String!]!
+}
+
+# CROSSWORD
+type GameCrossword {
+  total: Int!
+  words: [GameCrosswordWord!]!
+  # studentWords: [GameCrosswordWord!]!
+}
+
+type GameCrosswordWord {
+  row: Int!
+  col: Int!
+  direction: GameCrosswordDirection!
+  clue: String! # TODO: definitions?
+  length: Int!
+  word: String
+}
+
+input GameCrosswordInput {
+  words: [GameCrosswordWordInput!]!
+}
+
+input GameCrosswordWordInput {
+  row: Int!
+  col: Int!
+  direction: GameCrosswordDirection!
+  clue: String!
+  word: String!
+}
+
+enum GameCrosswordDirection {
+  HORIZONTAL
+  VERTICAL
+}

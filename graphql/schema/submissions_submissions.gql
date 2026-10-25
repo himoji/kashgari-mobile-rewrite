@@ -1,0 +1,236 @@
+type Query {
+  submission(id: ID!): Submission
+}
+
+type Mutation {
+  submitAssignment(
+    assignmentId: ID!
+    studentId: ID!
+    answers: SubmissionInput!
+    stats: SubmissionStatsInput
+  ): Submission
+  gradeFRQ(submissionId: ID!, questionId: ID!, grade: Int!): Boolean!
+}
+
+type Submission {
+  id: ID!
+  createdAt: Int!
+  student: Student!
+  assignment: Assignment!
+  wordShuffle: SubmissionWordShuffle
+  wordMatch: SubmissionWordMatch
+  complete: SubmissionComplete
+  completeV2: SubmissionCompleteV2
+  trueFalse: SubmissionTrueFalse
+  multipleChoice: SubmissionMultipleChoice
+  freeResponse: SubmissionFreeResponse
+  wordGrid: SubmissionWordGrid
+  crossword: SubmissionCrossword
+  progression: Progression! @deprecated(reason: "not working correctly yet")
+}
+
+input SubmissionInput {
+  wordShuffle: SubmissionWordShuffleInput
+  wordMatch: SubmissionWordMatchInput
+  complete: SubmissionCompleteInput
+  completeV2: SubmissionCompleteV2Input
+  trueFalse: SubmissionTrueFalseInput
+  multipleChoice: SubmissionMultipleChoiceInput
+  freeResponse: SubmissionFreeResponseInput
+  wordGrid: SubmissionWordGridInput
+  crossword: SubmissionCrosswordInput
+}
+
+input SubmissionStatsInput {
+  timeOnText: Int!
+  timeOnGames: Int!
+}
+
+# WORD SHUFFLE
+type SubmissionWordShuffle {
+  total: Int!
+  correct: Int!
+  pairs: [SubmissionWordShuffleAnswer!]!
+  studentTotal: Int!
+  studentCorrect: Int!
+  studentPairs: [SubmissionWordShuffleAnswer!]!
+}
+
+type SubmissionWordShuffleAnswer {
+  question: GameWordShufflePair!
+  answer: String
+}
+
+input SubmissionWordShuffleInput {
+  pairs: [GameWordShufflePairInput!]!
+  studentPairs: [GameWordShufflePairInput!]
+}
+
+# WORD MATCH
+type SubmissionWordMatch {
+  total: Int!
+  correct: Int!
+  pairs: [SubmissionWordMatchAnswer!]!
+  studentTotal: Int!
+  studentCorrect: Int!
+}
+
+type SubmissionWordMatchAnswer {
+  question: GameWordMatchPair!
+  answer: String
+}
+
+input SubmissionWordMatchPairInput {
+  word: String!
+  translation: String!
+  isStudentQ: Boolean!
+}
+
+input SubmissionWordMatchInput {
+  pairs: [SubmissionWordMatchPairInput!]!
+}
+
+# COMPLETE
+type SubmissionComplete {
+  total: Int!
+  correct: Int!
+  sentences: [SubmissionCompleteAnswer!]!
+}
+
+type SubmissionCompleteAnswer {
+  question: GameCompleteSentence!
+  answer: String
+}
+
+input SubmissionCompleteInput {
+  sentences: [GameCompleteSentenceInput!]!
+}
+
+# COMPLETE V2
+type SubmissionCompleteV2 {
+  total: Int!
+  correct: Int!
+  sentences: [SubmissionCompleteV2Answer!]!
+}
+
+type SubmissionCompleteV2Answer {
+  question: GameCompleteV2Sentence!
+  answer: String
+}
+
+input SubmissionCompleteV2Input {
+  sentences: [SubmissionCompleteV2SentenceInput!]!
+}
+
+input SubmissionCompleteV2SentenceInput {
+  before: String!
+  after: String!
+  word: String!
+}
+
+# TRUE/FALSE
+type SubmissionTrueFalse {
+  total: Int!
+  correct: Int!
+  questions: [SubmissionTrueFalseAnswer!]!
+  studentTotal: Int!
+  studentCorrect: Int!
+  studentQuestions: [SubmissionTrueFalseAnswer!]!
+}
+
+type SubmissionTrueFalseAnswer {
+  question: GameTrueFalseQuestion!
+  answer: Boolean
+}
+
+input SubmissionTrueFalseInput {
+  questions: [GameTrueFalseQuestionInput!]!
+  studentQuestions: [GameTrueFalseQuestionInput!]
+}
+
+# MULTIPLE CHOICE
+type SubmissionMultipleChoice {
+  total: Int!
+  correct: Int!
+  questions: [SubmissionMultipleChoiceAnswer!]!
+  studentTotal: Int!
+  studentCorrect: Int!
+  studentQuestions: [SubmissionMultipleChoiceAnswer!]!
+}
+
+type SubmissionMultipleChoiceAnswer {
+  question: GameMultipleChoiceQuestion!
+  answer: String
+}
+
+input SubmissionMultipleChoiceInput {
+  questions: [SubmissionMultipleChoiceQuestionInput!]!
+  studentQuestions: [SubmissionMultipleChoiceQuestionInput!]
+}
+
+input SubmissionMultipleChoiceQuestionInput {
+  question: String!
+  answer: String!
+}
+
+# FREE RESPONSE
+type SubmissionFreeResponse {
+  total: Int!
+  questions: [SubmissionFreeResponseAnswer!]!
+}
+
+type SubmissionFreeResponseAnswer {
+  question: GameFreeResponseQuestion!
+  answer: String
+  grade: Int
+}
+
+input SubmissionFreeResponseInput {
+  questions: [SubmissionFreeResponseQuestionInput!]!
+}
+
+input SubmissionFreeResponseQuestionInput {
+  question: String!
+  answer: String!
+}
+
+# WORD GRID
+type SubmissionWordGrid {
+  total: Int!
+  correct: Int!
+  question: GameWordGrid!
+  answers: [String!]
+}
+
+input SubmissionWordGridInput {
+  words: [SubmissionWordGridWordInput!]!
+}
+
+input SubmissionWordGridWordInput {
+  word: String!
+  row: Int!
+  col: Int!
+}
+
+# CROSSWORD
+type SubmissionCrossword {
+  total: Int!
+  correct: Int!
+  words: [SubmissionCrosswordAnswer!]!
+}
+
+type SubmissionCrosswordAnswer {
+  question: GameCrosswordWord!
+  answer: String
+}
+
+input SubmissionCrosswordInput {
+  words: [SubmissionCrosswordWordInput!]!
+}
+
+input SubmissionCrosswordWordInput {
+  word: String!
+  row: Int!
+  col: Int!
+  direction: GameCrosswordDirection!
+}

@@ -1,0 +1,14 @@
+type Query {
+  durysSubmission(id: ID!): DurysSubmission
+}
+
+type Mutation {
+  submitDurysAssignment(durysAssignmentId: ID!, studentId: ID!): DurysSubmission
+}
+
+type DurysSubmission {
+  id: ID!
+  createdAt: Int!
+  student: Student!
+  assignment: DurysAssignment!
+}

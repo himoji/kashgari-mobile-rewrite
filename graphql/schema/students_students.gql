@@ -1,0 +1,30 @@
+type Query {
+  student(id: ID!): Student
+}
+
+type Mutation {
+  addStudent(accountId: ID!, studentName: String!, classId: ID!): Student
+  removeStudent(classId: ID!, studentId: ID!): Student
+  renameStudent(studentId: ID!, name: String!): Student
+}
+
+type Student {
+  id: ID!
+  name: String!
+  account: Account!
+  class: Class!
+  submissions: [Submission!]!
+  oynaSubmissions: [OynaSubmission!]!
+  durysSubmissions: [DurysSubmission!]!
+  zhazylymSubmissions: [ZhazylymSubmission!]!
+  lessons: [Lesson!]!
+  lessonSubmissions: [LessonSubmission!]!
+  words: [WordValue!]!
+  pendingWords: [WordValue!]!
+  acorns: Int!
+  rankPosition: RankPosition # null means 0 acorns (unranked)
+  assignmentsPerfectlyScored: Int!
+  moduleStats(module: Module!): ModuleStats!
+  submissionRate(start: Int, end: Int): Float
+  oynaSubmissionRate(start: Int, end: Int): Float
+}

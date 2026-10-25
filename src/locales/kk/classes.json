@@ -1,0 +1,45 @@
+{
+  "tabs": {
+    "assignments": "Тапсырмалар",
+    "classes": "Сыныптар",
+    "review": "Тексеру"
+  },
+  "school": "Мектеп",
+  "searchClasses": "Сыныпты іздеу",
+  "classGrades": "Сынып бағалары",
+  "classGradesHint": "Сыныпты, содан кейін оқушыны таңдаңыз.",
+  "viewGrades": "Бағаларды көру",
+  "studentGrades": "Оқушы бағалары",
+  "submittedOf": "{{done}}/{{total}} тапсырды",
+  "assignments": "Тапсырмалар",
+  "reviewAnswers": "Жауаптарды тексеру",
+  "noResponses": "Әзірге жауап жоқ",
+  "noClasses": "Әзірге сынып жоқ",
+  "status": {
+    "published": "Жарияланған",
+    "draft": "Жоба",
+    "scheduled": "Жоспарланған"
+  },
+  "content": {
+    "reading": "Мәтін",
+    "listening": "Тыңдалым",
+    "writing": "Жазылым",
+    "ministory": "Шағын әңгіме",
+    "wordle": "Сөзді тап",
+    "match": "Сәйкестендіру",
+    "wordGame": "Сөз ойыны",
+    "grammar": "Грамматика",
+    "game": "Ойын",
+    "physical": "Сергіту сәті",
+    "cards": "Сөз карточкалары",
+    "mcq": "Жауапты таңдау",
+    "tf": "Дұрыс / бұрыс",
+    "frq": "Ашық сұрақ",
+    "complete": "Бос орынды толтыру",
+    "shuffle": "Әріптерден сөз құрау",
+    "grid": "Сөздерді табу",
+    "crossword": "Сөзжұмбақ"
+  },
+  "studentCount": "{{count}} оқушы",
+  "workCount": "{{count}} тапсырма"
+}

@@ -1,0 +1,99 @@
+type WordValue {
+  account: Account!
+  word: String!
+  value: Float!
+  relativeValue: Float!
+  level: Int!
+  isPending: Boolean!
+}
+
+type Topic {
+  topicValue(studentId: ID!): TopicValue
+  name: String!
+  levels: [TopicLevel!]!
+}
+
+type TopicLevel {
+  level: Level!
+  words: [WordObject!]!
+}
+
+type WordObject {
+  word: String!
+  wordValue(studentId: ID!): WordValue
+}
+
+type Query {
+  topics: [Topic!]!
+  profileGame(studentId: ID!, centralWord: String): ProfileGames
+}
+
+type ProfileGames {
+  wordGroup: [String!]!
+  wordGrid: GameWordGrid
+  wordShuffle: GameWordShuffle
+  wordMatch: GameWordMatch
+  trueFalse: GameTrueFalse
+  multipleChoice: GameMultipleChoice
+  crossword: GameCrossword
+}
+
+type ProfileGameSubmit {
+  submission: Submission
+  isLastGame: Boolean
+}
+
+type Mutation {
+  submitProfileGame(
+    studentId: ID!
+    submission: SubmissionInput!
+    isLastSubmission: Boolean! = false
+  ): ProfileGameSubmit
+}
+
+type Progression {
+  wordValueChanges: [WordValueChange!]!
+  topicValueChanges: [TopicValueChange!]!
+  pendingStateChanges: [PendingStateChange!]!
+  acornsChange: AcornsChange!
+}
+
+type AcornsChange {
+  fromWordClicks: Int!
+  fromText: Int!
+  fromGames: Int!
+}
+
+type WordValueChange {
+  wordValue: WordValue!
+  changeAmount: Float!
+}
+
+type TopicValue {
+  account: Account!
+  value: Float!
+  topic: Topic!
+}
+
+type TopicValueChange {
+  topicValue: TopicValue!
+  changeAmount: Float!
+}
+
+type PendingStateChange {
+  wordValue: WordValue!
+  levelAchieved: Int!
+}
+
+type WordValueLetterPage {
+  letter: String!
+  wordValues: [WordValue!]!
+}
+
+type WordValueLevelPage {
+  level: Int!
+  wordValues: [WordValue!]!
+  page: Int!
+  totalPages: Int!
+  wordsPerPage: Int!
+}

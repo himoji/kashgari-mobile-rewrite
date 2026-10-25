@@ -1,0 +1,30 @@
+type Query {
+  endingSuggestions(query: String!, limit: Int! = 20): [EndingFlag!]!
+  durysTopicsSuggestions(query: String!, limit: Int! = 20): [DurysTopic!]!
+  getSentencesByEnding(endingFlagIds: [Int!]!, limit: Int! = 20): [String!]!
+  getSentencesByTopic(topicId: Int!, limit: Int! = 20): [String!]!
+  getInfinitivesByEnding(endingFlagIds: [Int!]!, limit: Int! = 20): [WordForm!]!
+}
+
+type EndingFlag {
+  ending: String!
+  id: Int!
+  name: String!
+  grammarTopicName: String!
+}
+
+type DurysTopic {
+  id: Int!
+  name: String!
+  description: String!
+}
+
+type Flag {
+  id: Int!
+  name: String!
+}
+
+type WordForm {
+  infinitive: String!
+  form: String!
+}

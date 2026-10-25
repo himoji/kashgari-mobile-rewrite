@@ -1,0 +1,16 @@
+{
+  "title": "Профиль",
+  "school": "Мектеп",
+  "class": "Сынып",
+  "phone": "Телефон",
+  "languageAndText": "Тіл және мәтін",
+  "interfaceLanguage": "Интерфейс тілі",
+  "explanationLanguage": "Түсіндірме тілі",
+  "script": "Қазақша жазу",
+  "cyrillic": "Кирилл",
+  "latin": "Латын",
+  "saveChanges": "Өзгерістерді сақтау",
+  "saved": "Сақталды",
+  "switchAccount": "Аккаунтты ауыстыру",
+  "signOut": "Шығу"
+}

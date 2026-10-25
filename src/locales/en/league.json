@@ -1,0 +1,9 @@
+{
+  "title": "Reading League",
+  "points": "points",
+  "rankings": "Rankings",
+  "pages_one": "{{count}} page",
+  "pages_other": "{{count}} pages",
+  "emptyTitle": "No books yet",
+  "emptyBody": "Texts for your level will appear soon."
+}

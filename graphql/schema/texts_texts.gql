@@ -1,0 +1,105 @@
+type Query {
+  oqylymText(id: ID!): OqylymText
+  tyndalymText(id: ID!): TyndalymText
+  scanText(image: String!): String
+  oqylymTextsByComplexity(complexity: Int!): [OqylymText!]!
+  tyndalymTextsByComplexity(complexity: Int!): [TyndalymText!]!
+}
+
+type Mutation {
+  createOqylymText(
+    teacherId: ID!
+    text: String!
+    isIPProtected: Boolean! = false
+    grade: Int
+    section: Int
+    lessonId: ID
+    index: Int
+    thumbnail: String
+  ): OqylymText
+  createOqylymByTopicKeywords(
+    teacherId: ID!
+    topic: String!
+    keywords: [String!]!
+    createTyndalym: Boolean!
+    grade: Int
+    section: Int
+    lessonId: ID
+    index: Int
+  ): OqylymText
+  createTyndalymText(
+    teacherId: ID!
+    text: String!
+    grade: Int
+    section: Int
+    audio: String
+    lessonId: ID
+    index: Int
+    thumbnail: String
+  ): TyndalymText
+  createTyndalymByTopicKeywords(
+    teacherId: ID!
+    topic: String!
+    keywords: [String!]!
+    createOqylym: Boolean!
+    grade: Int
+    section: Int
+    lessonId: ID
+    index: Int
+  ): TyndalymText
+  updateOqylymText(id: ID!, text: String!): OqylymText
+  updateTyndalymText(id: ID!, text: String!): TyndalymText
+  updateTyndalymTextAudio(id: ID!, audio: String!): TyndalymText
+  deleteText(id: ID!): Boolean!
+}
+
+interface Text {
+  id: ID!
+  order: Int
+  title: String!
+  titleRus: String
+  titleEng: String
+  paragraphs(withDef: Boolean = false): [Paragraph!]!
+  baseWords: [String!]!
+  section: Section
+  teacher: Teacher
+  assignment(classId: ID): Assignment
+  thumbnail(size: ImageSize! = W1024, url: Boolean! = false): String
+  textActivity: TextActivity
+  complexity: Int
+}
+
+type OqylymText implements Text {
+  id: ID!
+  order: Int
+  title: String!
+  titleRus: String
+  titleEng: String
+  paragraphs(withDef: Boolean = false): [OqylymParagraph!]!
+  baseWords: [String!]!
+  section: Section
+  teacher: Teacher
+  assignment(classId: ID): OqylymAssignment
+  thumbnail(size: ImageSize! = W1024, url: Boolean! = false): String
+  textActivity: TextActivity
+  isIPProtected: Boolean!
+  complexity: Int
+}
+
+type TyndalymText implements Text {
+  id: ID!
+  order: Int
+  title: String!
+  titleRus: String
+  titleEng: String
+  paragraphs(withDef: Boolean = false): [TyndalymParagraph!]!
+  baseWords: [String!]!
+  section: Section
+  teacher: Teacher
+  assignment(classId: ID): TyndalymAssignment
+  audio: String
+  audioUrl: String
+  thumbnail(size: ImageSize! = W1024, url: Boolean! = false): String
+  textActivity: TextActivity
+  complexity: Int
+}

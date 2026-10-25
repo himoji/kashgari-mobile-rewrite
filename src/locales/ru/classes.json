@@ -1,0 +1,51 @@
+{
+  "tabs": {
+    "assignments": "Задания",
+    "classes": "Классы",
+    "review": "Проверка"
+  },
+  "school": "Школа",
+  "searchClasses": "Найти класс",
+  "classGrades": "Оценки по классам",
+  "classGradesHint": "Выберите класс, затем ученика.",
+  "viewGrades": "Посмотреть оценки",
+  "studentGrades": "Оценки учеников",
+  "submittedOf": "{{done}}/{{total}} сдано",
+  "assignments": "Задания",
+  "reviewAnswers": "Проверить ответы",
+  "noResponses": "Пока нет ответов",
+  "noClasses": "Пока нет классов",
+  "status": {
+    "published": "Опубликовано",
+    "draft": "Черновик",
+    "scheduled": "Запланировано"
+  },
+  "content": {
+    "reading": "Текст",
+    "listening": "Аудирование",
+    "writing": "Письменный ответ",
+    "ministory": "Мини-история",
+    "wordle": "Угадай слово",
+    "match": "Сопоставление",
+    "wordGame": "Игра в слова",
+    "grammar": "Грамматика",
+    "game": "Игра",
+    "physical": "Разминка",
+    "cards": "Карточки слов",
+    "mcq": "Выбор ответа",
+    "tf": "Верно / неверно",
+    "frq": "Открытый вопрос",
+    "complete": "Пропуск в предложении",
+    "shuffle": "Собрать слово",
+    "grid": "Поиск слов",
+    "crossword": "Слово по подсказке"
+  },
+  "studentCount_one": "{{count}} ученик",
+  "studentCount_few": "{{count}} ученика",
+  "studentCount_many": "{{count}} учеников",
+  "studentCount_other": "{{count}} ученика",
+  "workCount_one": "{{count}} задание",
+  "workCount_few": "{{count}} задания",
+  "workCount_many": "{{count}} заданий",
+  "workCount_other": "{{count}} задания"
+}

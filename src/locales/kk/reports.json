@@ -1,0 +1,33 @@
+{
+  "title": "Есептер",
+  "periods": {
+    "week": "Осы апта",
+    "month": "Осы ай",
+    "quarter": "Осы тоқсан",
+    "allTime": "Барлық кезең"
+  },
+  "period": "Кезең",
+  "class": "Сынып",
+  "allClasses": "Барлық сыныптар",
+  "activeStudents": "Белсенді оқушылар",
+  "workAssigned": "Берілген жұмыстар",
+  "averageScore": "Орташа нәтиже",
+  "submissions": "Тапсырылған жұмыстар",
+  "moduleUsage": "Модульдерді пайдалану",
+  "modules": {
+    "reading": "Оқылым",
+    "listening": "Тыңдалым",
+    "grammar": "Грамматика",
+    "game": "Ойындар",
+    "writing": "Жазылым"
+  },
+  "schoolPerformance": "Мектеп үлгерімі",
+  "engagement": "Қатысу белсенділігі",
+  "appClicks": "Қолданба әрекеттері",
+  "appClicksHint": "Оқушылардың сөздерді басу саны.",
+  "members": "Қатысушылар",
+  "students": "Оқушылар",
+  "teachers": "Мұғалімдер",
+  "memberHint": "Мектепке тіркелген мұғалімдер мен оқушылар.",
+  "back": "Мектеп"
+}

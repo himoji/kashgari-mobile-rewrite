@@ -1,0 +1,9 @@
+{
+  "greeting": "Сәлем, {{name}}!",
+  "assign": "Тапсырма беру",
+  "review": "Жауаптарды тексеру",
+  "answers_one": "{{count}} жауап",
+  "answers_other": "{{count}} жауап",
+  "noAnswers": "Жаңа жауап жоқ",
+  "grades": "Бағаларды көру"
+}

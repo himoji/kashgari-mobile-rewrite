@@ -1,0 +1,47 @@
+{
+  "tabs": {
+    "assignments": "Assignments",
+    "classes": "Classes",
+    "review": "Review"
+  },
+  "school": "School",
+  "searchClasses": "Search classes",
+  "classGrades": "Class grades",
+  "classGradesHint": "Choose a class, then a student.",
+  "viewGrades": "View grades",
+  "studentGrades": "Student grades",
+  "submittedOf": "{{done}}/{{total}} submitted",
+  "assignments": "Assignments",
+  "reviewAnswers": "Review answers",
+  "noResponses": "No responses yet",
+  "noClasses": "No classes yet",
+  "status": {
+    "published": "Published",
+    "draft": "Draft",
+    "scheduled": "Scheduled"
+  },
+  "content": {
+    "reading": "Reading text",
+    "listening": "Listening",
+    "writing": "Writing",
+    "ministory": "Mini story",
+    "wordle": "Guess the word",
+    "match": "Matching pairs",
+    "wordGame": "Word game",
+    "grammar": "Grammar",
+    "game": "Game",
+    "physical": "Movement break",
+    "cards": "Flashcards",
+    "mcq": "Multiple choice",
+    "tf": "True / false",
+    "frq": "Open question",
+    "complete": "Sentence gap",
+    "shuffle": "Word shuffle",
+    "grid": "Word search",
+    "crossword": "Word clue"
+  },
+  "studentCount_one": "{{count}} student",
+  "studentCount_other": "{{count}} students",
+  "workCount_one": "{{count}} assignment",
+  "workCount_other": "{{count}} assignments"
+}

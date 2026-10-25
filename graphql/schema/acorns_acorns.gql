@@ -1,0 +1,11 @@
+type Subscription {
+  clickEvent: ClickEvent!
+}
+
+type ClickEvent {
+  acornAmount: Int!
+  accountId: ID!
+  oldRelativeValue: Float!
+  newRelativeValue: Float!
+  level: Int!
+}

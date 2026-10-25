@@ -1,0 +1,33 @@
+type Query {
+  infiniteRunner(id: ID!): InfiniteRunnerGame
+}
+
+type Mutation {
+  infiniteRunnerCreate(
+    data: InfiniteRunnerInput!
+    lessonId: ID
+    index: Int
+  ): InfiniteRunnerGame
+}
+
+type InfiniteRunnerGroup {
+  correct: String!
+  incorrect1: String!
+  incorrect2: String!
+}
+
+type InfiniteRunnerGame {
+  topic: String!
+  groups: [InfiniteRunnerGroup!]
+}
+
+input InfiniteRunnerInput {
+  topic: String!
+  groups: [InfiniteRunnerGroupInput!]!
+}
+
+input InfiniteRunnerGroupInput {
+  correct: String!
+  incorrect1: String!
+  incorrect2: String!
+}

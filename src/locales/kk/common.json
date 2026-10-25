@@ -1,0 +1,11 @@
+{
+  "appName": "Oqu Dana Tiin",
+  "roles": { "student": "Оқушы", "teacher": "Мұғалім", "parent": "Ата-ана", "principal": "Директор" },
+  "tabs": { "home": "Басты бет", "league": "Лига", "school": "Мектеп", "profile": "Профиль", "materials": "Материалдар", "classes": "Сыныптар", "children": "Балалар" },
+  "actions": { "save": "Сақтау", "cancel": "Бас тарту", "close": "Жабу", "back": "Артқа", "next": "Әрі қарай", "previous": "Алдыңғы", "retry": "Қайталау", "continue": "Жалғастыру", "open": "Ашу", "done": "Дайын", "signOut": "Шығу", "results": "Нәтижелер" },
+  "states": { "loading": "Жүктелуде…", "empty": "Әзірге ештеңе жоқ", "error": "Бірдеңе дұрыс болмады", "offline": "Интернет байланысы жоқ" },
+  "notReady": { "title": "Жақында", "body": "Бұл мүмкіндік әзірленуде." },
+  "status": { "done": "Орындалды", "todo": "Орындалмаған", "late": "Мерзімі өтті", "graded": "Бағаланды", "pending": "Тексерілуде" },
+  "periods": { "days": "Күн", "weeks": "Апта", "months": "Ай", "all": "Барлығы" },
+  "modules": { "OQYLYM": "Оқылым", "TYNDALYM": "Тыңдалым", "OYNA": "Ойна", "DURYS": "Дұрыс" }
+}

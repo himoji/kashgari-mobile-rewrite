@@ -1,0 +1,14 @@
+type Query {
+  getText(stage: Int!, textId: ID): PremadeText
+}
+
+type Mutation {
+  sendTextFirstStage(text: String!, textId: ID!): PremadeText
+  sendTextSecondStage(textId: ID!, text: String!, editCnt: Int!): Boolean
+}
+
+type PremadeText {
+  textId: ID!
+  text: String!
+  reviewerId: ID!
+}

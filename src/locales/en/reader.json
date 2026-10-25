@@ -1,0 +1,22 @@
+{
+  "page": "Page {{page}} / {{total}}",
+  "choosePage": "Choose a page",
+  "pageCount": "Pages · {{total}}",
+  "go": "Go",
+  "back": "Back",
+  "next": "Next page",
+  "quiz": "Take the quiz",
+  "quizNotReady": "The reading comprehension quiz is not available yet.",
+  "smaller": "Text size −",
+  "larger": "Text size +",
+  "progress": "Progress",
+  "help": "Help",
+  "guideTitle": "Tap a word",
+  "guideBody": "See its meaning and save it to practise later.",
+  "guideOk": "Got it",
+  "guideLines": ["Біздің ауыл өзен жағасында.", "Таңертең біз серуенге шықтық.", "Ағаштар жайқалып өсіп тұр.", "Әр адам оны қорғай алады."],
+  "guideBefore": "Біз",
+  "guideWord": "табиғат",
+  "guideAfter": "туралы оқимыз.",
+  "guideMeaning": "nature"
+}

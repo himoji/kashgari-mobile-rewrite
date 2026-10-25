@@ -1,0 +1,106 @@
+type Query {
+  newOcrLine: OcrLine
+  ocrLineById(id: ID!): OcrLine
+
+  correctorById(id: ID!): Corrector
+  reviewerById(id: ID!): Reviewer
+
+  correctorByAccount(accountId: ID!): Corrector
+  reviewerByAccount(accountId: ID!): Reviewer
+
+  ocrUnusualLines(
+    page: Int! = 1
+    perPage: Int! = 20
+    start: Int
+    end: Int
+  ): OcrLinesPage!
+  ocrReportedLines(
+    page: Int! = 1
+    perPage: Int! = 20
+    start: Int
+    end: Int
+  ): OcrLinesPage!
+  ocrHistogram(start: Int, end: Int): [Int!]!
+    @deprecated(reason: "Use ocrStats.histogram")
+  ocrStats(start: Int, end: Int): OcrStats!
+}
+
+type Mutation {
+  ocrCorrectLine(lineId: ID!, correction: String!): OcrCorrectionResult
+  ocrEditCorrection(lineId: ID!, edit: String!): OcrCorrectionResult
+  ocrReportLine(lineId: ID!): Boolean!
+
+  ocrReviewLine(lineId: ID!, review: String!): OcrCorrectionResult
+  changeLinesLimit(correctorId: ID!, limit: Int!): Corrector
+}
+
+type OcrLine {
+  id: ID!
+  image: String!
+  page: OcrPage!
+  index: Int!
+  prediction: String!
+  correction: String
+  correctionDistance: Int
+  corrector: Corrector
+  review: String
+  reviewer: Reviewer
+  hasUndecided: Boolean!
+  isReported: Boolean!
+  reportedAt: Int
+  reportedBy: WorkerType
+  unusual: Boolean
+}
+
+type OcrPage {
+  id: ID!
+  name: String
+  image: String
+}
+
+type OcrCorrectionResult {
+  delta: Float!
+  newBalance: Float!
+}
+
+type Corrector {
+  id: ID!
+  account: Account
+  linesCorrected: Int!
+  nextLineToReview: OcrLine
+  linesToReview(page: Int! = 1, perPage: Int! = 1): OcrLinesPage!
+  pastLines(page: Int! = 1, perPage: Int! = 20): OcrLinesPage!
+  usualLeft: Int!
+  unusualLeft: Int!
+  limit: Int
+  balance: Float @deprecated(reason: "Use Account.internalBalance")
+  totalMoneyMade: Float!
+}
+
+type OcrLinesPage {
+  lines: [OcrLine!]!
+  page: Int!
+  totalPages: Int!
+  perPage: Int!
+}
+
+type Reviewer {
+  id: ID!
+  account: Account
+  linesReviewed: Int!
+  balance: Float @deprecated(reason: "Use Account.internalBalance")
+  totalMoneyMade: Float!
+  correctors: [Corrector!]!
+}
+
+type OcrStats {
+  histogram: [Int!]!
+  totalDistance: Int!
+  totalLines: Int!
+  totalChars: Int!
+}
+
+enum WorkerType {
+  Corrector
+  Reviewer
+}

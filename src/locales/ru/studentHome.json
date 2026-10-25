@@ -1,0 +1,12 @@
+{
+  "hello": "Привет",
+  "dailyWord": "Слово дня",
+  "completed": "Выполнено",
+  "completion": "Прогресс",
+  "results": "Результаты",
+  "continueReading": "Продолжить чтение",
+  "readingHint": "Лига читателей",
+  "schoolTask": "Школьное задание",
+  "reviewWords": "Повторить слова",
+  "reviewWordsHint": "Сохранённые слова"
+}

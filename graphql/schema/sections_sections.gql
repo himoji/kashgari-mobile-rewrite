@@ -1,0 +1,20 @@
+type Query {
+  section(grade: Int!, section: Int!): Section
+}
+
+type Section {
+  section: Int
+  name: Name
+  baseWords: [String!]!
+  oqylymTexts(teacherId: ID): [OqylymText!]!
+  tyndalymTexts(teacherId: ID): [TyndalymText!]!
+  lessons(classId: ID): [Lesson!]!
+  grade: Grade!
+  oynaGames(classId: ID!): [OynaGame!]!
+}
+
+type Name {
+  kazakh: String
+  russian: String
+  english: String
+}

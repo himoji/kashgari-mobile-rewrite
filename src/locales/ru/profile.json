@@ -1,0 +1,16 @@
+{
+  "title": "Профиль",
+  "school": "Школа",
+  "class": "Класс",
+  "phone": "Телефон",
+  "languageAndText": "Язык и текст",
+  "interfaceLanguage": "Язык интерфейса",
+  "explanationLanguage": "Язык объяснений",
+  "script": "Казахское письмо",
+  "cyrillic": "Кириллица",
+  "latin": "Латиница",
+  "saveChanges": "Сохранить изменения",
+  "saved": "Сохранено",
+  "switchAccount": "Сменить аккаунт",
+  "signOut": "Выйти"
+}

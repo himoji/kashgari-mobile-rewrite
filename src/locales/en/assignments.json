@@ -1,0 +1,12 @@
+{
+  "tabs": { "new": "To do", "completed": "Completed" },
+  "start": "Start",
+  "viewResults": "View results",
+  "min": "min",
+  "modules": { "oqylym": "Reading", "tyndalym": "Listening", "durys": "Grammar", "oyna": "Games", "lesson": "Lesson", "zhazylym": "Writing" },
+  "state": { "done": "Completed", "waiting": "Awaiting grade", "inProgress": "In progress", "overdue": "Overdue", "notStarted": "Not started" },
+  "deadline": { "today": "Today", "daysLeft": "{{count}} days left" },
+  "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  "empty": { "new": "No new work", "newBody": "Work from your teacher will appear here.", "completed": "Nothing completed yet" },
+  "results": { "title": "Results", "completed": "Completed", "average": "Average score" }
+}

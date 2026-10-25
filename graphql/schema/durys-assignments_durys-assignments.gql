@@ -1,0 +1,25 @@
+type Query {
+  durysAssignment(id: ID!): DurysAssignment
+}
+
+type Mutation {
+  createDurysAssignment(
+    classId: ID!
+    data: DurysAssignmentInput!
+    lessonId: ID
+    index: Int
+  ): DurysAssignment
+  #   updateDurysAssignment(id: ID!, )
+  deleteDurysAssignment(id: ID!): ID
+}
+
+type DurysAssignment {
+  id: ID!
+  durysTitle: DurysTitle!
+  createdAt: Int!
+  submission(studentId: ID!): Boolean!
+}
+
+input DurysAssignmentInput {
+  titleId: ID!
+}

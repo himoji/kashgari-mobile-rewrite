@@ -1,0 +1,29 @@
+type Mutation {
+  loginGoogle(idToken: String!): AuthInfo
+  loginApple(idToken: String!): AuthInfo
+  loginYandex(idToken: String!): AuthInfo
+
+  verifyCaptcha(data: VerifyCaptchaInput!): ID
+  requestVerification(requestId: ID!, phoneNumber: String!): Boolean!
+  verifyPhoneNumber(requestId: ID!, verificationCode: String!): AuthInfo
+  verifyPhoneNumberAllLanguages(
+    requestId: ID!
+    verificationCode: String!
+  ): [LanguageAuthInfo!]
+}
+
+type LanguageAuthInfo {
+  language: AppLanguage!
+  authInfo: AuthInfo!
+}
+
+type AuthInfo {
+  accountId: ID!
+  accessToken: String!
+  refreshToken: String!
+}
+
+input VerifyCaptchaInput {
+  token: String
+  isMobile: Boolean! = false
+}

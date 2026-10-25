@@ -1,0 +1,23 @@
+/** Same values as the @theme block in global.css, for props that need a colour string (icons, SVG). */
+export const colors = {
+  primary: '#3b86ff',
+  primaryStrong: '#0a74ff',
+  link: '#1e7bff',
+  primarySoft: '#eaf3ff',
+  tile: '#edf5ff',
+  track: '#f1f6ff',
+  success: '#20996d',
+  attention: '#ff7a1a',
+  danger: '#d64848',
+  late: '#a32626',
+  ink: '#242631',
+  body: '#5b5e6b',
+  meta: '#656874',
+  muted: '#697387',
+  hint: '#7e899b',
+  subtle: '#8490a3',
+  line: '#edf1f7',
+  canvas: '#f6f8fc',
+  surface: '#ffffff',
+  white: '#ffffff',
+} as const;
