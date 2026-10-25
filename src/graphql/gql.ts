@@ -28,7 +28,8 @@ type Documents = {
     "\n  mutation VerifyCode($requestId: ID!, $verificationCode: String!) {\n    verifyPhoneNumberAllLanguages(requestId: $requestId, verificationCode: $verificationCode) {\n      language\n      authInfo { accountId accessToken refreshToken }\n    }\n  }\n": typeof types.VerifyCodeDocument,
     "\n  mutation LoginGoogle($idToken: String!) {\n    loginGoogle(idToken: $idToken) { accountId accessToken refreshToken }\n  }\n": typeof types.LoginGoogleDocument,
     "\n  mutation LoginApple($idToken: String!) {\n    loginApple(idToken: $idToken) { accountId accessToken refreshToken }\n  }\n": typeof types.LoginAppleDocument,
-    "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n": typeof types.AccountProfilesDocument,
+    "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      languageContext\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n": typeof types.AccountProfilesDocument,
+    "\n  mutation UpdateLanguage($id: ID!, $language: Language!) {\n    updateLanguage(id: $id, language: $language)\n  }\n": typeof types.UpdateLanguageDocument,
     "\n  mutation DeleteAccount($id: ID!) {\n    deleteAccount(id: $id)\n  }\n": typeof types.DeleteAccountDocument,
     "\n  query CheckClass($classId: ID!) {\n    class(id: $classId) { id }\n  }\n": typeof types.CheckClassDocument,
     "\n  mutation AddStudent($accountId: ID!, $studentName: String!, $classId: ID!) {\n    addStudent(accountId: $accountId, studentName: $studentName, classId: $classId) { id }\n  }\n": typeof types.AddStudentDocument,
@@ -123,7 +124,8 @@ const documents: Documents = {
     "\n  mutation VerifyCode($requestId: ID!, $verificationCode: String!) {\n    verifyPhoneNumberAllLanguages(requestId: $requestId, verificationCode: $verificationCode) {\n      language\n      authInfo { accountId accessToken refreshToken }\n    }\n  }\n": types.VerifyCodeDocument,
     "\n  mutation LoginGoogle($idToken: String!) {\n    loginGoogle(idToken: $idToken) { accountId accessToken refreshToken }\n  }\n": types.LoginGoogleDocument,
     "\n  mutation LoginApple($idToken: String!) {\n    loginApple(idToken: $idToken) { accountId accessToken refreshToken }\n  }\n": types.LoginAppleDocument,
-    "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n": types.AccountProfilesDocument,
+    "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      languageContext\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n": types.AccountProfilesDocument,
+    "\n  mutation UpdateLanguage($id: ID!, $language: Language!) {\n    updateLanguage(id: $id, language: $language)\n  }\n": types.UpdateLanguageDocument,
     "\n  mutation DeleteAccount($id: ID!) {\n    deleteAccount(id: $id)\n  }\n": types.DeleteAccountDocument,
     "\n  query CheckClass($classId: ID!) {\n    class(id: $classId) { id }\n  }\n": types.CheckClassDocument,
     "\n  mutation AddStudent($accountId: ID!, $studentName: String!, $classId: ID!) {\n    addStudent(accountId: $accountId, studentName: $studentName, classId: $classId) { id }\n  }\n": types.AddStudentDocument,
@@ -277,7 +279,11 @@ export function gql(source: "\n  mutation LoginApple($idToken: String!) {\n    l
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n"): (typeof documents)["\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n"];
+export function gql(source: "\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      languageContext\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n"): (typeof documents)["\n  query AccountProfiles($accountId: ID) {\n    account(id: $accountId) {\n      id\n      email\n      languageContext\n      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }\n      teacherProfiles { id name school { id name } }\n      parentProfile { id name }\n      principalProfiles { id name school { id name } }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateLanguage($id: ID!, $language: Language!) {\n    updateLanguage(id: $id, language: $language)\n  }\n"): (typeof documents)["\n  mutation UpdateLanguage($id: ID!, $language: Language!) {\n    updateLanguage(id: $id, language: $language)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

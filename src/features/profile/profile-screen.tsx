@@ -1,8 +1,11 @@
 import { router } from 'expo-router';
+import { useMutation } from '@apollo/client/react';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { UPDATE_LANGUAGE } from '@/features/auth/gql';
+import { apiLanguage } from '@/features/auth/profiles';
 import { useProfile, useSession, type Script, type UiLanguage } from '@/features/auth/session';
 import { UI_LANGUAGES } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -34,7 +37,20 @@ export function ProfileScreen() {
   const dirty =
     prefs.uiLanguage !== session.uiLanguage || prefs.definitionLanguage !== session.definitionLanguage || prefs.script !== session.script;
 
-  const save = () => {
+  const [updateLanguage, languageState] = useMutation(UPDATE_LANGUAGE);
+  const [failed, setFailed] = useState(false);
+
+  // Script and explanation language stay on the device; the interface language is also saved to the account.
+  const save = async () => {
+    setFailed(false);
+    if (prefs.uiLanguage !== session.uiLanguage) {
+      try {
+        const { data } = await updateLanguage({ variables: { id: profile.accountId, language: apiLanguage(prefs.uiLanguage) } });
+        if (!data?.updateLanguage) throw new Error('not saved');
+      } catch {
+        return setFailed(true);
+      }
+    }
     session.setPreferences(prefs);
     setSaved(true);
   };
@@ -95,9 +111,10 @@ export function ProfileScreen() {
           className="mt-1"
           icon={saved && !dirty ? 'check' : undefined}
           label={saved && !dirty ? t('profile.saved') : t('profile.saveChanges')}
-          disabled={!dirty && !saved}
-          onPress={save}
+          disabled={(!dirty && !saved) || languageState.loading}
+          onPress={() => void save()}
         />
+        {failed ? <Text className="mt-2 font-body text-[13px] leading-[18px] text-danger">{t('profile.saveFailed')}</Text> : null}
       </Card>
 
       <Pressable

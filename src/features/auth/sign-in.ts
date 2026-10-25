@@ -11,8 +11,9 @@ import { env } from '@/lib/env';
 export const CONTENT_LANGUAGES: ContentLanguage[] = ['kk', 'ru', 'en', 'fr'];
 
 export async function finishSignIn(credentials: Credentials[]) {
-  const profiles = await resolveProfiles(credentials);
+  const { profiles, uiLanguage } = await resolveProfiles(credentials);
   useSession.getState().signIn(credentials, profiles);
+  if (uiLanguage) useSession.getState().setPreferences({ uiLanguage });
 }
 
 /** Social providers log in per language database, unlike the phone flow which returns all at once. */

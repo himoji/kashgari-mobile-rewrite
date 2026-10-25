@@ -38,11 +38,18 @@ export const ACCOUNT_PROFILES = gql(`
     account(id: $accountId) {
       id
       email
+      languageContext
       studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }
       teacherProfiles { id name school { id name } }
       parentProfile { id name }
       principalProfiles { id name school { id name } }
     }
+  }
+`);
+
+export const UPDATE_LANGUAGE = gql(`
+  mutation UpdateLanguage($id: ID!, $language: Language!) {
+    updateLanguage(id: $id, language: $language)
   }
 `);
 

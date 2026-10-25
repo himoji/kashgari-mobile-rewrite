@@ -1,0 +1,1 @@
+export default () => ({ updateLanguage: true });

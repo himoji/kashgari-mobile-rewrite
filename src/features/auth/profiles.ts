@@ -2,7 +2,8 @@ import { apolloClient } from '@/lib/apollo';
 import { ACCOUNT_PROFILES } from '@/features/auth/gql';
 import { className } from '@/features/classes/format';
 import { profileKey, type Credentials, type Profile } from '@/features/auth/session';
-import type { AccountProfilesQuery } from '@/graphql/graphql';
+import type { UiLanguage } from '@/features/auth/session';
+import type { AccountProfilesQuery, Language } from '@/graphql/graphql';
 
 type Account = NonNullable<AccountProfilesQuery['account']>;
 
@@ -25,8 +26,12 @@ export function accountProfiles(cred: Credentials, account: Account): Profile[] 
   return list.map((p) => ({ ...p, key: profileKey(p) }));
 }
 
-/** Every role profile across the accounts a phone or social login returned. */
-export async function resolveProfiles(credentials: Credentials[]): Promise<Profile[]> {
+/** The account's saved interface language (`languageContext`) and back. */
+const FROM_API: Record<Language, UiLanguage> = { KZ: 'kk', RU: 'ru', EN: 'en' };
+export const apiLanguage = (lang: UiLanguage): Language => (lang === 'kk' ? 'KZ' : lang === 'ru' ? 'RU' : 'EN');
+
+/** Every role profile across the accounts a phone or social login returned, and the first account's interface language. */
+export async function resolveProfiles(credentials: Credentials[]): Promise<{ profiles: Profile[]; uiLanguage?: UiLanguage }> {
   const perAccount = await Promise.all(
     credentials.map(async (cred) => {
       const { data } = await apolloClient.query({
@@ -36,8 +41,9 @@ export async function resolveProfiles(credentials: Credentials[]): Promise<Profi
         // One account per language database: their ids can collide, so these never enter the cache.
         fetchPolicy: 'no-cache',
       });
-      return data?.account ? accountProfiles(cred, data.account) : [];
+      return data?.account ? { profiles: accountProfiles(cred, data.account), uiLanguage: FROM_API[data.account.languageContext] } : null;
     }),
   );
-  return perAccount.flat();
+  const found = perAccount.filter((a) => a !== null);
+  return { profiles: found.flatMap((a) => a.profiles), uiLanguage: found[0]?.uiLanguage };
 }

@@ -55,7 +55,7 @@ export function JoinClass() {
         context: { credentials: owner },
         fetchPolicy: 'no-cache',
       });
-      const profiles = await resolveProfiles(credentials);
+      const { profiles } = await resolveProfiles(credentials);
       useSession.getState().signIn(credentials, profiles);
     } catch {
       setError(t('auth.joinFailed'));

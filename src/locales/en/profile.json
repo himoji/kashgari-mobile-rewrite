@@ -13,5 +13,6 @@
   "saveChanges": "Save changes",
   "saved": "Saved",
   "switchAccount": "Switch account",
-  "signOut": "Sign out"
+  "signOut": "Sign out",
+  "saveFailed": "Couldn't save. Try again."
 }
