@@ -10,6 +10,7 @@ import { NotReady } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
+import { ListRows } from '@/ui/virtual-list';
 
 function Empty() {
   const { t } = useTranslation();
@@ -47,6 +48,8 @@ export function WordsScreen() {
     <TabScreen
       title={t('words.title')}
       mascot="learning"
+      back="/student"
+      list
     >
       <View>
         <View className="mb-3.5 flex-row items-center gap-2 px-[5px]">
@@ -59,33 +62,41 @@ export function WordsScreen() {
             </Text>
           </View>
         </View>
-        <View className="gap-2.5">
-          {words.length ? (
-            words.map((w) => (
-              <Pressable
-                key={w.word}
-                accessibilityRole="button"
-                onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
-                className="gap-1 rounded-[16.5px] bg-surface p-[13px] shadow-item active:opacity-80"
-              >
-                <Text variant="strong">{content(w.word)}</Text>
-                <Text variant="caption">{w.meaning}</Text>
-              </Pressable>
-            ))
-          ) : (
+        {words.length ? null : (
+          <View className="gap-2.5">
             <Empty />
+            {ready ? null : <NotReady body={t('words.notReady')} />}
+          </View>
+        )}
+        <ListRows
+          data={words}
+          keyExtractor={(w) => w.word}
+          gap={10}
+          renderItem={(w) => (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
+              className="gap-1 rounded-[16.5px] bg-surface p-[13px] shadow-item active:opacity-80"
+            >
+              <Text variant="strong">{content(w.word)}</Text>
+              <Text variant="caption">{w.meaning}</Text>
+            </Pressable>
           )}
-          {ready ? null : <NotReady body={t('words.notReady')} />}
-        </View>
-        {words.length ? (
-          <Button
-            variant="attention"
-            icon="solid-book"
-            label={t('words.practise')}
-            className="mt-5"
-            onPress={() => router.push('/student/practice')}
-          />
-        ) : null}
+          footer={
+            words.length ? (
+              <>
+                {ready ? null : <NotReady body={t('words.notReady')} className="mt-2.5" />}
+                <Button
+                  variant="attention"
+                  icon="solid-book"
+                  label={t('words.practise')}
+                  className="mt-5"
+                  onPress={() => router.push('/student/practice')}
+                />
+              </>
+            ) : undefined
+          }
+        />
       </View>
     </TabScreen>
   );

@@ -29,6 +29,7 @@ export function TeacherSchoolScreen() {
     <View className="flex-1">
       <TabScreen
         title={t('classes.school')}
+        list
         refreshing={refreshing}
         onRefresh={refresh}
       >

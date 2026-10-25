@@ -14,6 +14,7 @@ import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
 import { SearchField } from '@/ui/search-field';
 import { Text } from '@/ui/text';
+import { ListRows } from '@/ui/virtual-list';
 
 type State = 'pending' | 'reviewed';
 
@@ -43,10 +44,11 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
           accessibilityRole="button"
           accessibilityLabel={t('teacherAssignments.filterByClass')}
           onPress={() => setFilterOpen(true)}
+          hitSlop={4}
           className="h-9 flex-row items-center gap-[7px] rounded-tile bg-[#f3f7fc] px-2.5 active:opacity-80"
         >
           <Icon name="classes" size={15} color="#697c98" />
-          <Text className="font-body text-[12px] leading-[18px] text-[#697c98]">{selectedName}</Text>
+          <Text className="font-body text-[12px] leading-[18px] text-[#697c98]" maxFontSizeMultiplier={1.3}>{selectedName}</Text>
           <Icon name="down" size={15} color="#697c98" />
         </Pressable>
       </View>
@@ -65,12 +67,13 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               onPress={() => setState(key)}
+              hitSlop={3}
               className="press h-[38px] flex-row items-center gap-1.5"
               style={selected ? { boxShadow: `0 2px 0 ${colors.primary}` } : undefined}
             >
-              <Text className={cn('font-body text-[12px] leading-[18px]', selected ? 'text-link' : 'text-subtle')}>{label}</Text>
+              <Text className={cn('font-body text-[12px] leading-[18px]', selected ? 'text-link' : 'text-subtle')} maxFontSizeMultiplier={1.3}>{label}</Text>
               <View className="h-5 min-w-5 items-center justify-center rounded-[6px] bg-[#f2f5fa] px-[5px]">
-                <Text className={cn('font-body text-[10px] leading-[15px]', selected ? 'text-link' : 'text-subtle')}>{count}</Text>
+                <Text className={cn('font-body text-[10px] leading-[15px]', selected ? 'text-link' : 'text-subtle')} maxFontSizeMultiplier={1.3}>{count}</Text>
               </View>
             </Pressable>
           );
@@ -79,27 +82,33 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
 
       <SearchField value={query} onChangeText={setQuery} placeholder={t('review.searchPlaceholder')} className="mb-3" />
 
-      <View className="gap-1 p-2">
-        {list.map((i) => (
-          <ReviewRow
-            key={i.attempt.id}
-            studentName={i.studentName}
-            workName={i.work.name}
-            meta={`${i.work.className} · ${shortDate(i.attempt.createdAt, t)}`}
-            pending={i.attempt.pending}
-            score={i.attempt.score}
-            onPress={() => router.push(submissionHref(i.attempt, i.work.key))}
-          />
-        ))}
-        {list.length === 0 ? (
-          <View className="items-center gap-2 py-10">
-            <Icon name={q ? 'search' : 'check'} size={24} color={colors.subtle} />
-            <Text variant="heading" className="text-center">
-              {t(q ? 'review.noMatches' : state === 'pending' ? 'review.allCaught' : 'review.noGrades')}
-            </Text>
+      {list.length === 0 ? (
+        <View className="items-center gap-2 px-2 pb-10 pt-12">
+          <Icon name={q ? 'search' : 'check'} size={24} color={colors.subtle} />
+          <Text variant="heading" className="text-center">
+            {t(q ? 'review.noMatches' : state === 'pending' ? 'review.allCaught' : 'review.noGrades')}
+          </Text>
+        </View>
+      ) : null}
+      <ListRows
+        data={list}
+        keyExtractor={(i) => i.attempt.id}
+        gap={4}
+        before={8}
+        footer={<View className="h-2" />}
+        renderItem={(i) => (
+          <View className="px-2">
+            <ReviewRow
+              studentName={i.studentName}
+              workName={i.work.name}
+              meta={`${i.work.className} · ${shortDate(i.attempt.createdAt, t)}`}
+              pending={i.attempt.pending}
+              score={i.attempt.score}
+              onPress={() => router.push(submissionHref(i.attempt, i.work.key))}
+            />
           </View>
-        ) : null}
-      </View>
+        )}
+      />
 
       <ClassFilterDialog
         visible={filterOpen}

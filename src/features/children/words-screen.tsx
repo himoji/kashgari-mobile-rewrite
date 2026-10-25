@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@apollo/client/react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -14,9 +14,10 @@ import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
-import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { Text } from '@/ui/text';
+import { ListRows, VirtualList } from '@/ui/virtual-list';
 
 type Tab = 'learned' | 'learning';
 
@@ -28,28 +29,36 @@ export function ChildWordsScreen() {
   const childName = useChildName(childId);
   // Lives out here so the tabs keep their selection across loading and retry.
   const [tab, setTab] = useState<Tab>('learned');
+  const { refreshing, refresh } = useRefresh(CHILD_WORDS);
 
   return (
     <View className="flex-1 bg-surface">
       <BackBar label={childName ?? t('common.actions.back')} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
-        <Text className="mb-[3px] font-body-semibold text-[21px] leading-[28px]">{t('parent.words')}</Text>
-        <Text className="mb-5 font-body text-[12px] leading-[18px] text-subtle">{t('parent.wordsHint')}</Text>
-        <QueryBoundary
-          fallback={
-            <>
-              <WordTabs tab={tab} onChange={setTab} learned={0} learning={0} />
-              <View className="gap-2.5">
-                <Skeleton className="h-[58px]" />
-                <Skeleton className="h-[58px]" />
-                <Skeleton className="h-[58px]" />
-              </View>
-            </>
-          }
-        >
-          <Words childId={childId} tab={tab} onTabChange={setTab} />
-        </QueryBoundary>
-      </ScrollView>
+      <VirtualList
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: insets.bottom + 32 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+        rowClassName="px-5"
+        header={
+          <View className="px-5">
+            <Text className="mb-[3px] font-body-semibold text-[21px] leading-[28px]">{t('parent.words')}</Text>
+            <Text className="mb-5 font-body text-[12px] leading-[18px] text-subtle">{t('parent.wordsHint')}</Text>
+            <QueryBoundary
+              fallback={
+                <>
+                  <WordTabs tab={tab} onChange={setTab} learned={0} learning={0} />
+                  <View className="gap-2.5">
+                    <Skeleton className="h-[58px]" />
+                    <Skeleton className="h-[58px]" />
+                    <Skeleton className="h-[58px]" />
+                  </View>
+                </>
+              }
+            >
+              <Words childId={childId} tab={tab} onTabChange={setTab} />
+            </QueryBoundary>
+          </View>
+        }
+      />
     </View>
   );
 }
@@ -81,26 +90,27 @@ function Words({ childId, tab, onTabChange }: { childId: string; tab: Tab; onTab
   return (
     <>
       <WordTabs tab={tab} onChange={onTabChange} learned={lists.learned.length} learning={lists.learning.length} />
-      <SegmentPanel id={tab}>
-        {list.length === 0 ? (
+      {list.length === 0 ? (
+        <SegmentPanel id={tab}>
           <EmptyState title={t(tab === 'learned' ? 'parent.noLearned' : 'parent.noLearning')} illustration="materials" />
-        ) : (
-          <View className="gap-2.5">
-            {list.map((w) => (
-              <Pressable
-                key={w.word}
-                accessibilityRole="button"
-                onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
-                className="press-row min-h-[58px] flex-row items-center gap-3 rounded-[16.5px] bg-surface px-[14px] py-3 shadow-item active:opacity-80"
-              >
-                <Text className="flex-1 font-body-semibold text-[16px] leading-[22px]" numberOfLines={1}>{content(w.word)}</Text>
-                <Chip label={t('parent.wordLevel', { level: w.level })} />
-                <Icon name="arrow" size={18} color={colors.ink} />
-              </Pressable>
-            ))}
-          </View>
+        </SegmentPanel>
+      ) : null}
+      <ListRows
+        data={list}
+        keyExtractor={(w) => w.word}
+        gap={10}
+        renderItem={(w) => (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
+            className="press-row min-h-[58px] flex-row items-center gap-3 rounded-[16.5px] bg-surface px-[14px] py-3 shadow-item active:opacity-80"
+          >
+            <Text className="flex-1 font-body-semibold text-[16px] leading-[22px]" numberOfLines={1}>{content(w.word)}</Text>
+            <Chip label={t('parent.wordLevel', { level: w.level })} />
+            <Icon name="arrow" size={18} color={colors.ink} />
+          </Pressable>
         )}
-      </SegmentPanel>
+      />
     </>
   );
 }

@@ -17,6 +17,7 @@ import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
+import { ListRows } from '@/ui/virtual-list';
 
 // Free texts are grouped by `complexity` (1 = easiest); we offer the ones matching the account level.
 const COMPLEXITY: Record<Level, number> = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5 };
@@ -78,7 +79,7 @@ export function LeagueScreen() {
   const { t } = useTranslation();
   const { refreshing, refresh } = useRefresh(LEAGUE_STUDENT, LEAGUE_BOOKS);
   return (
-    <TabScreen title={t('league.title')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
+    <TabScreen title={t('league.title')} mascot="learning" list refreshing={refreshing} onRefresh={refresh}>
       <QueryBoundary fallback={<LeagueSkeleton />}>
         <League />
       </QueryBoundary>
@@ -121,13 +122,12 @@ function League() {
   return (
     <View>
       <PointsCard points={student.student?.acorns ?? null} />
-      <View className="mt-[18px] gap-1.5">
-        {list.length ? (
-          list.map((b) => <BookRow key={b.id} {...b} />)
-        ) : (
+      {list.length ? null : (
+        <View className="mt-[18px]">
           <EmptyState title={t('league.emptyTitle')} body={t('league.emptyBody')} illustration="materials" />
-        )}
-      </View>
+        </View>
+      )}
+      <ListRows data={list} keyExtractor={(b) => b.id} gap={6} before={18} renderItem={(b) => <BookRow {...b} />} />
     </View>
   );
 }

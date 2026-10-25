@@ -12,6 +12,7 @@ import { colors } from '@/theme/colors';
 import { EmptyState } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { SearchField } from '@/ui/search-field';
+import { ListRows } from '@/ui/virtual-list';
 
 export const workHref = (w: Pick<Work, 'kind' | 'id'>): Href =>
   ({ pathname: '/teacher/assignment/[kind]/[id]', params: { kind: w.kind, id: w.id } });
@@ -32,7 +33,7 @@ export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {
     .sort((a, b) => b.createdAt - a.createdAt);
 
   return (
-    <View className="pb-[70px]">
+    <View>
       <View className="mb-[14px] flex-row items-center gap-2">
         <SearchField value={query} onChangeText={setQuery} placeholder={t('teacherAssignments.searchAssignments')} className="flex-1" />
         <Pressable
@@ -44,12 +45,19 @@ export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {
           <Icon name="settings" size={20} color={classFilter === ALL_CLASSES ? colors.ink : colors.link} />
         </Pressable>
       </View>
-      <View className="gap-3">
-        {works.map((w) => {
+      {works.length === 0 ? (
+        <EmptyState title={t(q ? 'teacherAssignments.noMatches' : 'teacherAssignments.empty')} illustration="materials" />
+      ) : null}
+      <ListRows
+        data={works}
+        keyExtractor={(w) => w.key}
+        gap={12}
+        // Room for the floating "Assign work" button.
+        footer={<View className="h-[70px]" />}
+        renderItem={(w) => {
           const n = workNumbers(w);
           return (
             <WorkCard
-              key={w.key}
               name={w.name}
               className={w.className}
               date={shortDate(w.date, t)}
@@ -60,11 +68,8 @@ export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {
               onPress={() => router.push(workHref(w))}
             />
           );
-        })}
-        {works.length === 0 ? (
-          <EmptyState title={t(q ? 'teacherAssignments.noMatches' : 'teacherAssignments.empty')} illustration="materials" />
-        ) : null}
-      </View>
+        }}
+      />
       <ClassFilterDialog
         visible={filterOpen}
         classes={classes}

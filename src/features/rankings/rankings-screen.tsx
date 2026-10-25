@@ -10,7 +10,7 @@ import { classRows, rankRows, type RankRow } from '@/features/rankings/rank';
 import { cn } from '@/ui/cn';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { gradient } from '@/ui/gradient';
-import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -183,10 +183,14 @@ function SchoolClasses() {
 export function RankingsScreen() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('students');
+  const { refreshing, refresh } = useRefresh(RANKINGS_CLASSMATES, RANKINGS_CLASSES);
   return (
     <TabScreen
       title={t('rankings.title')}
       mascot="learning"
+      back="/student/league"
+      refreshing={refreshing}
+      onRefresh={refresh}
     >
       <View>
         <Tabs value={tab} onChange={setTab} />

@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from '@apollo/client/react';
 import { router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -14,11 +14,57 @@ import { NotReady, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Sheet } from '@/ui/sheet';
 import { Text } from '@/ui/text';
+import { ListRows, VirtualList } from '@/ui/virtual-list';
+
+/**
+ * The API looks words up one at a time (`word(wordCyrillic)`, no list form), so each row asks for its
+ * own translation. Only rows on screen mount (the list virtualises), and at most this many lookups run
+ * at once; the rest wait their turn.
+ */
+const MAX_LOOKUPS = 4;
+let lookups = 0;
+const waiting: (() => void)[] = [];
+
+function nextLookup() {
+  lookups -= 1;
+  const start = waiting.shift();
+  if (start) {
+    lookups += 1;
+    start();
+  }
+}
+
+/** True once this row may send its lookup; `needed` false (the lookup finished, or unmount) frees the turn. */
+function useLookupTurn(needed: boolean) {
+  const [turn, setTurn] = useState(false);
+  useEffect(() => {
+    if (!needed) return;
+    let held = false;
+    const start = () => {
+      held = true;
+      setTurn(true);
+    };
+    if (lookups < MAX_LOOKUPS) {
+      lookups += 1;
+      start();
+    } else waiting.push(start);
+    return () => {
+      const queued = waiting.indexOf(start);
+      if (queued >= 0) waiting.splice(queued, 1);
+      if (held) nextLookup();
+    };
+  }, [needed]);
+  return turn;
+}
 
 function WordRow({ word, onEdit }: { word: string; onEdit: () => void }) {
   const { t } = useTranslation();
   const content = useContentText();
-  const { data } = useQuery(MATERIALS_WORD_TRANSLATION, { variables: { word } });
+  const [done, setDone] = useState(false);
+  const turn = useLookupTurn(!done);
+  // cache-first: dictionary translations don't change, so a word seen before needs no request.
+  const { data, loading } = useQuery(MATERIALS_WORD_TRANSLATION, { variables: { word }, skip: !turn, fetchPolicy: 'cache-first' });
+  if (turn && !loading && !done) setDone(true);
   const def = data?.word?.definitions[0];
   const meaning = [def?.translationRussian, def?.translationEnglish].filter(Boolean).join(' · ');
   return (
@@ -40,7 +86,7 @@ export function WordBankScreen() {
   return (
     <>
       <Stack.Screen options={{ presentation: 'transparentModal', animation: 'fade' }} />
-      <Sheet title={t('materials.wordBank')} tall onClose={() => goBack()}>
+      <Sheet title={t('materials.wordBank')} tall scroll={false} onClose={() => goBack()}>
         <QueryBoundary
           fallback={
             <View className="gap-3">
@@ -73,27 +119,34 @@ function WordBank({ onEdit }: { onEdit: () => void }) {
   const words = [...new Set((topics[topic]?.levels ?? []).flatMap((l) => l.words.map((w) => w.word)))];
 
   return (
-    <>
-      {topics.length > 1 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-5 mb-2" contentContainerStyle={{ paddingHorizontal: 20, gap: 6 }}>
-          {topics.map((tp, i) => (
-            <Pressable
-              key={tp.name}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: i === topic }}
-              onPress={() => setTopic(i)}
-              className={cn('press h-9 justify-center rounded-tile px-3', i === topic ? 'bg-primary-strong' : 'bg-track')}
-            >
-              <Text className={cn('font-body-semibold text-[12px]', i === topic ? 'text-white' : 'text-link')}>{content(tp.name)}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      ) : null}
-      <View className="gap-1">
-        {words.map((w) => (
-          <WordRow key={w} word={w} onEdit={onEdit} />
-        ))}
-      </View>
-    </>
+    <VirtualList
+      bounces={false}
+      header={
+        <>
+          {topics.length > 1 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-5 mb-2" contentContainerStyle={{ paddingHorizontal: 20, gap: 6 }}>
+              {topics.map((tp, i) => (
+                <Pressable
+                  key={tp.name}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: i === topic }}
+                  onPress={() => setTopic(i)}
+                  hitSlop={{ top: 4, bottom: 4 }}
+                  className={cn('press h-9 justify-center rounded-tile px-3', i === topic ? 'bg-primary-strong' : 'bg-track')}
+                >
+                  <Text
+                    className={cn('font-body-semibold text-[12px]', i === topic ? 'text-white' : 'text-link')}
+                    maxFontSizeMultiplier={1.3}
+                  >
+                    {content(tp.name)}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          ) : null}
+          <ListRows data={words} keyExtractor={(w) => w} gap={4} renderItem={(w) => <WordRow word={w} onEdit={onEdit} />} />
+        </>
+      }
+    />
   );
 }

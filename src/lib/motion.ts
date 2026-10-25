@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { Easing, FadeIn, FadeOut, Keyframe } from 'react-native-reanimated';
 
 /**
@@ -29,11 +30,18 @@ export const pageIn = new Keyframe({
   100: { opacity: 1, transform: [{ translateY: 0 }], easing: motion.page.easing },
 }).duration(motion.page.duration);
 
-/** Tab-panel change: from 45% opacity, 4px lower (micro.js transitionPanel). */
-export const panelIn = new Keyframe({
-  0: { opacity: 0.45, transform: [{ translateY: 4 }] },
-  100: { opacity: 1, transform: [{ translateY: 0 }], easing: motion.page.easing },
-}).duration(motion.page.duration);
+/**
+ * Tab-panel change: from 45% opacity, 4px lower (micro.js transitionPanel). On web a plain fade:
+ * Reanimated's web cleanup pins a finished Keyframe entering at `position: absolute`, which takes the
+ * panel out of the layout and lets the rows of a virtualised list slide under it.
+ */
+export const panelIn =
+  Platform.OS === 'web'
+    ? FadeIn.duration(motion.page.duration)
+    : new Keyframe({
+        0: { opacity: 0.45, transform: [{ translateY: 4 }] },
+        100: { opacity: 1, transform: [{ translateY: 0 }], easing: motion.page.easing },
+      }).duration(motion.page.duration);
 
 /** Loaded content replacing its skeleton. */
 export const contentIn = FadeIn.duration(motion.fade);

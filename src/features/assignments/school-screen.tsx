@@ -6,6 +6,7 @@ import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { TabScreen } from '@/ui/tab-screen';
+import { ListRows } from '@/ui/virtual-list';
 
 import { AssignmentCard } from './assignment-card';
 import { STUDENT_ASSIGNMENTS } from './gql';
@@ -35,7 +36,7 @@ export function SchoolScreen() {
   const [segment, setSegment] = useState<Segment>('new');
 
   return (
-    <TabScreen title={t('common.tabs.school')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
+    <TabScreen title={t('common.tabs.school')} mascot="learning" list refreshing={refreshing} onRefresh={refresh}>
       <QueryBoundary
         fade={false}
         fallback={
@@ -63,21 +64,16 @@ function School({ segment, onSegment }: { segment: Segment; onSegment: (s: Segme
   return (
     <>
       <Segments value={segment} onChange={onSegment} counts={{ new: fresh.length, completed: completed.length }} />
-      <SegmentPanel id={segment}>
-        {list.length === 0 ? (
-          segment === 'new' ? (
+      {list.length === 0 ? (
+        <SegmentPanel id={segment}>
+          {segment === 'new' ? (
             <EmptyState illustration="classroom" title={t('assignments.empty.new')} body={t('assignments.empty.newBody')} />
           ) : (
             <EmptyState illustration="progress" title={t('assignments.empty.completed')} />
-          )
-        ) : (
-          <View className="gap-2.5">
-            {list.map((a) => (
-              <AssignmentCard key={`${a.kind}:${a.id}`} item={a} />
-            ))}
-          </View>
-        )}
-      </SegmentPanel>
+          )}
+        </SegmentPanel>
+      ) : null}
+      <ListRows data={list} keyExtractor={(a) => `${a.kind}:${a.id}`} gap={10} before={12} renderItem={(a) => <AssignmentCard item={a} />} />
     </>
   );
 }

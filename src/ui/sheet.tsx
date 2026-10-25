@@ -18,6 +18,8 @@ type Props = {
   onClose?: () => void;
   /** Long lists: open at full height, so the sheet doesn't grow once its data loads. */
   tall?: boolean;
+  /** Off when the content scrolls itself (a virtualised list): it then fills the sheet below the title. */
+  scroll?: boolean;
   children: ReactNode;
 };
 
@@ -33,8 +35,17 @@ const DISMISS = 96;
 // Through the alias the worklets plugin no longer spots the callbacks, so they say 'worklet' themselves.
 const panGesture = () => Gesture.Pan();
 
+function Heading({ title, description }: { title: string; description?: string }) {
+  return (
+    <>
+      <Text variant="display" className="mb-2.5 text-[25px] leading-[30px]">{title}</Text>
+      {description ? <Text className="mb-5 font-body text-[13px] leading-[20px] text-muted">{description}</Text> : null}
+    </>
+  );
+}
+
 /** Bottom sheet from the design (rounded top, handle, display title). Render it inside a transparent modal route. */
-export function Sheet({ title, description, onClose, tall, children }: Props) {
+export function Sheet({ title, description, onClose, tall, scroll = true, children }: Props) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   useEscape(onClose);
@@ -64,11 +75,17 @@ export function Sheet({ title, description, onClose, tall, children }: Props) {
                 <View className="h-1 w-10 self-center rounded bg-[#dce1eb]" />
               </View>
             </GestureDetector>
-            <ScrollView bounces={false}>
-              <Text variant="display" className="mb-2.5 text-[25px] leading-[30px]">{title}</Text>
-              {description ? <Text className="mb-5 font-body text-[13px] leading-[20px] text-muted">{description}</Text> : null}
-              {children}
-            </ScrollView>
+            {scroll ? (
+              <ScrollView bounces={false}>
+                <Heading title={title} description={description} />
+                {children}
+              </ScrollView>
+            ) : (
+              <>
+                <Heading title={title} description={description} />
+                <View className="flex-1">{children}</View>
+              </>
+            )}
           </View>
         </Animated.View>
       </Animated.View>

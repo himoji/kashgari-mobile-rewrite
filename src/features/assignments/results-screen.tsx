@@ -5,6 +5,7 @@ import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
+import { ListRows } from '@/ui/virtual-list';
 
 import { AssignmentCard } from './assignment-card';
 import { STUDENT_ASSIGNMENTS } from './gql';
@@ -37,7 +38,7 @@ export function ResultsScreen() {
 
   return (
     <View className="flex-1">
-      <TabScreen title={t('assignments.results.title')} mascot="results" refreshing={refreshing} onRefresh={refresh}>
+      <TabScreen title={t('assignments.results.title')} mascot="results" back="/student/school" list refreshing={refreshing} onRefresh={refresh}>
         <QueryBoundary
           fallback={
             <>
@@ -64,13 +65,8 @@ function Results() {
       <Summary completed={completed.length} average={averageScore(completed)} />
       {completed.length === 0 ? (
         <EmptyState illustration="progress" title={t('assignments.empty.completed')} />
-      ) : (
-        <View className="gap-2.5">
-          {completed.map((a) => (
-            <AssignmentCard key={`${a.kind}:${a.id}`} item={a} />
-          ))}
-        </View>
-      )}
+      ) : null}
+      <ListRows data={completed} keyExtractor={(a) => `${a.kind}:${a.id}`} gap={10} before={12} renderItem={(a) => <AssignmentCard item={a} />} />
     </>
   );
 }

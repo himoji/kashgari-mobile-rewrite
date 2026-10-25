@@ -19,9 +19,10 @@ import { Card } from '@/ui/card';
 import { Dialog } from '@/ui/dialog';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
-import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
+import { ListRows } from '@/ui/virtual-list';
 
 function Badge({ label }: { label: string }) {
   return (
@@ -96,9 +97,10 @@ export function LibraryScreen() {
   const [open, setOpen] = useState<Open>(null);
   const [notReady, setNotReady] = useState(false);
   const controls: Controls = { filter, setFilter, open, setOpen, setPickedGrade, onSaved: () => setNotReady(true) };
+  const { refreshing, refresh } = useRefresh(MATERIALS_GRADE, MATERIALS_GRAMMAR);
 
   return (
-    <TabScreen title={t('materials.title')}>
+    <TabScreen title={t('materials.title')} list raiseHeader refreshing={refreshing} onRefresh={refresh}>
       <View className="flex-row gap-2">
         <Button variant="soft" className="flex-1" label={t('materials.wordBank')} onPress={() => router.push('/teacher/word-bank')} />
         <Button variant="strong" className="flex-1" icon="plus" label={t('materials.createAssignment')} onPress={() => router.push('/teacher/assign/new')} />
@@ -252,10 +254,9 @@ function LibraryList({ grade, filter, onClear, onSaved }: { grade: number; filte
   );
   const list = filterLibrary(items, filter);
 
+  // The boundary around this list already spaces it from the filters above.
   return list.length ? (
-    <>
-      {list.map((item) => <MaterialCard key={materialParam(item.ref)} item={item} onSave={onSaved} />)}
-    </>
+    <ListRows data={list} keyExtractor={(item) => materialParam(item.ref)} gap={12} renderItem={(item) => <MaterialCard item={item} onSave={onSaved} />} />
   ) : (
     <View>
       <EmptyState title={t('materials.emptyTitle')} body={t('materials.emptyHint')} />
