@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useProfile } from '@/features/auth/session';
 import { useRetryKey } from '@/ui/query-boundary';
 
-import { STUDENT_ASSIGNMENTS } from './gql';
+import { LESSON_PARTS_ERROR_POLICY, STUDENT_ASSIGNMENTS } from './gql';
 import { mapAssignments, sortCompleted, sortNew } from './map';
 
 /**
@@ -14,9 +14,7 @@ import { mapAssignments, sortCompleted, sortNew } from './map';
 export function useStudentAssignments() {
   const { profileId } = useProfile();
   const queryKey = useRetryKey();
-  // errorPolicy 'all': one broken field (the API can throw on a lesson submission's createdAt)
-  // must not blank the whole list; that field comes back null instead.
-  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId }, queryKey, errorPolicy: 'all' });
+  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId }, queryKey, errorPolicy: LESSON_PARTS_ERROR_POLICY });
   const cls = data?.student?.class;
   return useMemo(() => {
     const all = mapAssignments(cls);

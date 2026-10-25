@@ -5,6 +5,7 @@ import Animated from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
 import { motion, panelIn } from '@/lib/motion';
 import { cn } from '@/ui/cn';
+import { gradient } from '@/ui/gradient';
 import { useSlidingPill } from '@/ui/sliding-pill';
 import { Text } from '@/ui/text';
 
@@ -26,7 +27,7 @@ const track: Record<Variant, string> = {
 };
 const pill: Record<Variant, string> = {
   tabs: 'rounded-[9px] bg-surface shadow-pill',
-  choice: 'rounded-[9px] bg-primary-strong sheen',
+  choice: 'rounded-[9px] bg-primary-strong',
   section: 'rounded-tile bg-surface shadow-[0_2px_6px_rgba(36,38,49,0.035)]',
 };
 const item: Record<Variant, string> = {
@@ -47,7 +48,7 @@ export function SegmentedTabs<T extends string>({ value, options, onChange, vari
   return (
     <View accessibilityRole="tablist" className={cn('flex-row', track[variant], className)}>
       <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 4, bottom: 4, left: 0 }, style]}>
-        <View className={cn('flex-1', pill[variant])} />
+        <View className={cn('flex-1', pill[variant])} style={variant === 'choice' ? gradient('sheen') : undefined} />
       </Animated.View>
       {options.map((o) => {
         const selected = o.value === value;

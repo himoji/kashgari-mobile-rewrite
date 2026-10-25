@@ -3,13 +3,14 @@ import { ActivityIndicator, Pressable, type PressableProps } from 'react-native'
 
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
+import { gradient } from '@/ui/gradient';
 import { Icon, type IconName } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
 const button = cva('press flex-row items-center justify-center gap-2 rounded-control px-[13px]', {
   variants: {
     variant: {
-      primary: 'bg-primary sheen shadow-button active:opacity-90',
+      primary: 'bg-primary shadow-button active:opacity-90',
       strong: 'bg-primary-strong active:opacity-90',
       attention: 'bg-attention active:opacity-90',
       danger: 'bg-danger-soft active:opacity-80',
@@ -50,6 +51,7 @@ export function Button({ label: text, icon, loading, variant, size, block, disab
       accessibilityRole="button"
       disabled={disabled || loading}
       className={cn(button({ variant, size, block }), (disabled || loading) && 'opacity-50', className)}
+      style={v === 'primary' ? gradient('sheen') : undefined}
       {...props}
     >
       {loading ? <ActivityIndicator color={iconColor[v]} /> : icon ? <Icon name={icon} size={16} color={iconColor[v]} /> : null}

@@ -2,7 +2,7 @@ import { useQuery, useSuspenseQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
 
 import { mapAssignments } from '@/features/assignments/map';
-import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
+import { LESSON_PARTS_ERROR_POLICY, STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
 import { useProfile } from '@/features/auth/session';
 import { CHILDREN } from '@/features/children/gql';
 import { mapChildren } from '@/features/children/children-data';
@@ -38,7 +38,7 @@ export function useChildName(childId: string): string | undefined {
  */
 export function useChildAssignments(studentId: string) {
   const queryKey = useRetryKey();
-  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId }, queryKey, errorPolicy: 'all' });
+  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId }, queryKey, errorPolicy: LESSON_PARTS_ERROR_POLICY });
   const cls = data?.student?.class;
   const all = useMemo(() => mapAssignments(cls), [cls]);
   return { all };

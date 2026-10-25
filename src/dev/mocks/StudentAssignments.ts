@@ -19,7 +19,7 @@ const lesson = (id: string, name: string, minutes: number[], openedDaysAgo: numb
   visible: true,
   opensAt: now() - openedDaysAgo * DAY,
   activities: minutes.map((m) => ({ __typename: 'OynaActivity', estTime: m })),
-  submission: { __typename: 'LessonSubmission', createdAt: null, submissions: minutes.map(() => null) },
+  submission: { __typename: 'LessonSubmission', submissions: minutes.map(() => null) },
 });
 
 export default () => {

@@ -12,6 +12,7 @@ import type { Level } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { EmptyState, Skeleton } from '@/ui/feedback';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
@@ -24,8 +25,8 @@ function PointsCard({ points }: { points: number | null }) {
   const { t } = useTranslation();
   return (
     <View
-      className="sheen min-h-[88px] flex-row items-center justify-between gap-3 rounded-[20px] bg-primary px-4 py-[18px]"
-      style={{ boxShadow: '0 3px 12px rgba(52, 125, 233, 0.11)' }}
+      className="min-h-[88px] flex-row items-center justify-between gap-3 rounded-[20px] bg-primary px-4 py-[18px]"
+      style={[gradient('sheen'), { boxShadow: '0 3px 12px rgba(52, 125, 233, 0.11)' }]}
     >
       <View className="flex-row items-baseline gap-1.5">
         <Text className="font-body-medium text-[34px] leading-[40px] text-white">

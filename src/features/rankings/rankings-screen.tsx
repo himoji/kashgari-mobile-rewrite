@@ -9,6 +9,7 @@ import { Podium } from '@/features/rankings/podium';
 import { classRows, rankRows, type RankRow } from '@/features/rankings/rank';
 import { cn } from '@/ui/cn';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
+import { gradient } from '@/ui/gradient';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -33,9 +34,9 @@ function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void })
             onPress={() => onChange(tab)}
             className={cn(
               'press h-11 flex-1 items-center justify-center rounded-[9px] p-2',
-              selected && 'sheen bg-primary-strong',
+              selected && 'bg-primary-strong',
             )}
-            style={selected ? { boxShadow: '0 2px 6px rgba(10, 116, 255, 0.094)' } : undefined}
+            style={selected ? [gradient('sheen'), { boxShadow: '0 2px 6px rgba(10, 116, 255, 0.094)' }] : undefined}
           >
             <Text
               className={cn(
@@ -56,7 +57,7 @@ function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void })
 function OwnSummary({ tab, own, total }: { tab: Tab; own: RankRow; total: number }) {
   const { t } = useTranslation();
   return (
-    <View className="sheen mb-[26px] flex-row items-center gap-[15px] rounded-[16px] bg-primary p-4">
+    <View className="mb-[26px] flex-row items-center gap-[15px] rounded-[16px] bg-primary p-4" style={gradient('sheen')}>
       <View className="flex-1 gap-[5px]">
         <Text className="font-body text-[12px] leading-[19px] text-white">
           {t(`rankings.own.${tab}`)}

@@ -143,7 +143,8 @@ export function mapAssignments(cls: ClassData | undefined, now = Date.now() / 10
   for (const l of cls.lessons) {
     if (!l.visible || l.opensAt > now) continue;
     const parts = l.submission?.submissions ?? [];
-    const submitted = parts.filter(Boolean).length;
+    const times = parts.flatMap((p) => (p ? [p.createdAt] : []));
+    const submitted = times.length;
     const state: AssignmentState =
       parts.length > 0 && submitted === parts.length ? 'done' : submitted > 0 ? 'inProgress' : 'notStarted';
     const minutes = l.activities.reduce((n, a) => {
@@ -158,7 +159,7 @@ export function mapAssignments(cls: ClassData | undefined, now = Date.now() / 10
         title: l.name,
         minutes: minutes > 0 ? Math.max(1, Math.round(minutes)) : undefined,
         state,
-        submittedAt: state === 'done' ? (l.submission?.createdAt ?? undefined) : undefined,
+        submittedAt: state === 'done' ? Math.max(...times) : undefined,
         createdAt: l.opensAt,
       }),
     );
@@ -176,7 +177,7 @@ export const canStart = (a: StudentAssignment) => !isCompleted(a) && a.state !==
 export function sortNew(list: StudentAssignment[]) {
   return list
     .filter((a) => !isCompleted(a))
-    .toSorted((a, b) => {
+    .sort((a, b) => {
       if (a.deadline != null && b.deadline != null) return a.deadline - b.deadline;
       if (a.deadline != null) return -1;
       if (b.deadline != null) return 1;
@@ -186,7 +187,7 @@ export function sortNew(list: StudentAssignment[]) {
 
 /** Completed work, most recently submitted first. */
 export function sortCompleted(list: StudentAssignment[]) {
-  return list.filter(isCompleted).toSorted((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt));
+  return list.filter(isCompleted).sort((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt));
 }
 
 /** Rounded average of the scored items, or undefined when nothing has a score yet. */

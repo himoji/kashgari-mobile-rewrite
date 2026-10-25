@@ -7,6 +7,7 @@ import { haptics } from '@/lib/haptics';
 import { motion } from '@/lib/motion';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
+import { gradient } from '@/ui/gradient';
 import { useSlidingPill } from '@/ui/sliding-pill';
 import { Text } from '@/ui/text';
 
@@ -27,13 +28,13 @@ export function PillTabBar({ state, descriptors, navigation, parents = {} }: Bot
   const pill = useSlidingPill(active, motion.dock);
   return (
     <>
-      <View pointerEvents="none" className="bg-dock-fade absolute inset-x-0 bottom-0" style={{ height: bottom + DOCK_HEIGHT + 24 }} />
+      <View pointerEvents="none" className="absolute inset-x-0 bottom-0" style={[gradient('dockFade'), { height: bottom + DOCK_HEIGHT + 24 }]} />
       <View
-        className="bg-dock absolute inset-x-[14px] flex-row items-center gap-1 rounded-[14px] border border-white/60 p-1.5 shadow-dock"
-        style={{ bottom, height: DOCK_HEIGHT }}
+        className="absolute inset-x-[14px] flex-row items-center gap-1 rounded-[14px] border border-white/60 p-1.5 shadow-dock"
+        style={[gradient('dock'), { bottom, height: DOCK_HEIGHT }]}
       >
         <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 6, bottom: 6, left: 0 }, pill.style]}>
-          <View className="bg-primary-strong sheen flex-1 rounded-[10px]" style={{ boxShadow: '0 2px 5px rgba(10,116,255,0.18)' }} />
+          <View className="flex-1 rounded-[10px] bg-primary-strong" style={[gradient('sheen'), { boxShadow: '0 2px 5px rgba(10,116,255,0.18)' }]} />
         </Animated.View>
         {state.routes.map((route) => {
           // Dock pages have no button of their own.

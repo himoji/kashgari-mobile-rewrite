@@ -46,7 +46,7 @@ export function lessonOutcome(lesson: Lesson, lang: UiLanguage): Outcome {
   const total: Score = { correct: 0, total: 0, pending: false };
   const steps: Step[] = [];
   const answers: Answers = {};
-  let submittedAt = lesson.submission?.createdAt ?? null;
+  let submittedAt: number | null = null;
   let touched = false;
   const seen = (at: number | null | undefined) => {
     touched = true;

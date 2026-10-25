@@ -31,9 +31,9 @@ describe('mapAssignments', () => {
 
   it('marks lessons in progress or done from their activity submissions', () => {
     const l = cls.lessons[0]!;
-    const sub = (parts: ({ __typename: 'Submission' } | null)[]) => ({ ...cls, lessons: [{ ...l, submission: { createdAt: 5, submissions: parts } }] });
-    expect(mapAssignments(sub([{ __typename: 'Submission' }, null]), now).find((a) => a.id === l.id)?.state).toBe('inProgress');
-    expect(mapAssignments(sub([{ __typename: 'Submission' }]), now).find((a) => a.id === l.id)).toMatchObject({ state: 'done', submittedAt: 5 });
+    const sub = (parts: ({ createdAt: number } | null)[]) => ({ ...cls, lessons: [{ ...l, submission: { submissions: parts } }] });
+    expect(mapAssignments(sub([{ createdAt: 5 }, null]), now).find((a) => a.id === l.id)?.state).toBe('inProgress');
+    expect(mapAssignments(sub([{ createdAt: 5 }, { createdAt: 9 }]), now).find((a) => a.id === l.id)).toMatchObject({ state: 'done', submittedAt: 9 });
   });
 
   it('treats the max-int deadline as none', () => {

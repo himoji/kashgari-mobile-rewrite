@@ -11,6 +11,7 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/feedback';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { ListRow } from '@/ui/list-row';
 import { ProgressRing } from '@/ui/progress-ring';
@@ -22,7 +23,7 @@ import { Text } from '@/ui/text';
 function DailyWordCard() {
   const { t } = useTranslation();
   return (
-    <View className="sheen mb-[18px] gap-[3px] rounded-[18px] bg-primary p-3">
+    <View className="mb-[18px] gap-[3px] rounded-[18px] bg-primary p-3" style={gradient('sheen')}>
       <Text className="font-body-medium text-[11px] leading-[16px] text-white">{t('studentHome.dailyWord')}</Text>
       <View className="flex-row items-center gap-2.5">
         <Icon name="hourglass" size={18} color={colors.white} />

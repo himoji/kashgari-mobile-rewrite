@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Icon } from '@/ui/icon';
+import { gradient } from '@/ui/gradient';
 import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
@@ -89,7 +90,8 @@ function AudioCard({ url, title }: { url: string; title: string }) {
           accessibilityRole="button"
           accessibilityLabel={status.playing ? t('player.pauseAudio') : t('player.playAudio')}
           onPress={toggle}
-          className="h-11 w-11 items-center justify-center rounded-control bg-primary-strong sheen active:opacity-90"
+          className="h-11 w-11 items-center justify-center rounded-control bg-primary-strong active:opacity-90"
+          style={gradient('sheen')}
         >
           {status.playing && status.isBuffering ? (
             <ActivityIndicator size="small" color={colors.white} />

@@ -64,11 +64,22 @@ export const STUDENT_ASSIGNMENTS = gql(`
             ... on DurysActivity { estTime }
           }
           submission(studentId: $studentId) {
-            createdAt
-            submissions { __typename }
+            submissions {
+              ... on Submission { createdAt }
+              ... on ZhazylymSubmission { createdAt }
+              ... on OynaSubmission { createdAt }
+              ... on DurysSubmission { createdAt }
+            }
           }
         }
       }
     }
   }
 `);
+
+/**
+ * The API lists a lesson game the student has not played as a submission with no fields, so its
+ * `createdAt` fails and that list item comes back null with an error. 'all' keeps the rest of the
+ * data; a null part reads as not submitted.
+ */
+export const LESSON_PARTS_ERROR_POLICY = 'all';

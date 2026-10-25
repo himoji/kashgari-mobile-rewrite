@@ -6,7 +6,6 @@ export default ({ id }: { id: string }) => ({
     id,
     name: lessonName(id),
     opensAt: lessonOpensAt(id),
-    submission: { __typename: 'LessonSubmission', createdAt: now() - 86400 },
     activities: [
       {
         __typename: 'TextActivity',

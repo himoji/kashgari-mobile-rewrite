@@ -55,14 +55,14 @@ export function moduleBreakdown(list: StudentAssignment[]): ModuleSummary[] {
 
 /** Latest activity first: submitted work by submission time, open work by when it was given. */
 export function recentAssignments(list: StudentAssignment[], count = 4): StudentAssignment[] {
-  return list.toSorted((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt)).slice(0, count);
+  return [...list].sort((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt)).slice(0, count);
 }
 
 /** Module page order: open work first (as the student sees it), then completed work. */
 export function moduleAssignments(list: StudentAssignment[], kind: AssignmentKind): StudentAssignment[] {
   const items = list.filter((a) => a.kind === kind);
-  const open = items.filter((a) => !isCompleted(a)).toSorted((a, b) => b.createdAt - a.createdAt);
-  const done = items.filter(isCompleted).toSorted((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt));
+  const open = items.filter((a) => !isCompleted(a)).sort((a, b) => b.createdAt - a.createdAt);
+  const done = items.filter(isCompleted).sort((a, b) => (b.submittedAt ?? b.createdAt) - (a.submittedAt ?? a.createdAt));
   return [...open, ...done];
 }
 
@@ -72,6 +72,6 @@ export type ChildWord = { word: string; level: number };
 /** Learned words (no longer pending) and words still being learned, each alphabetical. */
 export function splitWords(words: ApiWord[]): { learned: ChildWord[]; learning: ChildWord[] } {
   const sort = (list: ApiWord[]) =>
-    list.map((w) => ({ word: w.word, level: w.level })).toSorted((a, b) => a.word.localeCompare(b.word, 'kk'));
+    list.map((w) => ({ word: w.word, level: w.level })).sort((a, b) => a.word.localeCompare(b.word, 'kk'));
   return { learned: sort(words.filter((w) => !w.isPending)), learning: sort(words.filter((w) => w.isPending)) };
 }

@@ -176,7 +176,6 @@ export const PLAYER_LESSON = gql(`
       id
       name
       opensAt
-      submission(studentId: $studentId) { createdAt }
       activities {
         __typename
         ... on TextActivity {

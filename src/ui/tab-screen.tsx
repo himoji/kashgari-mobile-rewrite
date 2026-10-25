@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Mask, Pattern, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { cn } from '@/ui/cn';
+import { gradient } from '@/ui/gradient';
 import { DOCK_HEIGHT, dockBottom } from '@/ui/pill-tab-bar';
 import { BoundaryGap } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
@@ -81,7 +82,7 @@ export function TabScreen({
           ) : undefined
         }
       >
-        <View className="bg-workspace absolute inset-x-0 top-0 h-[284px]" />
+        <View className="absolute inset-x-0 top-0 h-[284px]" style={gradient('workspace')} />
         <HeroPattern />
         <View
           className="h-11 flex-row items-center justify-end gap-1.5 px-5"

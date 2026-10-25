@@ -10,6 +10,7 @@ import { OynaResult } from '@/features/oyna/oyna-player';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { ErrorState, Skeleton } from '@/ui/feedback';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
@@ -47,7 +48,7 @@ function StateCard({ outcome }: { outcome: Outcome }) {
   return (
     <View
       className="mb-6 items-center gap-[5px] overflow-hidden rounded-sheet bg-success px-[18px] pb-[26px] pt-6"
-      style={{ experimental_backgroundImage: 'radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.14), transparent 65%)' }}
+      style={gradient('result')}
     >
       <View className="mb-[5px] h-[38px] w-[38px] items-center justify-center rounded-full bg-white/15">
         <Icon name="check" size={20} color={colors.white} />
