@@ -89,5 +89,9 @@
     "start": "Start",
     "yourText": "Your text"
   },
-  "activityCompleted": "Activity completed"
+  "activityCompleted": "Activity completed",
+  "leaveTitle": "Leave the lesson?",
+  "leaveBody": "Your answers won't be saved.",
+  "leave": "Leave",
+  "stay": "Stay"
 }

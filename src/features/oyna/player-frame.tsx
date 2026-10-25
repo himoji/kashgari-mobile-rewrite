@@ -1,18 +1,22 @@
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { formatClock } from '@/features/oyna/logic/game-type';
 import type { SessionTimer } from '@/features/oyna/use-session-clock';
-import { motion, toastIn, toastOut } from '@/lib/motion';
+import { ConfirmSheet } from '@/features/player/player-shell';
+import { motion } from '@/lib/motion';
+import { useLeaveGuard } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
 import { useModalMotion } from '@/ui/dialog';
 import { Icon, type IconName } from '@/ui/icon';
+import { KeyboardFooter } from '@/ui/keyboard';
 import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
@@ -73,20 +77,26 @@ type Props = {
   /** Collapsible "Сабақ реті / Сөздер" block under the exercise. */
   outline?: ReactNode;
   footer?: ReactNode;
-  toast?: ReactNode;
+  /** Unsaved play (a started timer, written text, finished steps): leaving asks first. */
+  dirty?: boolean;
 };
 
 /** Layout of every player screen in the prototype (student-player-a4/a6/a8): white page, step head, pinned actions. */
-export function PlayerFrame({ title, caption, progress, backLabel, onBack, timer, children, outline, footer, toast }: Props) {
+export function PlayerFrame({ title, caption, progress, backLabel, onBack, timer, children, outline, footer, dirty = false }: Props) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const guard = useLeaveGuard(dirty);
   return (
     <View className="flex-1 bg-surface">
       <View className="flex-row items-center justify-between gap-3 bg-surface px-5 pb-2.5" style={{ paddingTop: insets.top > 0 ? insets.top : 38 }}>
         <BackLink label={backLabel ?? t('oyna.back')} onPress={onBack ?? leavePlayer} />
         {timer ? <TimerPill endsAt={timer.endsAt} running={timer.running} /> : null}
       </View>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 + insets.bottom }} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView
+        bottomOffset={90}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 + insets.bottom }}
+      >
         <View className="mb-5">
           <Text className="mb-1.5 font-body-semibold text-[17px] leading-[23px]">{title}</Text>
           {caption ? <Text className="font-body text-[11px] leading-[16px] text-[#7a8090]">{caption}</Text> : null}
@@ -96,16 +106,27 @@ export function PlayerFrame({ title, caption, progress, backLabel, onBack, timer
         </View>
         {children}
         {outline}
-      </ScrollView>
+      </KeyboardAwareScrollView>
       {footer ? (
-        <View
-          className="absolute inset-x-0 bottom-0 flex-row items-center gap-2.5 bg-white/95 px-5 pt-3"
-          style={{ paddingBottom: insets.bottom + 14, boxShadow: '0 -5px 18px rgba(36, 38, 49, 0.01)' }}
-        >
-          {footer}
-        </View>
+        // Rides on the keyboard, so Submit stays in reach while writing.
+        <KeyboardFooter>
+          <View
+            className="flex-row items-center gap-2.5 bg-white/95 px-5 pt-3"
+            style={{ paddingBottom: insets.bottom + 14, boxShadow: '0 -5px 18px rgba(36, 38, 49, 0.01)' }}
+          >
+            {footer}
+          </View>
+        </KeyboardFooter>
       ) : null}
-      {toast}
+      <ConfirmSheet
+        visible={guard.asking}
+        title={t('oyna.leaveTitle')}
+        body={t('oyna.leaveBody')}
+        confirmLabel={t('oyna.leave')}
+        cancelLabel={t('oyna.stay')}
+        onConfirm={guard.leave}
+        onClose={guard.stay}
+      />
     </View>
   );
 }
@@ -155,39 +176,6 @@ export function PlayerActions({
       </Pressable>
     </>
   );
-}
-
-/** The white hint toast pinned under the app bar ("Қайта тексеріңіз."). */
-export function useToast() {
-  const [message, setMessage] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const insets = useSafeAreaInsets();
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
-  const show = useCallback((text: string) => {
-    if (timer.current) clearTimeout(timer.current);
-    setMessage(text);
-    timer.current = setTimeout(() => setMessage(null), 2200);
-  }, []);
-  const node = message ? (
-    <Animated.View
-      key={message}
-      entering={toastIn}
-      exiting={toastOut}
-      pointerEvents="none"
-      style={{ position: 'absolute', left: 40, right: 40, top: (insets.top > 0 ? insets.top : 38) + 32 }}
-    >
-      <View
-        accessibilityLiveRegion="polite"
-        className="rounded-[13px] bg-surface px-[15px] py-3"
-        style={{ boxShadow: '0 5px 24px rgba(48, 62, 88, 0.11)' }}
-      >
-        <Text className="font-body text-[13px] leading-[20px] text-[#6d84a5]">{message}</Text>
-      </View>
-    </Animated.View>
-  ) : null;
-  return { toast: node, showToast: show };
 }
 
 /** "Жұмысты тапсыру керек пе?" dialog (student-player-a4-submit-confirm). */

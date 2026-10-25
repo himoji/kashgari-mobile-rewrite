@@ -8,7 +8,7 @@ import { useProfile } from '@/features/auth/session';
 import { OYNA_MINI_STORY_GAME, OYNA_MINI_STORY_SUBMIT } from '@/features/oyna/gql';
 import { countWords, usedWords } from '@/features/oyna/logic/ministory';
 import { Chip, ExerciseTitle, Hint, Outline } from '@/features/oyna/parts';
-import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/oyna/player-frame';
+import { ConfirmSubmit, PlayerActions, PlayerFrame } from '@/features/oyna/player-frame';
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
@@ -19,6 +19,7 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
+import { showToast } from '@/ui/toast';
 
 type Game = NonNullable<OynaMiniStoryGameQuery['miniStoryGame']>;
 
@@ -43,7 +44,6 @@ function MiniStoryLoad({ id }: { id: string }) {
 function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
   const { t } = useTranslation();
   const ct = useContentText();
-  const { toast, showToast } = useToast();
   const [text, setText] = useState('');
   const [confirm, setConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -86,7 +86,7 @@ function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
           onPress={() => (text.trim() ? setConfirm(true) : showToast(t('oyna.emptyStory')))}
         />
       }
-      toast={toast}
+      dirty={!!text.trim() || !!clock.timer}
     >
       <ExerciseTitle>{t('oyna.kinds.ministory')}</ExerciseTitle>
       <Hint>{t('oyna.storyHint')}</Hint>

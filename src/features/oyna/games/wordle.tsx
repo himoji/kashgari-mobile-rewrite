@@ -16,7 +16,7 @@ import {
   type LetterState,
 } from '@/features/oyna/logic/wordle';
 import { ExerciseTitle, Hint, Outline } from '@/features/oyna/parts';
-import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/oyna/player-frame';
+import { ConfirmSubmit, PlayerActions, PlayerFrame } from '@/features/oyna/player-frame';
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
@@ -29,6 +29,7 @@ import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
+import { showToast } from '@/ui/toast';
 
 type Game = NonNullable<OynaWordleGameQuery['wordleGame']>;
 
@@ -124,7 +125,6 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
   const client = useApolloClient();
   const { language } = useProfile();
   const { width } = useWindowDimensions();
-  const { toast, showToast } = useToast();
   const words = game.words.map((w) => w.toLocaleUpperCase());
   const [wordIndex, setWordIndex] = useState(0);
   const [guesses, setGuesses] = useState<string[][]>(() => words.map(() => []));
@@ -219,7 +219,7 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
           loading={checking}
         />
       }
-      toast={toast}
+      dirty={!!clock.timer || !!typed || guesses.some((g) => g.length > 0)}
     >
       <ExerciseTitle>{t('oyna.kinds.wordle')}</ExerciseTitle>
       <Hint>{t('oyna.wordleHint')}</Hint>

@@ -10,7 +10,7 @@ import { cleanBoards, guessedPayload, quizletSeconds, type QuizletCard } from '@
 import { shuffled } from '@/features/oyna/logic/shuffle';
 import { displayTranslation } from '@/features/oyna/logic/translation';
 import { ChoiceLabel, ExerciseTitle, Hint, ListChoice, Outline } from '@/features/oyna/parts';
-import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/oyna/player-frame';
+import { ConfirmSubmit, PlayerActions, PlayerFrame } from '@/features/oyna/player-frame';
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
@@ -19,6 +19,7 @@ import { haptics } from '@/lib/haptics';
 import type { OynaQuizletGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
+import { showToast } from '@/ui/toast';
 
 type Game = NonNullable<OynaQuizletGameQuery['quizletGame']>;
 
@@ -108,7 +109,6 @@ function Board({ cards, images, matched, onMatch, onMiss }: { cards: QuizletCard
 function QuizletRun({ game, studentId }: { game: Game; studentId: string }) {
   const { t } = useTranslation();
   const ct = useContentText();
-  const { toast, showToast } = useToast();
   // matched words are kept per API board index; empty boards are skipped when playing
   const all = cleanBoards(game.boards);
   const boards = all.map((cards, at) => ({ cards, at })).filter((b) => b.cards.length > 0);
@@ -163,7 +163,7 @@ function QuizletRun({ game, studentId }: { game: Game; studentId: string }) {
           }}
         />
       }
-      toast={toast}
+      dirty={!!clock.timer || matched.some((m) => m.length > 0)}
     >
       <ExerciseTitle>{t('oyna.steps.match')}</ExerciseTitle>
       <Hint>{t('oyna.matchHint')}</Hint>

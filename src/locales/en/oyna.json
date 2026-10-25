@@ -75,5 +75,9 @@
     "yourStory": "Your story",
     "leaderboard": "Class leaderboard",
     "you": "you"
-  }
+  },
+  "leaveTitle": "Leave the game?",
+  "leaveBody": "Your progress won't be saved.",
+  "leave": "Leave",
+  "stay": "Stay"
 }

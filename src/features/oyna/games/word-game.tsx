@@ -7,7 +7,7 @@ import { useProfile } from '@/features/auth/session';
 import { OYNA_WORD_GAME, OYNA_WORD_GAME_STATUS, OYNA_WORD_GAME_SUBMIT } from '@/features/oyna/gql';
 import { emptyMatch, matchPayload, mcqPayload, wordSteps, type MatchState, type WordStep } from '@/features/oyna/logic/word-game';
 import { Outline } from '@/features/oyna/parts';
-import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/oyna/player-frame';
+import { ConfirmSubmit, PlayerActions, PlayerFrame } from '@/features/oyna/player-frame';
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
@@ -17,6 +17,7 @@ import { haptics } from '@/lib/haptics';
 import { useContentText } from '@/lib/i18n';
 import { pageIn } from '@/lib/motion';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
+import { showToast } from '@/ui/toast';
 
 import {
   CAPTCHA_LIVES,
@@ -62,7 +63,6 @@ function WordGameLoader({ id, studentId }: { id: string; studentId: string }) {
 function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
   const { t } = useTranslation();
   const ct = useContentText();
-  const { toast, showToast } = useToast();
   const steps = wordSteps(game);
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState<Set<WordStep>>(() => new Set());
@@ -182,7 +182,7 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
           onPrevious={index > 0 ? () => goTo(index - 1) : undefined}
         />
       }
-      toast={toast}
+      dirty={done.size > 0 || furthest > 0}
     >
       <Animated.View key={step} entering={pageIn}>
         {body}

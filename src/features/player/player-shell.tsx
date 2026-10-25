@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useContentText } from '@/lib/i18n';
 import { haptics } from '@/lib/haptics';
-import { motion, pageIn, toastIn, toastOut } from '@/lib/motion';
+import { motion, pageIn } from '@/lib/motion';
+import { useLeaveGuard } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
@@ -15,6 +16,7 @@ import { useModalMotion } from '@/ui/dialog';
 import { Icon, type IconName } from '@/ui/icon';
 import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
+import { showToast } from '@/ui/toast';
 
 import { isStepComplete } from './engine/checking';
 import type { Answers, Mode, Step, StepAnswer, StepLabel } from './engine/types';
@@ -73,28 +75,6 @@ function ActionButton({ label, icon, iconAfter, onPress, loading }: { label: str
       <Text className="font-body-semibold text-[14px] leading-[18px] text-white">{label}</Text>
       {iconAfter ? glyph : null}
     </Pressable>
-  );
-}
-
-function Toast({ message }: { message: string | null }) {
-  const insets = useSafeAreaInsets();
-  if (!message) return null;
-  return (
-    <Animated.View
-      key={message}
-      entering={toastIn}
-      exiting={toastOut}
-      pointerEvents="none"
-      style={{ position: 'absolute', left: 40, right: 40, top: Math.max(insets.top, 28) + 42 }}
-    >
-      <View
-        accessibilityLiveRegion="polite"
-        className="rounded-[13px] bg-surface px-[15px] py-3"
-        style={{ boxShadow: '0 5px 24px rgba(48,62,88,0.11)' }}
-      >
-        <Text className="font-body text-[13px] leading-[20px] text-[#6d84a5]">{message}</Text>
-      </View>
-    </Animated.View>
   );
 }
 
@@ -233,7 +213,6 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
   const [done, setDone] = useState<Set<string>>(() => new Set(mode === 'review' ? steps.map((s) => s.id) : []));
-  const [toast, setToast] = useState<string | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const spent = useRef<Record<string, number>>({});
@@ -243,11 +222,8 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
     enteredAt.current = Date.now();
   }, []);
 
-  useEffect(() => {
-    if (!toast) return;
-    const id = setTimeout(() => setToast(null), 2400);
-    return () => clearTimeout(id);
-  }, [toast]);
+  // Answers live only here until the submit: leaving midway asks first.
+  const guard = useLeaveGuard(mode === 'play' && (done.size > 0 || Object.keys(answers).length > 0));
 
   const step = steps[Math.min(index, steps.length - 1)];
   if (!step) return null;
@@ -269,7 +245,7 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
 
   const next = () => {
     if (!complete(step)) {
-      setToast(t('player.finishActivity'));
+      showToast(t('player.finishActivity'));
       return;
     }
     setDone((d) => new Set(d).add(step.id));
@@ -280,7 +256,7 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
     const missing = steps.findIndex((s) => !complete(s));
     if (missing >= 0) {
       if (missing !== index) goTo(missing);
-      setToast(t('player.finishActivity'));
+      showToast(t('player.finishActivity'));
       return;
     }
     setDone((d) => new Set(d).add(step.id));
@@ -298,13 +274,16 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
       else g.games += secs;
     }
     setBusy(true);
+    // The submit replaces this screen with the result; that is not leaving midway.
+    guard.release();
     try {
       await onSubmit(answers, timing);
       haptics.success();
       setConfirm(false);
     } catch {
+      guard.release(false);
       setConfirm(false);
-      setToast(t('player.submitError'));
+      showToast(t('player.submitError'), 'error');
     } finally {
       setBusy(false);
     }
@@ -363,7 +342,6 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
         ) : null}
         {primary}
       </View>
-      <Toast message={toast} />
       <ConfirmSheet
         visible={confirm}
         title={t('player.confirmTitle')}
@@ -373,6 +351,15 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
         onConfirm={() => void submit()}
         onClose={() => !busy && setConfirm(false)}
         busy={busy}
+      />
+      <ConfirmSheet
+        visible={guard.asking}
+        title={t('player.leaveTitle')}
+        body={t('player.leaveBody')}
+        confirmLabel={t('player.leave')}
+        cancelLabel={t('player.stay')}
+        onConfirm={guard.leave}
+        onClose={guard.stay}
       />
     </View>
   );

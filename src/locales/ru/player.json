@@ -93,5 +93,9 @@
     "start": "Начать",
     "yourText": "Ваш текст"
   },
-  "activityCompleted": "Активность завершена"
+  "activityCompleted": "Активность завершена",
+  "leaveTitle": "Выйти из урока?",
+  "leaveBody": "Ваши ответы не сохранятся.",
+  "leave": "Выйти",
+  "stay": "Остаться"
 }
