@@ -2,32 +2,38 @@ import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/clien
 import { SetContextLink } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { print } from 'graphql';
 import { jwtDecode } from 'jwt-decode';
 import { map } from 'rxjs';
 
 import introspection from '@/graphql/possible-types';
-import { activeCredentials, useSession, type Credentials } from '@/features/auth/session';
+import { AUTH_REFRESH } from '@/features/auth/gql';
+import { activeCredentials, sameCredentials, useSession, type Credentials } from '@/features/auth/session';
 import { env } from '@/lib/env';
 
 /**
  * Per-operation context:
  * - `credentials`: act as a specific account (used at login, before a profile is active).
  * - `language`: content language header without credentials (login mutations).
+ * - `auth`: set by the auth link to the credentials the request was sent with; the refresh and
+ *   sign-out handling act on these, never on whatever account is active when the response arrives.
  */
 declare module '@apollo/client' {
   interface DefaultContext {
     credentials?: Credentials;
     language?: Credentials['language'];
+    auth?: Credentials | null;
   }
 }
 
-/** The API accepts the refresh token once the access token expires and returns a fresh one. */
-function bearer({ accessToken, refreshToken }: Credentials): string {
+/** True when the access token is gone or about to expire and the refresh token can replace it. */
+export function needsRefresh({ accessToken, refreshToken }: Credentials): boolean {
+  if (!refreshToken) return false;
   try {
     const { exp } = jwtDecode<{ exp?: number }>(accessToken);
-    return exp && exp > Date.now() / 1000 + 30 ? accessToken : refreshToken;
+    return !!exp && exp <= Date.now() / 1000 + 30;
   } catch {
-    return refreshToken;
+    return true;
   }
 }
 
@@ -36,39 +42,81 @@ function headersFor(credentials: Credentials | null, language?: string): Record<
     'danatiin-language': credentials?.language ?? language ?? 'kk',
   };
   // Demo credentials carry no token: the API serves its demo account to unauthenticated requests.
-  const token = credentials ? bearer(credentials) : '';
-  if (token) headers.authorization = token;
+  if (credentials?.accessToken) headers.authorization = credentials.accessToken;
   return headers;
 }
 
-const authLink = new SetContextLink((prev) => {
+/**
+ * The API takes the refresh token as the bearer and answers with a fresh access token in the
+ * `new-authorization` header. Only this call carries the refresh token. Resolves to the credentials
+ * with the new access token, or as they were when the API gave none (the request then fails with
+ * AUTHENTICATION_ERROR and the error link signs out).
+ */
+async function refresh(credentials: Credentials): Promise<Credentials> {
+  try {
+    const response = await fetch(env.graphqlUrl, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'danatiin-language': credentials.language,
+        authorization: credentials.refreshToken,
+      },
+      body: JSON.stringify({ query: print(AUTH_REFRESH), variables: { accountId: credentials.accountId } }),
+    });
+    const token = response.headers.get('new-authorization');
+    if (!token) return credentials;
+    useSession.getState().updateAccessToken(credentials, token);
+    return { ...credentials, accessToken: token };
+  } catch {
+    return credentials;
+  }
+}
+
+/** One refresh per login session at a time: parallel requests with an expired token share it. */
+const refreshing = new Map<string, Promise<Credentials>>();
+
+export function refreshed(credentials: Credentials): Promise<Credentials> {
+  const key = `${credentials.language}:${credentials.accountId}:${credentials.refreshToken}`;
+  let pending = refreshing.get(key);
+  if (!pending) {
+    pending = refresh(credentials).finally(() => refreshing.delete(key));
+    refreshing.set(key, pending);
+  }
+  return pending;
+}
+
+const authLink = new SetContextLink(async (prev) => {
   // A login call names its language and must not borrow the active account's token.
-  const credentials = prev.credentials ?? (prev.language ? null : activeCredentials());
-  return { headers: { ...prev.headers, ...headersFor(credentials, prev.language) } };
+  const resolved = prev.credentials ?? (prev.language ? null : activeCredentials());
+  const auth = resolved && needsRefresh(resolved) ? await refreshed(resolved) : resolved;
+  // `credentials` is also a fetch option for the HTTP link; ours is an account, so it stops here.
+  return { credentials: undefined, auth, headers: { ...prev.headers, ...headersFor(auth, prev.language) } };
 });
 
+/** The API can also hand out a new access token on an ordinary response. */
 const refreshLink = new ApolloLink((operation, forward) =>
   forward(operation).pipe(
     map((result) => {
-      const { response, credentials = activeCredentials() } = operation.getContext() as {
-        response?: Response;
-        credentials?: Credentials | null;
-      };
+      const { response, auth } = operation.getContext() as { response?: Response; auth?: Credentials | null };
       const token = response?.headers?.get('new-authorization');
-      if (token && credentials && token !== credentials.accessToken) {
-        useSession.getState().updateAccessToken(credentials.accountId, credentials.language, token);
-      }
+      if (token && auth && token !== auth.accessToken) useSession.getState().updateAccessToken(auth, token);
       return result;
     }),
   ),
 );
 
-const errorLink = new ErrorLink(({ error }) => {
+/** Signs out only when the active account was rejected, not a lookup against another database. */
+const errorLink = new ErrorLink(({ error, operation }) => {
+  const { auth } = operation.getContext();
+  const active = activeCredentials();
   if (
+    auth &&
+    active &&
+    sameCredentials(auth, active) &&
     CombinedGraphQLErrors.is(error) &&
     error.errors.some((e) => e.extensions?.code === 'AUTHENTICATION_ERROR')
   ) {
-    useSession.getState().signOut();
+    useSession.getState().expire();
   }
 });
 

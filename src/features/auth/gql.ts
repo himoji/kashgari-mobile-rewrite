@@ -33,6 +33,13 @@ export const LOGIN_APPLE = gql(`
   }
 `);
 
+/** Sent with the refresh token only: the API answers with a fresh access token in `new-authorization`. */
+export const AUTH_REFRESH = gql(`
+  query AuthRefresh($accountId: ID) {
+    account(id: $accountId) { id }
+  }
+`);
+
 export const ACCOUNT_PROFILES = gql(`
   query AccountProfiles($accountId: ID) {
     account(id: $accountId) {
