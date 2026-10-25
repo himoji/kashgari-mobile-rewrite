@@ -7,6 +7,7 @@ import Svg, { Circle, Defs, Mask, Pattern, RadialGradient, Rect, Stop } from 're
 
 import { cn } from '@/ui/cn';
 import { DOCK_HEIGHT, dockBottom } from '@/ui/pill-tab-bar';
+import { BoundaryGap } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 const mascots = {
@@ -107,7 +108,7 @@ export function TabScreen({
           ) : null}
         </View>
         <View className={cn('mx-[14px] gap-3 rounded-sheet bg-surface p-2.5', className)}>
-          {children}
+          <BoundaryGap value={12}>{children}</BoundaryGap>
         </View>
       </ScrollView>
     </View>

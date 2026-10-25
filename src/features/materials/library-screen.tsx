@@ -105,6 +105,7 @@ export function LibraryScreen() {
       </View>
 
       <QueryBoundary
+        fade={false}
         fallback={
           <LibraryFilters {...controls} grades={[]} grade={null}>
             <ListSkeleton />
@@ -198,7 +199,7 @@ function LibraryFilters({
       <Pressable
         accessibilityRole="button"
         onPress={onSaved}
-        className="mt-0.5 h-11 flex-row items-center gap-2 self-start rounded-control bg-[#f3f7ff] px-[14px] active:opacity-80"
+        className="press mt-0.5 h-11 flex-row items-center gap-2 self-start rounded-control bg-[#f3f7ff] px-[14px] active:opacity-80"
       >
         <Text className="font-body-semibold text-[14px] leading-[18px] text-link">{t('materials.saved')}</Text>
         <View className="rounded-md bg-surface px-1.5 py-0.5">

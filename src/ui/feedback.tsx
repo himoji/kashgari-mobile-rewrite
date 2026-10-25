@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { View } from 'react-native';
+import { useReducedMotion } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme/colors';
@@ -54,8 +55,10 @@ export function NotReady({ title, body, className }: { title?: string; body?: st
   );
 }
 
+/** A loading block. It pulses unless the system asks for reduced motion (read once, so the class never toggles). */
 export function Skeleton({ className }: { className?: string }) {
-  return <View className={cn('animate-pulse rounded-card bg-line', className)} />;
+  const still = useReducedMotion();
+  return <View className={cn(!still && 'animate-pulse', 'rounded-card bg-line', className)} />;
 }
 
 /** Default Suspense fallback for a tab: hero-shaped block plus three rows. */

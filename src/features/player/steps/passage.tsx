@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Icon } from '@/ui/icon';
+import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
 import type { PassageParagraph, PassageStep, StepViewProps } from '../engine/types';
@@ -109,9 +110,7 @@ function AudioCard({ url, title }: { url: string; title: string }) {
           {status.duration ? ` / ${clock(status.duration)}` : ''}
         </Text>
       </View>
-      <View className="h-[5px] overflow-hidden rounded-lg bg-[#e3e8f2]">
-        <View className="h-full rounded-lg bg-primary" style={{ width: `${progress * 100}%` }} />
-      </View>
+      <ProgressBar value={progress} className="h-[5px] rounded-lg bg-[#e3e8f2]" fillClassName="rounded-lg bg-primary" />
     </View>
   );
 }
@@ -142,7 +141,7 @@ export function PassageView({ step }: StepViewProps<PassageStep>) {
               accessibilityRole="button"
               accessibilityState={{ expanded: transcript }}
               onPress={() => setTranscript((v) => !v)}
-              className="h-11 flex-row items-center justify-between px-3"
+              className="press h-11 flex-row items-center justify-between px-3"
             >
               <Text className="font-body-medium text-[12px] leading-[18px] text-muted">{t('player.transcript')}</Text>
               <Icon name={transcript ? 'up' : 'down'} size={16} color={colors.muted} />
