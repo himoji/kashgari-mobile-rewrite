@@ -66,7 +66,8 @@ function RootStack() {
       </Stack.Protected>
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="accounts" options={{ presentation: role ? 'transparentModal' : 'card', animation: role ? 'fade' : 'default', contentStyle: role ? { backgroundColor: 'transparent' } : undefined }} />
-        <Stack.Screen name="word" options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }} />
+        {/* Opens at the word and its meaning; the screen narrows the small detent to its content. */}
+        <Stack.Screen name="word" options={{ presentation: 'formSheet', sheetAllowedDetents: [0.3, 0.9], sheetGrabberVisible: true, sheetCornerRadius: 24, contentStyle: { backgroundColor: '#ffffff' } }} />
       </Stack.Protected>
       <Stack.Protected guard={role === 'student'}>
         <Stack.Screen name="student" />

@@ -1,5 +1,4 @@
 import { Modal, View } from 'react-native';
-import Svg, { Circle, G, Path, Rect, Text as SvgText, TSpan } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 
 import { DialogCard } from '@/features/dictionary/dialog-card';
@@ -7,54 +6,45 @@ import { useContentText } from '@/lib/i18n';
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
 
-/** The prototype's illustration: blurred lines of text, one tapped word and its tooltip. */
+const faded = 'text-center font-body text-[11.5px] leading-[22px] text-[#9aaec9]/50';
+
+/**
+ * The prototype's illustration: faded lines of text, one tapped word and its tooltip. Laid out with
+ * views, not SVG text: react-native-svg does not flow a centred line with an inline span, so the
+ * highlighted word drifted off its box and over its neighbours.
+ */
 function GuideVisual() {
   const { t } = useTranslation();
   const content = useContentText();
   const lines = t('reader.guideLines', { returnObjects: true }) as string[];
-  const font = { fontFamily: 'Onest_400Regular', fontSize: 11.5, textAnchor: 'middle' as const };
+  const word = content(t('reader.guideWord'));
   return (
-    <Svg
-      width="100%"
-      height={179}
-      viewBox="0 0 280 180"
-      style={{ marginBottom: 20, borderRadius: 17 }}
-    >
-      <Rect width={280} height={180} rx={17} fill="#edf4ff" />
-      <G fill="#9aaec9" opacity={0.45}>
-        {lines.map((line, i) => (
-          <SvgText key={line} x={140} y={[29, 51, 98, 120][i]} {...font}>
-            {content(line)}
-          </SvgText>
-        ))}
-      </G>
-      <Rect x={62} y={60} width={63} height={21} rx={5} fill="#cee1ff" />
-      <SvgText x={140} y={75} fill="#617d9e" {...font}>
-        {content(t('reader.guideBefore'))}{' '}
-        <TSpan fill="#2178ee" fontFamily="Onest_600SemiBold">
-          {content(t('reader.guideWord'))}
-        </TSpan>{' '}
-        {content(t('reader.guideAfter'))}
-      </SvgText>
-      <Circle
-        cx={101}
-        cy={86}
-        r={9}
-        fill="#8ebaff"
-        fillOpacity={0.18}
-        stroke="#73aaff"
-        strokeWidth={1.2}
-      />
-      <Circle cx={101} cy={86} r={3.2} fill="#3683f6" />
-      <Rect x={65} y={138} width={150} height={30} rx={9} fill="#fff" />
-      <Path d="m91 138 6-6 6 6" fill="#fff" />
-      <SvgText x={78} y={157} fill="#242631" fontFamily="Onest_600SemiBold" fontSize={11}>
-        {content(t('reader.guideWord'))}
-      </SvgText>
-      <SvgText x={145} y={157} fill="#8490a3" fontFamily="Onest_400Regular" fontSize={10}>
-        {t('reader.guideMeaning')}
-      </SvgText>
-    </Svg>
+    <View className="mb-5 items-center rounded-[17px] bg-[#edf4ff] px-3 pb-3 pt-3.5">
+      {lines.slice(0, 2).map((line) => (
+        <Text key={line} className={faded} numberOfLines={1}>{content(line)}</Text>
+      ))}
+      <View className="flex-row items-center">
+        <Text className="font-body text-[11.5px] leading-[22px] text-[#617d9e]">{content(t('reader.guideBefore'))} </Text>
+        <View className="rounded-[5px] bg-[#cee1ff] px-1.5">
+          <Text className="font-body-semibold text-[11.5px] leading-[20px] text-[#2178ee]">{word}</Text>
+          {/* The tap */}
+          <View className="absolute -bottom-[13px] left-1/2 -ml-[9px] h-[18px] w-[18px] items-center justify-center rounded-full border border-[#73aaff] bg-[#8ebaff]/20">
+            <View className="h-[6.4px] w-[6.4px] rounded-full bg-[#3683f6]" />
+          </View>
+        </View>
+        <Text className="font-body text-[11.5px] leading-[22px] text-[#617d9e]"> {content(t('reader.guideAfter'))}</Text>
+      </View>
+      {lines.slice(2).map((line) => (
+        <Text key={line} className={faded} numberOfLines={1}>{content(line)}</Text>
+      ))}
+      <View className="mt-2.5 items-center">
+        <View className="h-2 w-2 translate-y-1 rotate-45 bg-white" />
+        <View className="h-[30px] min-w-[150px] flex-row items-center gap-5 rounded-[9px] bg-white px-3.5">
+          <Text className="font-body-semibold text-[11px] leading-[16px] text-ink">{word}</Text>
+          <Text className="font-body text-[10px] leading-[14px] text-[#8490a3]">{t('reader.guideMeaning')}</Text>
+        </View>
+      </View>
+    </View>
   );
 }
 
