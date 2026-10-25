@@ -1,6 +1,6 @@
 import { skipToken, useMutation, useQuery, useSuspenseQuery } from '@apollo/client/react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, ScrollView, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -111,7 +111,6 @@ function WordSheet({ word, def, assignmentId, onFold }: Params & { onFold: (heig
   const profile = useProfile();
   const content = useContentText();
   const meaningOf = useMeaning();
-  const { width } = useWindowDimensions();
   const metadata = profile.role === 'student' && assignmentId ? { studentId: profile.profileId, assignmentId } : null;
   const queryKey = useRetryKey();
   const { data } = useSuspenseQuery(DICTIONARY_WORD, word ? { variables: { word, metadata }, queryKey } : skipToken);
@@ -123,7 +122,9 @@ function WordSheet({ word, def, assignmentId, onFold }: Params & { onFold: (heig
   const definitions = [...(entry?.definitions ?? [])].sort((a, b) => a.order - b.order);
   const [page, setPage] = useState(() => Math.min(Number(def ?? 0) || 0, Math.max(definitions.length - 1, 0)));
   const [headHeight, setHeadHeight] = useState(0);
-  const pageWidth = width - SIDE * 2;
+  // Pages are as wide as the pager itself (the sheet can be narrower than the window), padding inside.
+  const [pageWidth, setPageWidth] = useState(0);
+  const pager = useRef<ScrollView>(null);
   const example = (d: Definition) =>
     [...(extra?.word?.definitions.find((x) => x.id === d.id)?.examples ?? [])].sort((a, b) => a.order - b.order)[0];
 
@@ -149,14 +150,20 @@ function WordSheet({ word, def, assignmentId, onFold }: Params & { onFold: (heig
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            contentOffset={{ x: page * pageWidth, y: 0 }}
-            onMomentumScrollEnd={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / pageWidth))}
+            ref={pager}
+            onLayout={(e) => {
+              const w = e.nativeEvent.layout.width;
+              setPageWidth(w);
+              // Opened on a later definition (`def`): start on its page.
+              pager.current?.scrollTo({ x: page * w, animated: false });
+            }}
+            onMomentumScrollEnd={(e) => pageWidth && setPage(Math.round(e.nativeEvent.contentOffset.x / pageWidth))}
             style={{ marginHorizontal: -SIDE }}
           >
             {definitions.map((d, i) => {
               const ex = example(d);
               return (
-                <View key={d.id} style={{ width: pageWidth, marginHorizontal: SIDE }}>
+                <View key={d.id} style={{ width: pageWidth || undefined, paddingHorizontal: SIDE }}>
                   <Text onLayout={i === page ? meaningLaid : undefined} className="font-body text-[16px] leading-[24px] text-[#485970]">
                     {meaningOf(d) || t('dictionary.noDefinition')}
                   </Text>
