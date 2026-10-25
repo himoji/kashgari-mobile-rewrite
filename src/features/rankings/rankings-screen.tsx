@@ -1,5 +1,4 @@
 import { useSuspenseQuery } from '@apollo/client/react';
-import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +7,7 @@ import { useProfile } from '@/features/auth/session';
 import { RANKINGS_CLASSES, RANKINGS_CLASSMATES } from '@/features/rankings/gql';
 import { Podium } from '@/features/rankings/podium';
 import { classRows, rankRows, type RankRow } from '@/features/rankings/rank';
+import { goBack } from '@/lib/navigation';
 import { cn } from '@/ui/cn';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { IconButton } from '@/ui/icon-button';
@@ -194,7 +194,7 @@ export function RankingsScreen() {
             icon="back"
             tone="glass"
             label={t('common.actions.back')}
-            onPress={() => router.back()}
+            onPress={() => goBack()}
           />
         </View>
       }

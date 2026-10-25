@@ -9,6 +9,7 @@ import { DICTIONARY_WORD } from '@/features/dictionary/gql';
 import { useWordAudio } from '@/features/dictionary/word-audio';
 import { useSavedWords, type SavedWord } from '@/features/words/saved-words';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { NotReady } from '@/ui/feedback';
@@ -106,7 +107,7 @@ function Flashcards({ words }: { words: SavedWord[] }) {
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          onPress={() => (last ? router.back() : move(1))}
+          onPress={() => (last ? goBack('/student/words') : move(1))}
           className="h-[46px] flex-1 flex-row items-center justify-center gap-2 rounded-control bg-attention active:opacity-90"
         >
           <Text className="font-body-semibold text-[13px] leading-[18px] text-white">

@@ -11,7 +11,7 @@ import { MATERIALS_TEXT } from '@/features/materials/gql';
 import { sectionName } from '@/features/materials/library-items';
 import { coverTint, materialArt } from '@/features/materials/material-art';
 import { kindFlags, levelOf, materialParam, type MaterialKind } from '@/features/materials/material-ref';
-import { countWords, tokenize } from '@/features/materials/reading-words';
+import { parseParagraph } from '@/features/reader/book';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
@@ -148,28 +148,24 @@ function Material({ onExercises }: { onExercises: () => void }) {
               </View>
             </View>
             <Text className="font-body text-[13px] leading-[18.85px] text-body">
-              {[level, t('materials.wordsCount', { count: countWords(paragraphs) })].filter(Boolean).join(' · ')}
+              {[level, t('materials.wordsCount', { count: paragraphs.reduce((n, p) => n + parseParagraph(p).filter((tok) => tok.lookup).length, 0) })].filter(Boolean).join(' · ')}
             </Text>
             {audioUrl ? <ListenButton url={audioUrl} /> : null}
             <View className="mt-6">
-              {paragraphs.map((p, i) => {
-                // Look words up in their original script even when the text is shown in Latin.
-                const source = tokenize(p);
-                return (
-                  <Text key={i} className="mb-3 font-reading text-ink" style={{ fontSize, lineHeight: fontSize * 1.6 }}>
-                    {tokenize(content(p)).map((tok, j) => {
-                      const word = source[j]?.word ?? tok.word;
-                      return word ? (
-                        <Text key={j} onPress={() => openWord(word)}>
-                          {tok.text}
-                        </Text>
-                      ) : (
-                        tok.text
-                      );
-                    })}
-                  </Text>
-                );
-              })}
+              {paragraphs.map((p, i) => (
+                // Stored texts can carry the reader's word notes (\~surface\~note\~), so parse them like the reader does.
+                <Text key={i} className="mb-3 font-reading text-ink" style={{ fontSize, lineHeight: fontSize * 1.6 }}>
+                  {parseParagraph(p).map((tok, j) =>
+                    tok.lookup ? (
+                      <Text key={j} onPress={() => openWord(tok.lookup!)}>
+                        {content(tok.text)}
+                      </Text>
+                    ) : (
+                      content(tok.text)
+                    ),
+                  )}
+                </Text>
+              ))}
             </View>
           </Card>
 

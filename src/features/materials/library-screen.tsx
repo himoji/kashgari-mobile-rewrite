@@ -14,6 +14,7 @@ import { LEVEL_OPTIONS, materialParam, type Level, type MaterialKind } from '@/f
 import { Select } from '@/features/materials/select';
 import { useGrades } from '@/features/materials/use-grades';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -102,7 +103,7 @@ export function LibraryScreen() {
   return (
     <TabScreen
       title={t('materials.title')}
-      actions={<IconButton tone="glass" icon="back" label={t('common.actions.back')} onPress={() => router.back()} />}
+      actions={<IconButton tone="glass" icon="back" label={t('common.actions.back')} onPress={() => goBack()} />}
     >
       <View className="flex-row gap-2">
         <Button variant="soft" className="flex-1" label={t('materials.wordBank')} onPress={() => router.push('/teacher/word-bank')} />

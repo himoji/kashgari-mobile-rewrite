@@ -127,7 +127,7 @@ function Overview() {
       <View className="mt-[18px]">
         <SectionHead title={t('principal.teachers')} onViewAll={() => router.navigate({ pathname: '/principal/school', params: { tab: 'teachers' } })} />
         <View className="gap-3">
-          {teacherRows(school).slice(0, PREVIEW).map((row) => (
+          {teacherRows(school, undefined, after).slice(0, PREVIEW).map((row) => (
             <TeacherCard key={row.id} {...row} onOpen={() => openTeacher(row.id)} />
           ))}
         </View>
@@ -135,7 +135,7 @@ function Overview() {
 
       <View className="mt-[18px]">
         <SectionHead title={t('principal.classes')} onViewAll={() => router.navigate({ pathname: '/principal/school', params: { tab: 'classes' } })} />
-        <ClassTable schoolName={school.name} classes={classRows(school).slice(0, PREVIEW)} onOpen={openClass} />
+        <ClassTable schoolName={school.name} classes={classRows(school, after).slice(0, PREVIEW)} onOpen={openClass} />
       </View>
     </View>
   );

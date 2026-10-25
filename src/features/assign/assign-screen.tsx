@@ -46,6 +46,7 @@ import { className } from '@/features/classes/format';
 import { evictFields } from '@/lib/cache';
 import { useProfile } from '@/features/auth/session';
 import { kindFlags, parseMaterialParam } from '@/features/materials/material-ref';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
@@ -203,8 +204,10 @@ export function AssignScreen() {
     setErrors({});
     setNotice(null);
     try {
+      // The API answers null (with no errors) when it did not create the assignment.
+      let created: { id: string } | null | undefined;
       if (source.ref.kind === 'grammar') {
-        await createGrammar({ variables: { classId, titleId: source.ref.id }, update: (cache) => evictFields(cache, 'Class', classId, ['durysAssignments']) });
+        created = (await createGrammar({ variables: { classId, titleId: source.ref.id }, update: (cache) => evictFields(cache, 'Class', classId, ['durysAssignments']) })).data?.createDurysAssignment;
       } else {
         const assignment = {
           type: 'HW' as const,
@@ -215,10 +218,12 @@ export function AssignScreen() {
           games: gamesInput(blocks, games),
           hasFlashcards: blocks.some((b) => b.type === 'cards'),
         };
-        if (source.ref.kind === 'tyndalym')
-          await createTyndalym({ variables: { classId, visible, assignment: { ...assignment, listenType } }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) });
-        else await createOqylym({ variables: { classId, visible, assignment }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) });
+        created =
+          source.ref.kind === 'tyndalym'
+            ? (await createTyndalym({ variables: { classId, visible, assignment: { ...assignment, listenType } }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) })).data?.createTyndalymAssignment
+            : (await createOqylym({ variables: { classId, visible, assignment }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) })).data?.createOqylymAssignment;
       }
+      if (!created) throw new Error('not created');
       setDone(visible ? 'assigned' : 'draft');
     } catch {
       setNotice('failed');
@@ -457,7 +462,7 @@ export function AssignScreen() {
         <NotReady />
       </Dialog>
 
-      <Dialog visible={!!done} title={done === 'draft' ? t('assign.draftSaved') : t('assign.assigned')} onClose={() => router.back()}>
+      <Dialog visible={!!done} title={done === 'draft' ? t('assign.draftSaved') : t('assign.assigned')} onClose={() => goBack()}>
         {done === 'draft' ? <Text className="mb-4 font-body text-[13px] leading-[20px] text-muted">{t('assign.draftHint')}</Text> : null}
         <View className="gap-2">
           <Button label={t('assign.toSchool')} onPress={() => (setDone(null), router.replace('/teacher/school'))} />

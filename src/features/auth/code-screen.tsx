@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { REQUEST_CODE, VERIFY_CODE } from '@/features/auth/gql';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { phoneDigits } from '@/features/auth/phone';
 import { finishSignIn } from '@/features/auth/sign-in';
+import { goBack } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
 import { Text } from '@/ui/text';
@@ -71,7 +72,7 @@ export function CodeScreen() {
         </>
       }
     >
-      <Pressable onPress={() => router.back()} className="mb-6 min-h-11 justify-center self-start">
+      <Pressable onPress={() => goBack()} className="mb-6 min-h-11 justify-center self-start">
         <Text className="font-body text-[14px] text-link">{t('auth.changePhone')}</Text>
       </Pressable>
       <Text variant="display" className="mb-3 text-[28px] leading-[34px]" nativeID="code-label">

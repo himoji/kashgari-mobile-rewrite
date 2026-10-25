@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MATERIALS_WORD_BANK, MATERIALS_WORD_TRANSLATION } from '@/features/materials/gql';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
 import { Dialog } from '@/ui/dialog';
@@ -39,7 +40,7 @@ export function WordBankScreen() {
   return (
     <>
       <Stack.Screen options={{ presentation: 'transparentModal', animation: 'fade' }} />
-      <Sheet title={t('materials.wordBank')} onClose={() => router.back()}>
+      <Sheet title={t('materials.wordBank')} onClose={() => goBack()}>
         <QueryBoundary
           fallback={
             <View className="gap-3">
@@ -52,7 +53,7 @@ export function WordBankScreen() {
           <WordBank onEdit={() => setNotReady(true)} />
         </QueryBoundary>
         <View className="mt-4 flex-row gap-2">
-          <Button variant="secondary" className="flex-1" label={t('materials.close')} onPress={() => router.back()} />
+          <Button variant="secondary" className="flex-1" label={t('materials.close')} onPress={() => goBack()} />
           <Button className="flex-1" label={t('materials.addWord')} onPress={() => setNotReady(true)} />
         </View>
       </Sheet>

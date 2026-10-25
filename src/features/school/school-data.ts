@@ -63,22 +63,25 @@ export function averageScore(classes: ClassWork[]): number | null {
   return scores.length ? Math.round(scores.reduce((s, x) => s + x, 0) / scores.length) : null;
 }
 
-/** Props for the class table cards. */
-export const classRows = (school: SchoolData) =>
+/** Published work given since `after` (null: all time). */
+const worksSince = (classes: ClassWork[], after: number | null) => publishedWorks(classes).filter((w) => w.createdAt >= (after ?? 0)).length;
+
+/** Props for the class table cards; work counts since `after` (null: all time). */
+export const classRows = (school: SchoolData, after: number | null = null) =>
   school.classes.map((c) => ({
     id: c.id,
     name: c.name,
     teacherName: c.teacherName,
     studentCount: c.students.length,
-    workCount: publishedWorks([c]).length,
+    workCount: worksSince([c], after),
   }));
 
-/** Props for the teacher cards. */
-export const teacherRows = (school: SchoolData, now = Date.now() / 1000) =>
+/** Props for the teacher cards; work counts since `after` (null: all time). */
+export const teacherRows = (school: SchoolData, now = Date.now() / 1000, after: number | null = null) =>
   school.teachers.map((t) => ({
     id: t.id,
     name: t.name,
     classNames: t.classes.map((c) => c.name),
     active: isActiveTeacher(t, now),
-    workCount: publishedWorks(t.classes).length,
+    workCount: worksSince(t.classes, after),
   }));

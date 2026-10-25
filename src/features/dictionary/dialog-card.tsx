@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
+import { useEscape } from '@/ui/use-escape';
 
 /** The prototype's centred dialog (word detail, reading guide): tinted backdrop, white card, close in the corner. */
 export function DialogCard({
@@ -17,6 +18,7 @@ export function DialogCard({
   className?: string;
 }) {
   const { t } = useTranslation();
+  useEscape(onClose);
   return (
     <View className="flex-1 items-center justify-center px-10">
       <Pressable

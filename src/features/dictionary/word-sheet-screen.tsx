@@ -1,5 +1,5 @@
 import { skipToken, useMutation, useQuery, useSuspenseQuery } from '@apollo/client/react';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +9,7 @@ import { DICTIONARY_REQUEST_DEFINITION, DICTIONARY_WORD, DICTIONARY_WORD_EXAMPLE
 import { useWordAudio } from '@/features/dictionary/word-audio';
 import type { DictionaryWordQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { NotReady, Skeleton } from '@/ui/feedback';
@@ -72,7 +73,7 @@ export function WordSheetScreen() {
   const word = String(params.word ?? '').toLowerCase();
 
   return (
-    <DialogCard onClose={() => router.back()}>
+    <DialogCard onClose={() => goBack()}>
       <QueryBoundary
         fallback={
           <>

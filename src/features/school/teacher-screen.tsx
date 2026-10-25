@@ -22,7 +22,7 @@ export function PrincipalTeacherScreen() {
 
   return (
     <View className="flex-1 bg-surface">
-      <BackBar label={t('principal.schoolTitle')} />
+      <BackBar label={t('principal.schoolTitle')} fallback="/principal/school?tab=teachers" />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
         <QueryBoundary
           fallback={

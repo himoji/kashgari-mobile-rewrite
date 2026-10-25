@@ -18,8 +18,10 @@ export type LibraryFilter = { module: MaterialKind | 'all'; level: Level | 'all'
 
 /** Section names come in three languages; Kazakh is the fallback, then "<label> N". */
 export function sectionName(name: Name | null | undefined, section: number | null | undefined, lang: string, label: string): string {
+  // Some unnamed sections are stored as the placeholder "empty".
+  const real = (s: string | null | undefined) => (s && s.trim().toLowerCase() !== 'empty' ? s : null);
   const byLang = lang === 'ru' ? name?.russian : lang === 'en' ? name?.english : name?.kazakh;
-  return byLang || name?.kazakh || `${label} ${section ?? ''}`.trim();
+  return real(byLang) || real(name?.kazakh) || `${label} ${section ?? ''}`.trim();
 }
 
 /** One topic of the curriculum with its texts (reading first, then listening). */

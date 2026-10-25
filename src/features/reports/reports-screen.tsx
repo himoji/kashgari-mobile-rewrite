@@ -1,5 +1,4 @@
 import { useSuspenseQuery } from '@apollo/client/react';
-import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,7 @@ import type { ClassWork } from '@/features/classes/class-data';
 import { ALL_CLASSES, useSchoolFilters } from '@/features/teacher-assignments/filters';
 import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { Skeleton } from '@/ui/feedback';
@@ -50,7 +50,7 @@ export function ReportsScreen() {
   return (
     <TabScreen
       title={t('reports.title')}
-      actions={<IconButton icon="back" tone="glass" label={t('reports.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}
+      actions={<IconButton icon="back" tone="glass" label={t('reports.back')} onPress={() => goBack()} />}
       refreshing={refreshing}
       onRefresh={refresh}
     >

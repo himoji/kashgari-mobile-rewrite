@@ -44,6 +44,7 @@ function TopicDialog({ topic, items, onClose }: { topic: string; items: LibraryI
   return (
     <Dialog visible title={topic} onClose={onClose} className="mx-2.5">
       <View className="gap-4">
+        {items.length ? null : <Text className="font-body text-[14px] leading-[21px] text-body">{t('materials.noMaterials')}</Text>}
         {items.map((m) => (
           <View key={materialParam(m.ref)} className="rounded-[14px] bg-[#f7f9fd] p-[14px]">
             <Text className="font-body text-[11px] leading-[16.5px] text-[#98a6ba]">{t(`materials.modules.${m.ref.kind}`)}</Text>

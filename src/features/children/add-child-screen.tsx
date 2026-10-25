@@ -1,11 +1,12 @@
 import { useMutation } from '@apollo/client/react';
-import { router, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useProfile } from '@/features/auth/session';
 import { ADD_CHILD, CHILDREN } from '@/features/children/gql';
+import { goBack } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Sheet } from '@/ui/sheet';
@@ -25,7 +26,7 @@ export function AddChildScreen() {
     try {
       const { data } = await addChild({ variables: { parentId: profileId, studentId: id } });
       if (!data?.addChild) return setError(t('parent.add.failed'));
-      router.back();
+      goBack();
     } catch {
       setError(t('parent.add.failed'));
     }
@@ -34,7 +35,7 @@ export function AddChildScreen() {
   return (
     <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Stack.Screen options={{ presentation: 'transparentModal', animation: 'fade' }} />
-      <Sheet title={t('parent.addChild')} description={t('parent.add.hint')} onClose={() => router.back()}>
+      <Sheet title={t('parent.addChild')} description={t('parent.add.hint')} onClose={() => goBack()}>
         <View className="gap-4">
           <Input
             label={t('parent.add.label')}

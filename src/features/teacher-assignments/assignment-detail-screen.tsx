@@ -30,6 +30,7 @@ import { EditWorkDialog } from '@/features/teacher-assignments/edit-work-dialog'
 import { findWork, useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
 import { evictEntity } from '@/lib/cache';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
@@ -143,9 +144,9 @@ function AssignmentDetail() {
   const attempts = new Map(work.attempts.map((a) => [a.studentId, a]));
   const previewHref: Href | null =
     textId && (work.kind === 'oqylym' || work.kind === 'tyndalym')
-      ? ({ pathname: '/teacher/material/[id]', params: { id: `${work.kind}:${textId}` } })
+      ? ({ pathname: '/teacher/material/[id]', params: { id: textId, kind: work.kind } })
       : work.durysTitleId
-        ? ({ pathname: '/teacher/material/[id]', params: { id: `grammar:${work.durysTitleId}` } })
+        ? ({ pathname: '/teacher/material/[id]', params: { id: work.durysTitleId, kind: 'grammar' } })
         : null;
   const canToggle = work.kind === 'oqylym' || work.kind === 'tyndalym' || work.kind === 'lesson';
   const visible = work.status !== 'draft';
@@ -173,7 +174,7 @@ function AssignmentDetail() {
     const result = await remove({ variables: { id: work.id } }).catch(() => null);
     setConfirmDelete(false);
     if (!result?.data) return;
-    router.back();
+    goBack();
     evictEntity(client.cache, work.typename, work.id);
   };
   const openReview = () => {

@@ -3,12 +3,14 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/ui/text';
+import { useEscape } from '@/ui/use-escape';
 
 type Props = { title: string; description?: string; onClose?: () => void; children: ReactNode };
 
 /** Bottom sheet from the design (rounded top, handle, display title). Render it inside a transparent modal route. */
 export function Sheet({ title, description, onClose, children }: Props) {
   const insets = useSafeAreaInsets();
+  useEscape(onClose);
   return (
     <View className="flex-1 justify-end">
       <Pressable accessibilityLabel="close" className="absolute inset-0 bg-[#24263155]" onPress={onClose} disabled={!onClose} />

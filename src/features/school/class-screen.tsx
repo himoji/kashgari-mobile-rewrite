@@ -21,7 +21,7 @@ export function PrincipalClassScreen() {
 
   return (
     <View className="flex-1 bg-surface">
-      <BackBar label={t('principal.schoolTitle')} />
+      <BackBar label={t('principal.schoolTitle')} fallback="/principal/school?tab=classes" />
       <QueryBoundary fallback={<ClassSkeleton bottom={insets.bottom} />}>
         <ClassPage id={id} bottom={insets.bottom} />
       </QueryBoundary>

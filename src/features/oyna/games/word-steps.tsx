@@ -154,6 +154,11 @@ export function ShuffleStep({ pairs, words, onDone, toast }: { pairs: { shuffled
     } else {
       setState('wrong');
       toast(t('oyna.tryAgain'));
+      // Like the gap step: clear the wrong order so the student can try again.
+      setTimeout(() => {
+        setPicked([]);
+        setState('idle');
+      }, 900);
     }
   };
 

@@ -30,7 +30,7 @@
   "preview": "Preview",
   "assignShort": "Assign",
   "emptyTitle": "Nothing here yet",
-  "emptyHint": "Add material or choose another filter.",
+  "emptyHint": "Choose another filter.",
   "clearFilters": "Clear filters",
   "modules": { "oqylym": "Reading", "tyndalym": "Listening", "grammar": "Grammar" },
   "tryExercises": "Try exercises",

@@ -7,6 +7,7 @@ import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
+import { useEscape } from '@/ui/use-escape';
 
 type Props = {
   visible: boolean;
@@ -30,6 +31,7 @@ export function Dialog({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const sheet = variant === 'sheet';
+  useEscape(onClose, visible);
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View className={cn('flex-1', sheet ? 'justify-end' : 'justify-center px-[30px]')}>

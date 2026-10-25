@@ -6,7 +6,9 @@ import type { UiLanguage } from '@/features/auth/session';
  */
 export function displayTranslation(raw: string | null | undefined, lang: UiLanguage): string {
   if (!raw) return '';
-  const [ru = '', en = ''] = raw.split('|').map((part) => part.trim());
+  // "-" marks a missing translation in the word lists.
+  const [ru = '', en = ''] = raw.split('|').map((part) => (part.trim() === '-' ? '' : part.trim()));
   const picked = lang === 'en' ? en || ru : ru || en;
-  return picked.split(';')[0]!.trim();
+  const first = picked.split(';')[0]!.trim();
+  return first === '-' ? '' : first;
 }

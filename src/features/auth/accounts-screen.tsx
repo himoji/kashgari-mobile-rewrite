@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { JoinClass } from '@/features/auth/join-class';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { useActiveProfile, useSession, type Profile } from '@/features/auth/session';
+import { goBack } from '@/lib/navigation';
 import { Avatar } from '@/ui/avatar';
 import { Sheet } from '@/ui/sheet';
 import { Text } from '@/ui/text';
@@ -46,7 +47,7 @@ export function AccountsScreen() {
     <Sheet
       title={switching ? t('auth.switchAccount') : t('auth.whoIsSigningIn')}
       description={t('auth.chooseAccount')}
-      onClose={switching ? () => router.back() : undefined}
+      onClose={switching ? () => goBack() : undefined}
     >
       <View className="gap-2.5">
         {profiles.map((p) => (

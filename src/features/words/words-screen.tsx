@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSavedWords } from '@/features/words/saved-words';
 import { useContentText } from '@/lib/i18n';
+import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { NotReady } from '@/ui/feedback';
@@ -54,7 +55,7 @@ export function WordsScreen() {
             icon="back"
             tone="glass"
             label={t('common.actions.back')}
-            onPress={() => router.back()}
+            onPress={() => goBack()}
           />
         </View>
       }
