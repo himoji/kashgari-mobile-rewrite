@@ -1,11 +1,11 @@
-import { skipToken, useMutation, useSuspenseQuery } from '@apollo/client/react';
+import { skipToken, useMutation, useQuery, useSuspenseQuery } from '@apollo/client/react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useProfile, useSession } from '@/features/auth/session';
 import { DialogCard } from '@/features/dictionary/dialog-card';
-import { DICTIONARY_REQUEST_DEFINITION, DICTIONARY_WORD } from '@/features/dictionary/gql';
+import { DICTIONARY_REQUEST_DEFINITION, DICTIONARY_WORD, DICTIONARY_WORD_EXAMPLES } from '@/features/dictionary/gql';
 import { useWordAudio } from '@/features/dictionary/word-audio';
 import type { DictionaryWordQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
@@ -18,6 +18,22 @@ import { Text } from '@/ui/text';
 
 type Word = NonNullable<DictionaryWordQuery['word']>;
 type Params = { word: string; def?: string; assignmentId?: string };
+
+/** The first example of the shown definition. Loaded on its own and quietly left out when the API fails on it. */
+function Example({ word, definitionId }: { word: string; definitionId: string }) {
+  const { t } = useTranslation();
+  const content = useContentText();
+  const { data } = useQuery(DICTIONARY_WORD_EXAMPLES, { variables: { word }, errorPolicy: 'all', fetchPolicy: 'no-cache' });
+  const examples = data?.word?.definitions.find((d) => d.id === definitionId)?.examples ?? [];
+  const example = [...examples].sort((a, b) => a.order - b.order)[0];
+  if (!example) return null;
+  return (
+    <View className="py-3.5">
+      <Text className="font-body text-[11px] leading-[16px] text-[#93a0b3]">{t('dictionary.example')}</Text>
+      <Text className="mt-2 font-body text-[15px] leading-[24px] text-[#485970]">{content(example.text)}</Text>
+    </View>
+  );
+}
 
 function AudioButton({ word }: { word: Word }) {
   const { t } = useTranslation();
@@ -103,7 +119,6 @@ function WordSheet({ word, def, assignmentId }: Params) {
         ? definition.translationRussian || definition.textRussian
         : definition.translationEnglish || definition.text
     : null;
-  const example = [...(definition?.examples ?? [])].sort((a, b) => a.order - b.order)[0];
 
   return (
     <>
@@ -119,16 +134,7 @@ function WordSheet({ word, def, assignmentId }: Params) {
         {entry ? <AudioButton word={entry} /> : null}
       </View>
 
-      {example ? (
-        <View className="py-3.5">
-          <Text className="font-body text-[11px] leading-[16px] text-[#93a0b3]">
-            {t('dictionary.example')}
-          </Text>
-          <Text className="mt-2 font-body text-[15px] leading-[24px] text-[#485970]">
-            {content(example.text)}
-          </Text>
-        </View>
-      ) : null}
+      {definition ? <Example word={word} definitionId={definition.id} /> : null}
 
       <View className="mt-[18px] gap-2.5">
         {!entry ? (

@@ -13,6 +13,21 @@ export const DICTIONARY_WORD = gql(`
         textRussian
         translationRussian
         translationEnglish
+      }
+    }
+  }
+`);
+
+/**
+ * Examples ride in their own query: the API can fail on one example's text, and since every field
+ * up to `word` is non-null, that would otherwise null the whole entry and lose the definition too.
+ */
+export const DICTIONARY_WORD_EXAMPLES = gql(`
+  query DictionaryWordExamples($word: String!) {
+    word(wordCyrillic: $word) {
+      id
+      definitions {
+        id
         examples {
           id
           order
