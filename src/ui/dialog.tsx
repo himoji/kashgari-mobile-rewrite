@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, type WithTimingConfig } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +8,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { motion } from '@/lib/motion';
 import { colors } from '@/theme/colors';
+import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
@@ -63,64 +65,101 @@ export function Dialog({
   const { mounted, backdrop, panel } = useModalMotion(visible, sheet ? 32 : 24, sheet ? motion.sheet : motion.dialog);
   return (
     <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose}>
-      <View className={cn('flex-1', sheet ? 'justify-end' : 'justify-center px-[30px]')}>
-        <Animated.View style={[StyleSheet.absoluteFill, backdrop]}>
-          <Pressable
-            accessibilityLabel={t('common.actions.close')}
-            className="flex-1 bg-[#24263155]"
-            onPress={onClose}
-          />
-        </Animated.View>
-        <Animated.View style={[{ maxHeight: sheet ? '88%' : '80%' }, panel]}>
-          <View
-            className={cn(
-              'shrink bg-surface',
-              sheet
-                ? 'rounded-t-[26px] px-5 pt-5'
-                : 'rounded-[22px] p-[18px]',
-              className,
-            )}
-            style={{
-              boxShadow: sheet
-                ? '0 -12px 48px rgba(34,50,72,0.125)'
-                : '0 18px 65px rgba(34,50,72,0.19)',
-              paddingBottom: sheet ? insets.bottom + 24 : undefined,
-            }}
-          >
+      {/* Dialogs with a text field rise above the keyboard instead of sitting under it. */}
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <View className={cn('flex-1', sheet ? 'justify-end' : 'justify-center px-[30px]')}>
+          <Animated.View style={[StyleSheet.absoluteFill, backdrop]}>
+            <Pressable
+              accessibilityLabel={t('common.actions.close')}
+              className="flex-1 bg-[#24263155]"
+              onPress={onClose}
+            />
+          </Animated.View>
+          <Animated.View style={[{ maxHeight: sheet ? '88%' : '80%' }, panel]}>
             <View
               className={cn(
-                'flex-row items-center justify-between gap-2.5',
-                sheet ? 'mb-3.5 pb-[15px] pt-2.5' : 'mb-[18px] pb-2.5 pt-0.5',
+                'shrink bg-surface',
+                sheet
+                  ? 'rounded-t-[26px] px-5 pt-5'
+                  : 'rounded-[22px] p-[18px]',
+                className,
               )}
+              style={{
+                boxShadow: sheet
+                  ? '0 -12px 48px rgba(34,50,72,0.125)'
+                  : '0 18px 65px rgba(34,50,72,0.19)',
+                paddingBottom: sheet ? insets.bottom + 24 : undefined,
+              }}
             >
-              <Text
+              <View
                 className={cn(
-                  'flex-1 font-body-medium text-ink',
-                  sheet ? 'text-[20px] leading-[26px]' : 'text-[18px] leading-[25px]',
+                  'flex-row items-center justify-between gap-2.5',
+                  sheet ? 'mb-3.5 pb-[15px] pt-2.5' : 'mb-[18px] pb-2.5 pt-0.5',
                 )}
               >
-                {title}
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('common.actions.close')}
-                hitSlop={8}
-                onPress={onClose}
-                className={cn(
-                  'press h-8 w-8 items-center justify-center bg-[#f3f6fb] active:opacity-80',
-                  sheet ? 'rounded-full' : 'rounded-tile',
-                )}
-              >
-                <Icon name="close" size={16} color={colors.subtle} />
-              </Pressable>
+                <Text
+                  className={cn(
+                    'flex-1 font-body-medium text-ink',
+                    sheet ? 'text-[20px] leading-[26px]' : 'text-[18px] leading-[25px]',
+                  )}
+                >
+                  {title}
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.actions.close')}
+                  hitSlop={8}
+                  onPress={onClose}
+                  className={cn(
+                    'press h-8 w-8 items-center justify-center bg-[#f3f6fb] active:opacity-80',
+                    sheet ? 'rounded-full' : 'rounded-tile',
+                  )}
+                >
+                  <Icon name="close" size={16} color={colors.subtle} />
+                </Pressable>
+              </View>
+              <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
+                {children}
+              </ScrollView>
             </View>
-            <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
-              {children}
-            </ScrollView>
-          </View>
-        </Animated.View>
-      </View>
+          </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
+  );
+}
+
+/** A yes/no question in the centre dialog: what happens, then cancel and the action (red when it destroys something). */
+export function ConfirmDialog({
+  visible,
+  title,
+  body,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  onClose,
+  busy,
+  destructive,
+}: {
+  visible: boolean;
+  title: string;
+  body?: string;
+  confirmLabel: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onClose: () => void;
+  busy?: boolean;
+  destructive?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Dialog visible={visible} title={title} onClose={onClose}>
+      {body ? <Text className="mb-4 font-body text-[13px] leading-[20px] text-muted">{body}</Text> : null}
+      <View className="flex-row gap-2">
+        <Button variant="secondary" className="flex-1" label={cancelLabel ?? t('common.actions.cancel')} disabled={busy} onPress={onClose} />
+        <Button variant={destructive ? 'danger' : 'primary'} className="flex-1" label={confirmLabel} loading={busy} onPress={onConfirm} />
+      </View>
+    </Dialog>
   );
 }
 

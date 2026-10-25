@@ -1,11 +1,13 @@
 import type { DocumentNode } from '@apollo/client';
 import { useApolloClient } from '@apollo/client/react';
 import { Component, createContext, Suspense, useContext, useState, useTransition, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import Animated from 'react-native-reanimated';
 
 import { contentIn } from '@/lib/motion';
 import { useOnline } from '@/lib/network';
 import { ErrorState, ScreenSkeleton } from '@/ui/feedback';
+import { showToast } from '@/ui/toast';
 
 type CatchProps = {
   children: ReactNode;
@@ -86,13 +88,15 @@ export const useRetryKey = () => useContext(Attempt);
 /**
  * Pull-to-refresh from outside a boundary: refetches the given (mounted) queries in a transition, so
  * their data stays on screen instead of the skeleton, and `refreshing` is true until all finish.
+ * A failed refresh keeps the old data and says so in a toast.
  */
 export function useRefresh(...queries: DocumentNode[]) {
+  const { t } = useTranslation();
   const client = useApolloClient();
   const [refreshing, startTransition] = useTransition();
   const refresh = () =>
     startTransition(async () => {
-      await client.refetchQueries({ include: queries }).catch(() => undefined);
+      await client.refetchQueries({ include: queries }).catch(() => showToast(t('common.refreshFailed'), 'error'));
     });
   return { refreshing, refresh };
 }

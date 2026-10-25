@@ -7,5 +7,6 @@
   "notReady": { "title": "Coming soon", "body": "This feature is still being built." },
   "status": { "done": "Done", "todo": "To do", "late": "Overdue", "graded": "Graded", "pending": "Awaiting review" },
   "periods": { "days": "Days", "weeks": "Weeks", "months": "Months", "all": "All time" },
-  "modules": { "OQYLYM": "Reading", "TYNDALYM": "Listening", "OYNA": "Games", "DURYS": "Grammar" }
+  "modules": { "OQYLYM": "Reading", "TYNDALYM": "Listening", "OYNA": "Games", "DURYS": "Grammar" },
+  "refreshFailed": "Couldn't refresh. Check your connection."
 }
