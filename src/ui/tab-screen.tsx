@@ -95,6 +95,8 @@ export function TabScreen({
   ) : undefined;
   const hero = (
     <>
+      {/* Orange also runs above the content, so a pull-to-refresh or an inset top never shows white. */}
+      <View className="absolute inset-x-0 -top-[1000px] h-[1000px] bg-workspace" />
       <View className="absolute inset-x-0 top-0 h-[284px]" style={gradient('workspace')} />
       <HeroPattern />
       <View
@@ -143,6 +145,7 @@ export function TabScreen({
         <VirtualList
           ref={scroll as never}
           contentContainerStyle={{ paddingBottom }}
+          contentInsetAdjustmentBehavior="never"
           refreshControl={refreshControl}
           raiseHeader={raiseHeader}
           header={
@@ -165,6 +168,7 @@ export function TabScreen({
       <ScrollView
         ref={scroll}
         contentContainerStyle={{ paddingBottom }}
+        contentInsetAdjustmentBehavior="never"
         refreshControl={refreshControl}
       >
         {hero}
