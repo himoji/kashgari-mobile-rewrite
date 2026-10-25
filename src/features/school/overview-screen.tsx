@@ -13,7 +13,7 @@ import { ClassTable, SectionHead, TeacherCard } from '@/features/school/school-p
 import { classRows, teacherActivity, teacherRows } from '@/features/school/school-data';
 import { useSchool } from '@/features/school/use-school';
 import { cn } from '@/ui/cn';
-import { ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -68,7 +68,7 @@ function Overview() {
   const openClass = (id: string) => router.push({ pathname: '/principal/class/[id]', params: { id } });
   const openTeacher = (id: string) => router.push({ pathname: '/principal/teacher/[id]', params: { id } });
 
-  if (!school) return <ErrorState />;
+  if (!school) return <EmptyState title={t('principal.noSchool')} body={t('principal.noSchoolBody')} illustration="classroom" />;
   return (
     <View>
       <View className={cn('mb-3', openSelect === 'school' && 'z-30')}>

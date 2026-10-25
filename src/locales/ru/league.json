@@ -3,6 +3,8 @@
   "points": "баллов",
   "rankings": "Рейтинг",
   "pages_one": "{{count}} стр.",
+  "pages_few": "{{count}} стр.",
+  "pages_many": "{{count}} стр.",
   "pages_other": "{{count}} стр.",
   "emptyTitle": "Книг пока нет",
   "emptyBody": "Тексты для вашего уровня скоро появятся."

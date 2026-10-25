@@ -16,6 +16,10 @@ export interface Credentials {
   refreshToken: string;
 }
 
+/** The same login session: a later sign-in to the same account gets a new refresh token. */
+export const sameCredentials = (a: Credentials, b: Credentials) =>
+  a.accountId === b.accountId && a.language === b.language && a.refreshToken === b.refreshToken;
+
 /** One thing the user can act as: a role profile inside one account. */
 export interface Profile {
   key: string;
@@ -41,12 +45,19 @@ interface SessionState {
   /** Language for word definitions in the dictionary. */
   definitionLanguage: UiLanguage;
   hydrated: boolean;
+  /** Set when the API rejected the active account's tokens; the sign-in screen says why. */
+  expired: boolean;
   signIn: (credentials: Credentials[], profiles: Profile[]) => void;
   setActive: (key: string) => void;
-  updateAccessToken: (accountId: string, language: ContentLanguage, token: string) => void;
+  /** Stores a new access token for exactly these credentials (same account, database and refresh token). */
+  updateAccessToken: (credentials: Credentials, token: string) => void;
   setPreferences: (prefs: Partial<Pick<SessionState, 'uiLanguage' | 'script' | 'definitionLanguage'>>) => void;
   signOut: () => void;
+  /** Signs out because the session ended on the server. */
+  expire: () => void;
 }
+
+const signedOut = { credentials: [], profiles: [], activeKey: null };
 
 export const useSession = create<SessionState>()(
   persist(
@@ -58,26 +69,27 @@ export const useSession = create<SessionState>()(
       script: 'cyrl',
       definitionLanguage: 'ru',
       hydrated: false,
+      expired: false,
       signIn: (credentials, profiles) =>
         set({
+          expired: false,
           credentials,
           profiles,
           activeKey: profiles.length === 1 ? profiles[0]!.key : null,
         }),
       setActive: (key) => set({ activeKey: key }),
-      updateAccessToken: (accountId, language, token) =>
+      updateAccessToken: (credentials, token) =>
         set((s) => ({
-          credentials: s.credentials.map((c) =>
-            c.accountId === accountId && c.language === language ? { ...c, accessToken: token } : c,
-          ),
+          credentials: s.credentials.map((c) => (sameCredentials(c, credentials) ? { ...c, accessToken: token } : c)),
         })),
       setPreferences: (prefs) => set(prefs),
-      signOut: () => set({ credentials: [], profiles: [], activeKey: null }),
+      signOut: () => set(signedOut),
+      expire: () => set({ ...signedOut, expired: true }),
     }),
     {
       name: 'danatiin-session',
       storage: createJSONStorage(() => secureStorage),
-      partialize: ({ hydrated: _h, ...rest }) => rest,
+      partialize: ({ hydrated: _h, expired: _e, ...rest }) => rest,
     },
   ),
 );

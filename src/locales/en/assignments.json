@@ -2,6 +2,7 @@
   "tabs": { "new": "To do", "completed": "Completed" },
   "start": "Start",
   "viewResults": "View results",
+  "closed": "Submission closed",
   "min": "min",
   "modules": { "oqylym": "Reading", "tyndalym": "Listening", "durys": "Grammar", "oyna": "Games", "lesson": "Lesson", "zhazylym": "Writing" },
   "state": { "done": "Completed", "waiting": "Awaiting grade", "inProgress": "In progress", "overdue": "Overdue", "notStarted": "Not started" },

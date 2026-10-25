@@ -18,7 +18,7 @@ export function BackBar({ label, onBack, fallback, action }: { label: string; on
         accessibilityLabel={label}
         onPress={onBack ?? (() => goBack(fallback))}
         hitSlop={4}
-        className="h-11 flex-row items-center gap-1.5 rounded-[24px] pl-2 pr-3 active:bg-canvas"
+        className="press h-11 flex-row items-center gap-1.5 rounded-[24px] pl-2 pr-3 active:bg-canvas"
       >
         <Icon name="back" size={20} color={colors.ink} />
         <Text className="font-body-medium text-[12px] leading-[18px] text-body" numberOfLines={1}>{label}</Text>

@@ -13,6 +13,7 @@ import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
+import { haptics } from '@/lib/haptics';
 import type { OynaMiniStoryGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -51,22 +52,24 @@ function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
   });
   const used = usedWords(game.words, text);
 
-  const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, () => {
-    showToast(t('oyna.timeUp'));
-    void send();
-  });
 
-  async function send() {
-    try {
-      const { data } = await submit({ variables: { gameId: game.id, studentId, data: { time: clock.spent(), text: text.trim() } } });
-      setConfirm(false);
-      if (data?.miniStorySubmit) setSubmitted(true);
-      else showToast(t('oyna.submitFailed'));
-    } catch {
-      setConfirm(false);
-      showToast(t('oyna.submitFailed'));
-    }
-  }
+  const send = async (time: number) => {
+    // No try/catch around the result checks: the compiler can't optimise those yet.
+    const ok = await submit({ variables: { gameId: game.id, studentId, data: { time, text: text.trim() } } }).then(
+      ({ data }) => !!data?.miniStorySubmit,
+      () => false,
+    );
+    setConfirm(false);
+    if (ok) {
+      haptics.success();
+      setSubmitted(true);
+    } else showToast(t('oyna.submitFailed'));
+  };
+
+  const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, (spent) => {
+    showToast(t('oyna.timeUp'));
+    void send(spent);
+  });
 
   if (submitted) return <OynaResultView kind="ministory" id={game.id} />;
 
@@ -74,7 +77,7 @@ function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
     <PlayerFrame
       title={ct(game.name)}
       caption={t('oyna.kinds.ministory')}
-      timer={clock.remaining}
+      timer={clock.timer}
       outline={<Outline label={t('oyna.words')} words={game.words} />}
       footer={
         <PlayerActions
@@ -106,7 +109,7 @@ function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
         <Text className="font-body text-[14px] leading-[21px] text-body">{t('oyna.wordCount', { n: countWords(text) })}</Text>
         <Text className="font-body text-[14px] leading-[21px] text-body">{t('oyna.wordsUsed', { n: used.length, total: game.words.length })}</Text>
       </View>
-      <ConfirmSubmit visible={confirm} loading={submitting} onCancel={() => setConfirm(false)} onConfirm={() => void send()} />
+      <ConfirmSubmit visible={confirm} loading={submitting} onCancel={() => setConfirm(false)} onConfirm={() => void send(clock.spent())} />
     </PlayerFrame>
   );
 }

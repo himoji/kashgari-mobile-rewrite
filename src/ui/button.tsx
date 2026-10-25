@@ -6,7 +6,7 @@ import { cn } from '@/ui/cn';
 import { Icon, type IconName } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
-const button = cva('flex-row items-center justify-center gap-2 rounded-control px-[13px]', {
+const button = cva('press flex-row items-center justify-center gap-2 rounded-control px-[13px]', {
   variants: {
     variant: {
       primary: 'bg-primary sheen shadow-button active:opacity-90',

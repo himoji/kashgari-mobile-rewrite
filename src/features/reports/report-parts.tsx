@@ -33,7 +33,7 @@ export function ReportSelect<T extends string>({
         accessibilityLabel={label}
         accessibilityState={{ expanded: open }}
         onPress={() => onOpenChange(!open)}
-        className="h-12 flex-row items-center justify-between gap-4 rounded-control bg-surface px-3"
+        className="press-row h-12 flex-row items-center justify-between gap-4 rounded-control bg-surface px-3"
         style={{ boxShadow: 'inset 0 0 0 1px #8a8d99' }}
       >
         <Text className="flex-1 font-body text-[16px] leading-[20.8px]" numberOfLines={1}>{options.find((o) => o.value === value)?.label}</Text>
@@ -53,7 +53,7 @@ export function ReportSelect<T extends string>({
                 accessibilityRole="menuitem"
                 accessibilityState={{ selected }}
                 onPress={() => (onChange(o.value), onOpenChange(false))}
-                className={cn('h-12 flex-row items-center justify-between gap-6 rounded-[9px] px-3', selected ? 'bg-highlight' : 'active:bg-canvas')}
+                className={cn('h-12 flex-row items-center justify-between gap-6 rounded-[9px] px-3', selected ? 'bg-highlight active:bg-highlight' : 'active:bg-canvas')}
               >
                 <Text className="font-body text-[16px] leading-[24px]">{o.label}</Text>
                 {selected ? <Icon name="check" size={18} color={colors.ink} /> : null}

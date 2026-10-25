@@ -8,10 +8,10 @@ import { classRows, teacherRows } from '@/features/school/school-data';
 import { ClassTable, TeacherCard } from '@/features/school/school-parts';
 import { SCHOOL_PRINCIPAL } from '@/features/school/gql';
 import { useSchool } from '@/features/school/use-school';
-import { SchoolTabs } from '@/features/teacher-assignments/school-tabs';
 import { cn } from '@/ui/cn';
-import { EmptyState, ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
+import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { TabScreen } from '@/ui/tab-screen';
 
 type Segment = 'teachers' | 'classes';
@@ -47,7 +47,7 @@ function School() {
   const { school } = useSchool();
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  if (!school) return <ErrorState />;
+  if (!school) return <EmptyState title={t('principal.noSchool')} body={t('principal.noSchoolBody')} illustration="classroom" />;
   return (
     <View>
       <View className={cn('mb-3', pickerOpen && 'z-30')}>
@@ -60,25 +60,28 @@ function School() {
           onChange={() => undefined}
         />
       </View>
-      <SchoolTabs
+      <SegmentedTabs
+        variant="section"
         value={segment}
         onChange={(tab) => router.setParams({ tab })}
         options={SEGMENTS.map((value) => ({ value, label: t(`principal.${value}`) }))}
       />
-      {segment === 'teachers' ? (
-        <View className="gap-3">
-          {teacherRows(school).map((row) => (
-            <TeacherCard key={row.id} {...row} onOpen={() => router.push({ pathname: '/principal/teacher/[id]', params: { id: row.id } })} />
-          ))}
-          {school.teachers.length === 0 ? <EmptyState title={t('principal.noTeachers')} illustration="classroom" /> : null}
-        </View>
-      ) : (
-        <ClassTable
-          schoolName={school.name}
-          classes={classRows(school)}
-          onOpen={(id) => router.push({ pathname: '/principal/class/[id]', params: { id } })}
-        />
-      )}
+      <SegmentPanel id={segment}>
+        {segment === 'teachers' ? (
+          <View className="gap-3">
+            {teacherRows(school).map((row) => (
+              <TeacherCard key={row.id} {...row} onOpen={() => router.push({ pathname: '/principal/teacher/[id]', params: { id: row.id } })} />
+            ))}
+            {school.teachers.length === 0 ? <EmptyState title={t('principal.noTeachers')} illustration="classroom" /> : null}
+          </View>
+        ) : (
+          <ClassTable
+            schoolName={school.name}
+            classes={classRows(school)}
+            onOpen={(id) => router.push({ pathname: '/principal/class/[id]', params: { id } })}
+          />
+        )}
+      </SegmentPanel>
     </View>
   );
 }

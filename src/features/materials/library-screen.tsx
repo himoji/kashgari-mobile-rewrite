@@ -1,7 +1,6 @@
-import { useSuspenseQuery } from '@apollo/client/react';
+import { useBackgroundQuery, useReadQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Heart } from 'lucide-react-native';
 import { useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +58,7 @@ function MaterialCard({ item, onSave }: { item: LibraryItem; onSave: () => void 
               onPress={onSave}
               className="-mr-1 -mt-2 h-11 w-11 items-center justify-center rounded-full bg-[#fafbfe] active:opacity-70"
             >
-              <Heart size={21} color={colors.subtle} strokeWidth={1.6} />
+              <Icon name="heart" size={21} color={colors.subtle} />
             </Pressable>
           </View>
           <Text className="mt-1.5 font-body-semibold text-[16px] leading-[21.6px]">{content(item.title)}</Text>
@@ -106,6 +105,7 @@ export function LibraryScreen() {
       </View>
 
       <QueryBoundary
+        fade={false}
         fallback={
           <LibraryFilters {...controls} grades={[]} grade={null}>
             <ListSkeleton />
@@ -199,7 +199,7 @@ function LibraryFilters({
       <Pressable
         accessibilityRole="button"
         onPress={onSaved}
-        className="mt-0.5 h-11 flex-row items-center gap-2 self-start rounded-control bg-[#f3f7ff] px-[14px] active:opacity-80"
+        className="press mt-0.5 h-11 flex-row items-center gap-2 self-start rounded-control bg-[#f3f7ff] px-[14px] active:opacity-80"
       >
         <Text className="font-body-semibold text-[14px] leading-[18px] text-link">{t('materials.saved')}</Text>
         <View className="rounded-md bg-surface px-1.5 py-0.5">
@@ -241,12 +241,14 @@ function LibraryList({ grade, filter, onClear, onSaved }: { grade: number; filte
   const { t, i18n } = useTranslation();
   const { profileId } = useProfile();
   const queryKey = useRetryKey();
-  const texts = useSuspenseQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
-  const grammar = useSuspenseQuery(MATERIALS_GRAMMAR, { queryKey });
+  // Both requests start before either is read, so the grade and the grammar list load in parallel.
+  const [gradeRef] = useBackgroundQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
+  const [grammarRef] = useBackgroundQuery(MATERIALS_GRAMMAR, { queryKey });
+  const { data: texts } = useReadQuery(gradeRef);
+  const { data: grammar } = useReadQuery(grammarRef);
   const items = useMemo(
-    () =>
-      libraryItems(texts.data.grade, grammar.data.allDurysTitles, (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
-    [texts.data, grammar.data, i18n.language, t],
+    () => libraryItems(texts.grade, grammar.allDurysTitles, (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
+    [texts, grammar, i18n.language, t],
   );
   const list = filterLibrary(items, filter);
 

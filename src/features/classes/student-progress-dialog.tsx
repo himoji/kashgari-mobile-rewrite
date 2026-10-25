@@ -1,7 +1,6 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { useSession } from '@/features/auth/session';
 import type { Attempt, Work } from '@/features/classes/class-data';
 import { shortDate } from '@/features/classes/format';
 import { StudentWorkRow } from '@/features/classes/student-work-row';
@@ -21,7 +20,6 @@ type Props = {
 /** A student's latest work with scores (opened from a roster row). */
 export function StudentProgressDialog({ visible, studentName, rows, onOpen, onClose }: Props) {
   const { t } = useTranslation();
-  const language = useSession((s) => s.uiLanguage);
   const content = useContentText();
   return (
     <Dialog visible={visible} title={studentName} onClose={onClose}>
@@ -30,7 +28,7 @@ export function StudentProgressDialog({ visible, studentName, rows, onOpen, onCl
           <StudentWorkRow
             key={row.attempt.id}
             title={content(row.work.name)}
-            date={shortDate(row.attempt.createdAt, language)}
+            date={shortDate(row.attempt.createdAt, t)}
             pending={row.attempt.pending}
             score={row.attempt.score}
             onPress={onOpen && row.attempt.reviewKind ? () => onOpen(row) : undefined}

@@ -7,11 +7,11 @@ import { ClassesSegment } from '@/features/classes/classes-segment';
 import { ReviewSegment } from '@/features/review/review-segment';
 import { AssignmentsSegment } from '@/features/teacher-assignments/assignments-segment';
 import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
-import { SchoolTabs } from '@/features/teacher-assignments/school-tabs';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
+import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { TabScreen } from '@/ui/tab-screen';
 
 type Segment = 'assignments' | 'classes' | 'review';
@@ -33,7 +33,8 @@ export function TeacherSchoolScreen() {
         onRefresh={refresh}
       >
         <View>
-          <SchoolTabs
+          <SegmentedTabs
+            variant="section"
             value={segment}
             onChange={(tab) => router.setParams({ tab })}
             options={SEGMENTS.map((value) => ({ value, label: t(`classes.tabs.${value}`) }))}
@@ -77,14 +78,18 @@ function SchoolSkeleton() {
 
 function School({ segment }: { segment: Segment }) {
   const school = useTeacherSchool();
-  return segment === 'assignments' ? (
-    <AssignmentsSegment classes={school.classes} />
-  ) : segment === 'classes' ? (
-    <ClassesSegment
-      classes={school.classes}
-      onOpenClass={(id) => router.push({ pathname: '/teacher/class/[id]', params: { id } })}
-    />
-  ) : (
-    <ReviewSegment classes={school.classes} />
+  return (
+    <SegmentPanel id={segment}>
+      {segment === 'assignments' ? (
+        <AssignmentsSegment classes={school.classes} />
+      ) : segment === 'classes' ? (
+        <ClassesSegment
+          classes={school.classes}
+          onOpenClass={(id) => router.push({ pathname: '/teacher/class/[id]', params: { id } })}
+        />
+      ) : (
+        <ReviewSegment classes={school.classes} />
+      )}
+    </SegmentPanel>
   );
 }

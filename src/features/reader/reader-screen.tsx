@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -12,11 +13,13 @@ import { PageContents } from '@/features/reader/page-contents';
 import { useReaderPrefs } from '@/features/reader/reader-prefs';
 import { ReadingGuide } from '@/features/reader/reading-guide';
 import { useContentText } from '@/lib/i18n';
+import { pageIn } from '@/lib/motion';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { NotReady, Skeleton } from '@/ui/feedback';
 import { BackBar } from '@/ui/back-bar';
 import { Icon } from '@/ui/icon';
+import { ProgressBar } from '@/ui/progress-bar';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
@@ -218,7 +221,7 @@ function Reader({ id, guide, onCloseGuide }: { id: string; guide: boolean; onClo
             accessibilityRole="button"
             accessibilityLabel={t('reader.choosePage')}
             onPress={() => setContents(true)}
-            className="h-11 flex-row items-center gap-[7px] rounded-[11px] bg-[#e7f0ff] px-3 active:opacity-80"
+            className="press h-11 flex-row items-center gap-[7px] rounded-[11px] bg-[#e7f0ff] px-3 active:opacity-80"
           >
             <Text className="font-body text-[13px] leading-[20px] text-primary">
               {t('reader.page', { page: page + 1, total: pages.length })}
@@ -230,18 +233,14 @@ function Reader({ id, guide, onCloseGuide }: { id: string; guide: boolean; onClo
             <FontButton label="A+" step={2} disabled={fontSize >= 28} />
           </View>
         </View>
-        <View
-          accessibilityRole="progressbar"
+        <ProgressBar
+          value={(page + 1) / pages.length}
           accessibilityLabel={t('reader.progress')}
           accessibilityValue={{ min: 0, max: pages.length, now: page + 1 }}
-          className="h-1 overflow-hidden rounded-[5px] bg-[#e7f0ff]"
-        >
-          <View
-            className="h-full rounded-[5px] bg-primary"
-            style={{ width: `${((page + 1) / pages.length) * 100}%` }}
-          />
-        </View>
-        <View className="mt-[22px] pb-5">
+          className="h-1 rounded-[5px] bg-[#e7f0ff]"
+          fillClassName="rounded-[5px] bg-primary"
+        />
+        <Animated.View key={page} entering={pageIn} style={{ marginTop: 22, paddingBottom: 20 }}>
           {current.image ? (
             <Image
               source={current.image}
@@ -250,7 +249,7 @@ function Reader({ id, guide, onCloseGuide }: { id: string; guide: boolean; onClo
             />
           ) : null}
           <Words tokens={current.tokens} fontSize={fontSize} />
-        </View>
+        </Animated.View>
         {last ? <NotReady body={t('reader.quizNotReady')} /> : null}
       </ReaderBody>
 

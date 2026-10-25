@@ -2,6 +2,7 @@
   "tabs": { "new": "Жаңа", "completed": "Орындалған" },
   "start": "Бастау",
   "viewResults": "Нәтижелерді көру",
+  "closed": "Тапсыру жабылды",
   "min": "мин",
   "modules": { "oqylym": "Оқылым", "tyndalym": "Тыңдалым", "durys": "Грамматика", "oyna": "Ойындар", "lesson": "Сабақ", "zhazylym": "Жазылым" },
   "state": { "done": "Орындалған", "waiting": "Бағалауды күтуде", "inProgress": "Орындалуда", "overdue": "Мерзімі өтті", "notStarted": "Басталмаған" },

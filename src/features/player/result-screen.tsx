@@ -120,6 +120,7 @@ function ResultView({ kind, id, outcome }: { kind: Kind; id: string; outcome: Ou
                   <Text className="font-body-medium text-[14px] leading-[21px] text-ink">{date(outcome.submittedAt)}</Text>
                 </View>
               ) : null}
+              {/* The API keeps one submission per work (no attempt count), so a result is always the first attempt. */}
               <View className="flex-1">
                 <Text className="mb-1 font-body text-[11px] leading-[16px] text-subtle">{t('player.result.attempt')}</Text>
                 <Text className="font-body-medium text-[14px] leading-[21px] text-ink">1</Text>

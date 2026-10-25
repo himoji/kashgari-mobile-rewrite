@@ -1,6 +1,7 @@
 import { useMutation, useSuspenseQuery } from '@apollo/client/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Animated from 'react-native-reanimated';
 
 import { useProfile } from '@/features/auth/session';
 import { OYNA_WORD_GAME, OYNA_WORD_GAME_STATUS, OYNA_WORD_GAME_SUBMIT } from '@/features/oyna/gql';
@@ -12,7 +13,9 @@ import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
 import type { OynaWordGameQuery } from '@/graphql/graphql';
+import { haptics } from '@/lib/haptics';
 import { useContentText } from '@/lib/i18n';
+import { pageIn } from '@/lib/motion';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 
 import {
@@ -60,7 +63,7 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
   const { t } = useTranslation();
   const ct = useContentText();
   const { toast, showToast } = useToast();
-  const steps = useMemo(() => wordSteps(game), [game]);
+  const steps = wordSteps(game);
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState<Set<WordStep>>(() => new Set());
   const [furthest, setFurthest] = useState(0);
@@ -103,25 +106,21 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
   };
 
   const send = async () => {
-    try {
-      const { data } = await submit({
-        variables: {
-          gameId: game.id,
-          studentId,
-          data: {
-            time: clock.spent(),
-            match: matchPairs.length ? matchPayload(matchPairs, match) : null,
-            mcq: mcqQuestions.length ? mcqPayload(mcqQuestions, mcq) : null,
-          },
-        },
-      });
-      setConfirm(false);
-      if (data?.wordGameSubmit) setSubmitted(true);
-      else showToast(t('oyna.submitFailed'));
-    } catch {
-      setConfirm(false);
-      showToast(t('oyna.submitFailed'));
-    }
+    const data = {
+      time: clock.spent(),
+      match: matchPairs.length ? matchPayload(matchPairs, match) : null,
+      mcq: mcqQuestions.length ? mcqPayload(mcqQuestions, mcq) : null,
+    };
+    // No try/catch around the result checks: the compiler can't optimise those yet.
+    const ok = await submit({ variables: { gameId: game.id, studentId, data } }).then(
+      (res) => !!res.data?.wordGameSubmit,
+      () => false,
+    );
+    setConfirm(false);
+    if (ok) {
+      haptics.success();
+      setSubmitted(true);
+    } else showToast(t('oyna.submitFailed'));
   };
 
   if (submitted) return <OynaResultView kind="wordgame" id={game.id} />;
@@ -185,7 +184,9 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
       }
       toast={toast}
     >
-      {body}
+      <Animated.View key={step} entering={pageIn}>
+        {body}
+      </Animated.View>
       <ConfirmSubmit visible={confirm} loading={submitting} onCancel={() => setConfirm(false)} onConfirm={() => void send()} />
     </PlayerFrame>
   );

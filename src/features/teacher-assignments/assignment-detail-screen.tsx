@@ -5,7 +5,6 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { useSession } from '@/features/auth/session';
 import { StudentAvatar } from '@/features/classes/class-avatar';
 import { workNumbers, type Work } from '@/features/classes/class-data';
 import { shortDate } from '@/features/classes/format';
@@ -49,7 +48,7 @@ function Disclosure({ label, count, defaultOpen = false, children }: { label: st
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((o) => !o)}
-        className="h-[52px] flex-row items-center gap-[9px]"
+        className="press h-[52px] flex-row items-center gap-[9px]"
       >
         <Text className="flex-1 font-body text-[13px] leading-[19.5px] text-[#7b8faa]">{label}</Text>
         {count != null ? <Text className="font-body text-[11px] leading-[16px] text-[#a3b2c8]">{count}</Text> : null}
@@ -121,7 +120,6 @@ export function AssignmentDetailScreen() {
 function AssignmentDetail() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const language = useSession((s) => s.uiLanguage);
   const content = useContentText();
   const { kind, id } = useLocalSearchParams<{ kind: string; id: string }>();
   const school = useTeacherSchool();
@@ -187,7 +185,7 @@ function AssignmentDetail() {
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 38 }}>
         <View className="flex-row items-center justify-between gap-2.5">
           <Text className="font-body text-[11px] leading-[16.5px] text-[#96a4b8]">
-            {work.className} · {shortDate(work.date, language)}
+            {work.className} · {shortDate(work.date, t)}
           </Text>
           <StatusMark status={work.status === 'published' ? 'done' : 'pending'} label={t(`classes.status.${work.status}`)} size={16} />
         </View>
@@ -208,7 +206,7 @@ function AssignmentDetail() {
             </Text>
             <Text className="flex-1 font-body text-[11px] leading-[16.5px] text-[#9aacbf]">{t('teacherAssignments.submitted')}</Text>
             {n.pending ? (
-              <Pressable accessibilityRole="button" onPress={openReview} className="flex-row items-center gap-[5px] py-[3px]">
+              <Pressable accessibilityRole="button" onPress={openReview} className="press flex-row items-center gap-[5px] py-[3px]">
                 <Text className="font-body text-[11px] leading-[16.5px] text-[#719bd5]">{t('teacherAssignments.toReview', { count: n.pending })}</Text>
                 <Icon name="arrow" size={14} color={colors.ink} />
               </Pressable>

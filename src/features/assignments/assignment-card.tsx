@@ -11,7 +11,7 @@ import { Card } from '@/ui/card';
 import { StatusMark } from '@/ui/status-mark';
 import { Text } from '@/ui/text';
 
-import { deadlineLabel, isCompleted, type StudentAssignment } from './map';
+import { canStart, deadlineLabel, isCompleted, type StudentAssignment } from './map';
 import { assignmentHref, resultHref, type AssignmentRef } from './routes';
 
 /**
@@ -89,8 +89,10 @@ export function AssignmentCard({ item, readOnly }: { item: StudentAssignment; re
       </View>
       {readOnly ? null : completed ? (
         <Button variant="soft" label={t('assignments.viewResults')} onPress={() => router.push(resultHref(item))} />
-      ) : (
+      ) : canStart(item) ? (
         <Button label={t('assignments.start')} onPressIn={() => prefetch(item)} onPress={() => router.push(assignmentHref(item))} />
+      ) : (
+        <Button variant="soft" disabled label={t('assignments.closed')} />
       )}
     </Card>
   );

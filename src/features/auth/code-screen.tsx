@@ -8,6 +8,7 @@ import { REQUEST_CODE, VERIFY_CODE } from '@/features/auth/gql';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { phoneDigits } from '@/features/auth/phone';
 import { finishSignIn } from '@/features/auth/sign-in';
+import { haptics } from '@/lib/haptics';
 import { goBack } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
@@ -40,11 +41,13 @@ export function CodeScreen() {
       const { data } = await verify({ variables: { requestId, verificationCode: value } });
       const rows = data?.verifyPhoneNumberAllLanguages;
       if (!rows?.length) {
+        haptics.error();
         setError(t('auth.codeWrong'));
         return;
       }
       await finishSignIn(rows.map((r) => ({ language: r.language, ...r.authInfo })));
     } catch {
+      haptics.error();
       setError(t('auth.codeWrong'));
     } finally {
       setBusy(false);
@@ -63,7 +66,7 @@ export function CodeScreen() {
       logo={false}
       footer={
         <>
-          <Pressable disabled={wait > 0} onPress={resend} className="min-h-11 items-center justify-center">
+          <Pressable disabled={wait > 0} onPress={resend} className="press min-h-11 items-center justify-center">
             <Text className={cn('font-body text-[13px]', wait > 0 ? 'text-[#8a95a7]' : 'text-link')}>
               {wait > 0 ? t('auth.resendIn', { n: wait }) : t('auth.resend')}
             </Text>
@@ -72,7 +75,7 @@ export function CodeScreen() {
         </>
       }
     >
-      <Pressable onPress={() => goBack()} className="mb-6 min-h-11 justify-center self-start">
+      <Pressable onPress={() => goBack()} className="press mb-6 min-h-11 justify-center self-start">
         <Text className="font-body text-[14px] text-link">{t('auth.changePhone')}</Text>
       </Pressable>
       <Text variant="display" className="mb-3 text-[28px] leading-[34px]" nativeID="code-label">

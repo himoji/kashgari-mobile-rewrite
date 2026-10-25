@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
-import { Hourglass } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
+import { canStart } from '@/features/assignments/map';
 import { assignmentHref } from '@/features/assignments/routes';
 import { useStudentAssignments } from '@/features/assignments/use-student-assignments';
 import { useProfile } from '@/features/auth/session';
@@ -11,6 +11,7 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/feedback';
+import { Icon } from '@/ui/icon';
 import { ListRow } from '@/ui/list-row';
 import { ProgressRing } from '@/ui/progress-ring';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
@@ -24,7 +25,7 @@ function DailyWordCard() {
     <View className="sheen mb-[18px] gap-[3px] rounded-[18px] bg-primary p-3">
       <Text className="font-body-medium text-[11px] leading-[16px] text-white">{t('studentHome.dailyWord')}</Text>
       <View className="flex-row items-center gap-2.5">
-        <Hourglass size={18} color={colors.white} />
+        <Icon name="hourglass" size={18} color={colors.white} />
         <Text className="font-body-semibold text-[22px] leading-[28px] text-white">{t('common.notReady.title')}</Text>
       </View>
       <Text className="font-body text-[11px] leading-[17px] text-white">{t('common.notReady.body')}</Text>
@@ -45,7 +46,7 @@ function ProgressCard({ done, total }: { done: number; total: number }) {
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push('/student/results')}
-          className="min-h-[37px] self-start justify-center rounded-[11px] bg-white px-[14px] py-2 active:opacity-90"
+          className="press min-h-[37px] self-start justify-center rounded-[11px] bg-white px-[14px] py-2 active:opacity-90"
           style={{ boxShadow: 'inset 0 1px 3px rgba(109,160,230,0.44), 0 2px 5px rgba(22,88,180,0.07)' }}
         >
           <Text className="font-body-semibold text-[12px] leading-[18px] text-link">{t('studentHome.results')}</Text>
@@ -97,6 +98,7 @@ export function StudentHomeScreen() {
           <>
             <Skeleton className="h-[156px] rounded-[20px]" />
             <ReadingRow />
+            <Skeleton className="h-[88px]" />
             <WordsRow />
           </>
         }
@@ -112,7 +114,7 @@ function Progress() {
   const { t } = useTranslation();
   const content = useContentText();
   const { all, fresh, completed } = useStudentAssignments();
-  const next = fresh[0];
+  const next = fresh.find(canStart);
   return (
     <>
       {all.length > 0 ? <ProgressCard done={completed.length} total={all.length} /> : null}

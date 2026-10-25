@@ -31,11 +31,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 export function ProfileScreen() {
   const { t } = useTranslation();
   const profile = useProfile();
-  const session = useSession();
-  const [prefs, setPrefs] = useState({ uiLanguage: session.uiLanguage, definitionLanguage: session.definitionLanguage, script: session.script });
+  // Selectors, so the screen does not re-render on every session write (e.g. a token refresh).
+  const uiLanguage = useSession((s) => s.uiLanguage);
+  const definitionLanguage = useSession((s) => s.definitionLanguage);
+  const script = useSession((s) => s.script);
+  const setPreferences = useSession((s) => s.setPreferences);
+  const signOut = useSession((s) => s.signOut);
+  const [prefs, setPrefs] = useState({ uiLanguage, definitionLanguage, script });
   const [saved, setSaved] = useState(false);
-  const dirty =
-    prefs.uiLanguage !== session.uiLanguage || prefs.definitionLanguage !== session.definitionLanguage || prefs.script !== session.script;
+  const dirty = prefs.uiLanguage !== uiLanguage || prefs.definitionLanguage !== definitionLanguage || prefs.script !== script;
 
   const [updateLanguage, languageState] = useMutation(UPDATE_LANGUAGE);
   const [failed, setFailed] = useState(false);
@@ -43,7 +47,7 @@ export function ProfileScreen() {
   // Script and explanation language stay on the device; the interface language is also saved to the account.
   const save = async () => {
     setFailed(false);
-    if (prefs.uiLanguage !== session.uiLanguage) {
+    if (prefs.uiLanguage !== uiLanguage) {
       try {
         const { data } = await updateLanguage({ variables: { id: profile.accountId, language: apiLanguage(prefs.uiLanguage) } });
         if (!data?.updateLanguage) throw new Error('not saved');
@@ -51,7 +55,7 @@ export function ProfileScreen() {
         return setFailed(true);
       }
     }
-    session.setPreferences(prefs);
+    setPreferences(prefs);
     setSaved(true);
   };
 
@@ -84,7 +88,7 @@ export function ProfileScreen() {
             variant="choice"
             value={prefs.uiLanguage}
             options={UI_LANGUAGES}
-            onChange={(uiLanguage: UiLanguage) => (setPrefs((p) => ({ ...p, uiLanguage })), setSaved(false))}
+            onChange={(value: UiLanguage) => (setPrefs((p) => ({ ...p, uiLanguage: value })), setSaved(false))}
           />
         </Field>
         <Field label={t('profile.explanationLanguage')}>
@@ -92,7 +96,7 @@ export function ProfileScreen() {
             variant="choice"
             value={prefs.definitionLanguage}
             options={UI_LANGUAGES}
-            onChange={(definitionLanguage: UiLanguage) => (setPrefs((p) => ({ ...p, definitionLanguage })), setSaved(false))}
+            onChange={(value: UiLanguage) => (setPrefs((p) => ({ ...p, definitionLanguage: value })), setSaved(false))}
           />
         </Field>
         <Field label={t('profile.script')}>
@@ -103,7 +107,7 @@ export function ProfileScreen() {
               { value: 'cyrl', label: t('profile.cyrillic') },
               { value: 'latn', label: t('profile.latin') },
             ]}
-            onChange={(script: Script) => (setPrefs((p) => ({ ...p, script })), setSaved(false))}
+            onChange={(value: Script) => (setPrefs((p) => ({ ...p, script: value })), setSaved(false))}
           />
         </Field>
         <Button
@@ -128,7 +132,7 @@ export function ProfileScreen() {
         <Icon name="arrow" size={19} color={colors.ink} />
       </Pressable>
 
-      <Button variant="danger" label={t('profile.signOut')} onPress={session.signOut} />
+      <Button variant="danger" label={t('profile.signOut')} onPress={signOut} />
     </TabScreen>
   );
 }

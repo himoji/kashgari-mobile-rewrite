@@ -1,12 +1,13 @@
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Icon } from '@/ui/icon';
+import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
 import type { PassageParagraph, PassageStep, StepViewProps } from '../engine/types';
@@ -90,20 +91,26 @@ function AudioCard({ url, title }: { url: string; title: string }) {
           onPress={toggle}
           className="h-11 w-11 items-center justify-center rounded-control bg-primary-strong sheen active:opacity-90"
         >
-          <Icon name={status.playing ? 'pause' : 'play'} size={18} color={colors.white} />
+          {status.playing && status.isBuffering ? (
+            <ActivityIndicator size="small" color={colors.white} />
+          ) : (
+            <Icon name={status.playing ? 'pause' : 'play'} size={18} color={colors.white} />
+          )}
         </Pressable>
         <View className="flex-1">
           <Text variant="strong" numberOfLines={1}>{content(title)}</Text>
-          <Text variant="caption">{t('player.labels.listening')}</Text>
+          {status.error ? (
+            <Text variant="caption" className="text-late">{t('common.states.audioError')}</Text>
+          ) : (
+            <Text variant="caption">{t('player.labels.listening')}</Text>
+          )}
         </View>
         <Text className="font-body-medium text-[12px] text-hint">
           {clock(status.currentTime)}
           {status.duration ? ` / ${clock(status.duration)}` : ''}
         </Text>
       </View>
-      <View className="h-[5px] overflow-hidden rounded-lg bg-[#e3e8f2]">
-        <View className="h-full rounded-lg bg-primary" style={{ width: `${progress * 100}%` }} />
-      </View>
+      <ProgressBar value={progress} className="h-[5px] rounded-lg bg-[#e3e8f2]" fillClassName="rounded-lg bg-primary" />
     </View>
   );
 }
@@ -134,7 +141,7 @@ export function PassageView({ step }: StepViewProps<PassageStep>) {
               accessibilityRole="button"
               accessibilityState={{ expanded: transcript }}
               onPress={() => setTranscript((v) => !v)}
-              className="h-11 flex-row items-center justify-between px-3"
+              className="press h-11 flex-row items-center justify-between px-3"
             >
               <Text className="font-body-medium text-[12px] leading-[18px] text-muted">{t('player.transcript')}</Text>
               <Icon name={transcript ? 'up' : 'down'} size={16} color={colors.muted} />

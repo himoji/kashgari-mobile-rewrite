@@ -32,7 +32,7 @@ function Tabs({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void })
             accessibilityState={{ selected }}
             onPress={() => onChange(tab)}
             className={cn(
-              'h-11 flex-1 items-center justify-center rounded-[9px] p-2',
+              'press h-11 flex-1 items-center justify-center rounded-[9px] p-2',
               selected && 'sheen bg-primary-strong',
             )}
             style={selected ? { boxShadow: '0 2px 6px rgba(10, 116, 255, 0.094)' } : undefined}

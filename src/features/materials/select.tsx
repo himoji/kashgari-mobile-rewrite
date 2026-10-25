@@ -27,7 +27,7 @@ export function Select<T extends string>({ label, value, options, open, onOpenCh
           accessibilityLabel={label}
           accessibilityState={{ expanded: open }}
           onPress={() => onOpenChange(!open)}
-          className="min-h-16 flex-row items-center justify-between gap-4 rounded-control bg-surface px-3 py-2.5"
+          className="press min-h-16 flex-row items-center justify-between gap-4 rounded-control bg-surface px-3 py-2.5"
           style={{ boxShadow: 'inset 0 0 0 1px #8a8d99' }}
         >
           <Text className="flex-1 font-body text-[16px] leading-[20.8px]">{current}</Text>
@@ -47,7 +47,7 @@ export function Select<T extends string>({ label, value, options, open, onOpenCh
                   accessibilityRole="menuitem"
                   accessibilityState={{ selected }}
                   onPress={() => (onChange(o.value), onOpenChange(false))}
-                  className={cn('min-h-12 flex-row items-center gap-2 rounded-tile px-3 py-2.5', selected ? 'bg-highlight' : 'active:bg-canvas')}
+                  className={cn('min-h-12 flex-row items-center gap-2 rounded-tile px-3 py-2.5', selected ? 'bg-highlight active:bg-highlight' : 'active:bg-canvas')}
                 >
                   <Text className="flex-1 font-body text-[16px] leading-[20.8px]">{o.label}</Text>
                   {selected ? <Icon name="check" size={16} color={colors.ink} /> : null}

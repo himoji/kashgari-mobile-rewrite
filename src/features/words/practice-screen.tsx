@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { DICTIONARY_WORD } from '@/features/dictionary/gql';
 import { useWordAudio } from '@/features/dictionary/word-audio';
 import { useSavedWords, type SavedWord } from '@/features/words/saved-words';
+import { haptics } from '@/lib/haptics';
 import { useContentText } from '@/lib/i18n';
 import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
@@ -15,6 +16,7 @@ import { cn } from '@/ui/cn';
 import { NotReady } from '@/ui/feedback';
 import { BackBar } from '@/ui/back-bar';
 import { Icon } from '@/ui/icon';
+import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
 function Listen({ word }: { word: string }) {
@@ -59,19 +61,21 @@ function Flashcards({ words }: { words: SavedWord[] }) {
           <Text className="font-body text-[12px] leading-[18px] text-subtle">
             {index + 1} / {words.length}
           </Text>
-          <View className="h-[5px] flex-1 overflow-hidden rounded-[5px] bg-[#eaf1fc]">
-            <View
-              className="h-full rounded-[5px] bg-primary"
-              style={{ width: `${((index + 1) / words.length) * 100}%` }}
-            />
-          </View>
+          <ProgressBar
+            value={(index + 1) / words.length}
+            className="h-[5px] flex-1 rounded-[5px] bg-[#eaf1fc]"
+            fillClassName="rounded-[5px] bg-primary"
+          />
         </View>
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: flipped }}
           accessibilityHint={t('words.flip')}
-          onPress={() => setFlipped((f) => !f)}
-          className="h-[180px] items-center justify-center gap-3.5 rounded-[20px] bg-[linear-gradient(140deg,#4a93ff,#1e75f4)] px-[18px] py-6"
+          onPress={() => {
+            haptics.selection();
+            setFlipped((f) => !f);
+          }}
+          className="press h-[180px] items-center justify-center gap-3.5 rounded-[20px] bg-[linear-gradient(140deg,#4a93ff,#1e75f4)] px-[18px] py-6"
           style={{ boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }}
         >
           <Text className="font-body text-[11px] leading-[16px] text-subtle">
@@ -99,7 +103,7 @@ function Flashcards({ words }: { words: SavedWord[] }) {
           disabled={index === 0}
           onPress={() => move(-1)}
           className={cn(
-            'h-[46px] w-[46px] items-center justify-center rounded-control bg-[#eff6ff]',
+            'press h-[46px] w-[46px] items-center justify-center rounded-control bg-[#eff6ff]',
             index === 0 && 'opacity-50',
           )}
         >

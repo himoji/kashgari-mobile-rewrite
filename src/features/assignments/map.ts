@@ -169,6 +169,9 @@ export function mapAssignments(cls: ClassData | undefined, now = Date.now() / 10
 
 export const isCompleted = (a: StudentAssignment) => a.state === 'done' || a.state === 'waiting';
 
+/** The player refuses unsubmitted work past its deadline, so overdue work has nothing to start. */
+export const canStart = (a: StudentAssignment) => !isCompleted(a) && a.state !== 'overdue';
+
 /** New work: overdue first, then by nearest deadline; work without a deadline last, newest first. */
 export function sortNew(list: StudentAssignment[]) {
   return list

@@ -1,12 +1,13 @@
 import { Image } from 'expo-image';
-import { Hourglass } from 'lucide-react-native';
 import { View } from 'react-native';
+import { useReducedMotion } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { cn } from '@/ui/cn';
+import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
 const illustrations = {
@@ -45,7 +46,7 @@ export function NotReady({ title, body, className }: { title?: string; body?: st
   const { t } = useTranslation();
   return (
     <Card variant="muted" className={cn('flex-row items-center gap-3 border border-dashed border-field', className)}>
-      <Hourglass size={20} color={colors.subtle} />
+      <Icon name="hourglass" size={20} color={colors.subtle} />
       <View className="flex-1">
         <Text variant="strong" tone="muted">{title ?? t('common.notReady.title')}</Text>
         <Text variant="caption">{body ?? t('common.notReady.body')}</Text>
@@ -54,8 +55,10 @@ export function NotReady({ title, body, className }: { title?: string; body?: st
   );
 }
 
+/** A loading block. It pulses unless the system asks for reduced motion (read once, so the class never toggles). */
 export function Skeleton({ className }: { className?: string }) {
-  return <View className={cn('animate-pulse rounded-card bg-line', className)} />;
+  const still = useReducedMotion();
+  return <View className={cn(!still && 'animate-pulse', 'rounded-card bg-line', className)} />;
 }
 
 /** Default Suspense fallback for a tab: hero-shaped block plus three rows. */

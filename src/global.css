@@ -79,3 +79,37 @@
 @utility bg-login {
   background-image: radial-gradient(ellipse at 5% 0%, #fff0df 0, transparent 48%), radial-gradient(ellipse at 100% 100%, #e8f3ff 0, transparent 45%);
 }
+
+/* Press feedback (prototype .btn:active / work rows): a quick scale while held. Keep these classes
+   unconditional: adding a transition after the first render remounts the component (react-native-css). */
+@utility press {
+  transition-property: transform, opacity, background-color, border-color;
+  transition-duration: 150ms;
+  &:active {
+    scale: 0.97;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0ms;
+  }
+}
+
+/* Large rows and cards: the same press, barely scaled. */
+@utility press-row {
+  transition-property: transform, opacity, background-color, border-color;
+  transition-duration: 150ms;
+  &:active {
+    scale: 0.99;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0ms;
+  }
+}
+
+/* Answer and selection states (prototype .exercise option: background/border .18s). */
+@utility transition-tone {
+  transition-property: color, background-color, border-color, opacity;
+  transition-duration: 180ms;
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0ms;
+  }
+}

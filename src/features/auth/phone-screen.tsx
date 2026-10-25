@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { REQUEST_CODE, REQUEST_ID } from '@/features/auth/gql';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { formatPhone, isValidPhone, phoneDigits } from '@/features/auth/phone';
+import { useSession } from '@/features/auth/session';
 import { signInAsDemo, signInWithApple, signInWithGoogle } from '@/features/auth/sign-in';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
@@ -16,6 +17,7 @@ export function PhoneScreen() {
   const { t } = useTranslation();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
+  const expired = useSession((s) => s.expired);
   const [social, setSocial] = useState<'apple' | 'google' | 'demo' | null>(null);
   const [requestId] = useMutation(REQUEST_ID);
   const [requestCode, { loading }] = useMutation(REQUEST_CODE);
@@ -78,7 +80,7 @@ export function PhoneScreen() {
         className="h-[52px] rounded-control bg-surface px-3.5 font-body text-[16px] text-ink"
       />
       <Text accessibilityRole="alert" className="mb-3.5 mt-2 min-h-[18px] font-body text-[12px] text-late">
-        {error}
+        {error || (expired ? t('auth.sessionExpired') : '')}
       </Text>
     </LoginLayout>
   );

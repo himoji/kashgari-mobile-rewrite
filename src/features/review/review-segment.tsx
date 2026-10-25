@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { useSession } from '@/features/auth/session';
 import { reviewItems, type ClassWork } from '@/features/classes/class-data';
 import { shortDate } from '@/features/classes/format';
 import { ReviewRow } from '@/features/review/review-row';
@@ -21,7 +20,6 @@ type State = 'pending' | 'reviewed';
 /** "Тексеру" segment: submissions awaiting a score and those already scored, filterable by class. */
 export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
   const { t } = useTranslation();
-  const language = useSession((s) => s.uiLanguage);
   const [state, setState] = useState<State>('pending');
   const [query, setQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -67,7 +65,7 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               onPress={() => setState(key)}
-              className="h-[38px] flex-row items-center gap-1.5"
+              className="press h-[38px] flex-row items-center gap-1.5"
               style={selected ? { boxShadow: `0 2px 0 ${colors.primary}` } : undefined}
             >
               <Text className={cn('font-body text-[12px] leading-[18px]', selected ? 'text-link' : 'text-subtle')}>{label}</Text>
@@ -87,7 +85,7 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
             key={i.attempt.id}
             studentName={i.studentName}
             workName={i.work.name}
-            meta={`${i.work.className} · ${shortDate(i.attempt.createdAt, language)}`}
+            meta={`${i.work.className} · ${shortDate(i.attempt.createdAt, t)}`}
             pending={i.attempt.pending}
             score={i.attempt.score}
             onPress={() => router.push(submissionHref(i.attempt, i.work.key))}

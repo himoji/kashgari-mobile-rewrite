@@ -73,7 +73,7 @@ export function JoinClass() {
       <Input label={t('auth.classCode')} value={code} onChangeText={setCode} autoCapitalize="none" autoCorrect={false} />
       <Input label={t('auth.yourName')} value={name} onChangeText={setName} textContentType="name" error={error || undefined} />
       <Button size="lg" variant="strong" label={t('auth.join')} loading={busy} onPress={join} />
-      <Pressable onPress={signOut} className="min-h-11 justify-center">
+      <Pressable onPress={signOut} className="press min-h-11 justify-center">
         <Text className="font-body text-[13px] text-link">{t('auth.otherNumber')}</Text>
       </Pressable>
     </View>
