@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { skipToken, useSuspenseQuery } from '@apollo/client/react';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,8 +11,9 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { Dialog } from '@/ui/dialog';
-import { ErrorState, Skeleton } from '@/ui/feedback';
+import { Skeleton } from '@/ui/feedback';
 import { Icon, type IconName } from '@/ui/icon';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 export type Stage = 1 | 2 | 3;
@@ -214,18 +215,8 @@ export function AddDialog({ visible, onClose, onMaterial, onType }: { visible: b
 /** "Материал" sheet: a grade's texts and the grammar sets. */
 export function MaterialPicker({ visible, grades, onClose, onPick }: { visible: boolean; grades: number[]; onClose: () => void; onPick: (s: Source) => void }) {
   const { t } = useTranslation();
-  const { profileId } = useProfile();
-  const content = useContentText();
   const [picked, setPicked] = useState<number | null>(null);
   const grade = picked ?? grades[0] ?? 7;
-  const { data, loading, error, refetch } = useQuery(ASSIGN_MATERIALS, { variables: { grade, teacherId: profileId }, skip: !visible });
-  const rows = [
-    ...(data?.grade?.sections ?? []).flatMap((s) => [
-      ...s.oqylymTexts.map((x) => ({ ref: { kind: 'oqylym' as const, id: x.id }, title: x.title, line: `${grade} · ${t('materials.modules.oqylym')}` })),
-      ...s.tyndalymTexts.map((x) => ({ ref: { kind: 'tyndalym' as const, id: x.id }, title: x.title, line: `${grade} · ${t('materials.modules.tyndalym')}` })),
-    ]),
-    ...(data?.allDurysTitles ?? []).map((x) => ({ ref: { kind: 'grammar' as const, id: x.id }, title: x.title, line: t('materials.modules.grammar') })),
-  ];
   return (
     <Dialog visible={visible} variant="sheet" title={t('assign.material')} onClose={onClose}>
       {grades.length > 1 ? (
@@ -243,28 +234,46 @@ export function MaterialPicker({ visible, grades, onClose, onPick }: { visible: 
           ))}
         </View>
       ) : null}
-      {error ? (
-        <ErrorState onRetry={() => void refetch()} />
-      ) : loading && !data ? (
-        <View className="gap-2">
-          <Skeleton className="h-16" />
-          <Skeleton className="h-16" />
-        </View>
-      ) : (
-        <View className="gap-0.5">
-          {rows.map((r) => (
-            <Pressable
-              key={`${r.ref.kind}:${r.ref.id}`}
-              accessibilityRole="button"
-              onPress={() => onPick({ ref: r.ref, title: r.title })}
-              className="gap-1.5 rounded-control bg-surface px-2.5 py-4 active:bg-canvas"
-            >
-              <Text className="font-body-medium text-[14px] leading-[21px] text-[#263449]">{content(r.title)}</Text>
-              <Text className="mt-1 font-body text-[12px] leading-[18px] text-[#8b99ac]">{r.line}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
+      <QueryBoundary
+        fallback={
+          <View className="gap-2">
+            <Skeleton className="h-16" />
+            <Skeleton className="h-16" />
+          </View>
+        }
+      >
+        <MaterialRows grade={grade} active={visible} onPick={onPick} />
+      </QueryBoundary>
     </Dialog>
+  );
+}
+
+function MaterialRows({ grade, active, onPick }: { grade: number; active: boolean; onPick: (s: Source) => void }) {
+  const { t } = useTranslation();
+  const { profileId } = useProfile();
+  const content = useContentText();
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(ASSIGN_MATERIALS, active ? { variables: { grade, teacherId: profileId }, queryKey } : skipToken);
+  const rows = [
+    ...(data?.grade?.sections ?? []).flatMap((s) => [
+      ...s.oqylymTexts.map((x) => ({ ref: { kind: 'oqylym' as const, id: x.id }, title: x.title, line: `${grade} · ${t('materials.modules.oqylym')}` })),
+      ...s.tyndalymTexts.map((x) => ({ ref: { kind: 'tyndalym' as const, id: x.id }, title: x.title, line: `${grade} · ${t('materials.modules.tyndalym')}` })),
+    ]),
+    ...(data?.allDurysTitles ?? []).map((x) => ({ ref: { kind: 'grammar' as const, id: x.id }, title: x.title, line: t('materials.modules.grammar') })),
+  ];
+  return (
+    <View className="gap-0.5">
+      {rows.map((r) => (
+        <Pressable
+          key={`${r.ref.kind}:${r.ref.id}`}
+          accessibilityRole="button"
+          onPress={() => onPick({ ref: r.ref, title: r.title })}
+          className="gap-1.5 rounded-control bg-surface px-2.5 py-4 active:bg-canvas"
+        >
+          <Text className="font-body-medium text-[14px] leading-[21px] text-[#263449]">{content(r.title)}</Text>
+          <Text className="mt-1 font-body text-[12px] leading-[18px] text-[#8b99ac]">{r.line}</Text>
+        </Pressable>
+      ))}
+    </View>
   );
 }

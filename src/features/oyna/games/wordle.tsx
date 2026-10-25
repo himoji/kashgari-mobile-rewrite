@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
+import { useApolloClient, useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { Delete } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View, useWindowDimensions } from 'react-native';
@@ -26,15 +26,24 @@ import type { OynaWordleGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 type Game = NonNullable<OynaWordleGameQuery['wordleGame']>;
 
 export function WordlePlayer({ id }: { id: string }) {
+  return (
+    <QueryBoundary fallback={<PlayerLoading />} errorFallback={(retry) => <PlayerError onRetry={retry} />}>
+      <WordleLoad id={id} />
+    </QueryBoundary>
+  );
+}
+
+function WordleLoad({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_WORDLE_GAME, { variables: { id, studentId: profileId } });
-  if (loading) return <PlayerLoading />;
-  if (error || !data?.wordleGame) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_WORDLE_GAME, { variables: { id, studentId: profileId }, queryKey });
+  if (!data.wordleGame) return <PlayerError />;
   if (data.wordleGame.submission) return <OynaResultView kind="wordle" id={id} />;
   return <WordleRun game={data.wordleGame} studentId={profileId} />;
 }

@@ -9,7 +9,8 @@ import { ClassDetailView } from '@/features/classes/class-detail-view';
 import { StudentProgressDialog } from '@/features/classes/student-progress-dialog';
 import { useSchool } from '@/features/school/use-school';
 import { BackBar } from '@/ui/back-bar';
-import { EmptyState, ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
+import { QueryBoundary } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 /** Principal's class page: the teacher's roster view, read-only (no grading, no assignment shortcuts). */
@@ -17,24 +18,42 @@ export function PrincipalClassScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { school, loading, error, refetch } = useSchool();
+
+  return (
+    <View className="flex-1 bg-surface">
+      <BackBar label={t('principal.schoolTitle')} />
+      <QueryBoundary fallback={<ClassSkeleton bottom={insets.bottom} />}>
+        <ClassPage id={id} bottom={insets.bottom} />
+      </QueryBoundary>
+    </View>
+  );
+}
+
+const scrollStyle = (bottom: number) => ({ paddingHorizontal: 20, paddingTop: 8, paddingBottom: bottom + 32 });
+
+function ClassSkeleton({ bottom }: { bottom: number }) {
+  return (
+    <ScrollView contentContainerStyle={scrollStyle(bottom)}>
+      <View className="gap-3">
+        <Skeleton className="h-14" />
+        <Skeleton className="h-16" />
+        <Skeleton className="h-16" />
+      </View>
+    </ScrollView>
+  );
+}
+
+function ClassPage({ id, bottom }: { id: string; bottom: number }) {
+  const { t } = useTranslation();
+  const { school } = useSchool();
   const [studentId, setStudentId] = useState<string | null>(null);
   const classWork = school?.classes.find((c) => c.id === id);
   const student = classWork?.students.find((s) => s.id === studentId);
 
   return (
-    <View className="flex-1 bg-surface">
-      <BackBar label={t('principal.schoolTitle')} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
-        {loading ? (
-          <View className="gap-3">
-            <Skeleton className="h-14" />
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-          </View>
-        ) : error ? (
-          <ErrorState onRetry={refetch} />
-        ) : !classWork ? (
+    <>
+      <ScrollView contentContainerStyle={scrollStyle(bottom)}>
+        {!classWork ? (
           <EmptyState title={t('classes.noClasses')} illustration="classroom" />
         ) : (
           <>
@@ -53,6 +72,6 @@ export function PrincipalClassScreen() {
           onClose={() => setStudentId(null)}
         />
       ) : null}
-    </View>
+    </>
   );
 }

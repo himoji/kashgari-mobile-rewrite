@@ -3,8 +3,9 @@ import { Hourglass } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { useStudentAssignments } from '@/features/assignments/use-student-assignments';
+import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
 import { assignmentHref } from '@/features/assignments/routes';
+import { useStudentAssignments } from '@/features/assignments/use-student-assignments';
 import { useProfile } from '@/features/auth/session';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -12,6 +13,7 @@ import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/feedback';
 import { ListRow } from '@/ui/list-row';
 import { ProgressRing } from '@/ui/progress-ring';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -56,25 +58,65 @@ function ProgressCard({ done, total }: { done: number; total: number }) {
   );
 }
 
+function ReadingRow() {
+  const { t } = useTranslation();
+  return (
+    <ListRow
+      icon="solid-book"
+      title={t('studentHome.continueReading')}
+      subtitle={t('studentHome.readingHint')}
+      onPress={() => router.push('/student/league')}
+    />
+  );
+}
+
+function WordsRow() {
+  const { t } = useTranslation();
+  return (
+    <ListRow
+      icon="solid-star"
+      title={t('studentHome.reviewWords')}
+      subtitle={t('studentHome.reviewWordsHint')}
+      onPress={() => router.push('/student/words')}
+    />
+  );
+}
+
 /** Student Home: greeting, word of the day, progress on school work and quick ways back into learning. */
 export function StudentHomeScreen() {
   const { t } = useTranslation();
-  const content = useContentText();
   const { name } = useProfile();
-  const { all, fresh, completed, loading, refreshing, refetch } = useStudentAssignments();
+  const { refreshing, refresh } = useRefresh(STUDENT_ASSIGNMENTS);
   const firstName = name.split(' ')[0] ?? name;
-  const next = fresh[0];
 
   return (
-    <TabScreen title={`${t('studentHome.hello')}\n${firstName}!`} mascot="home" refreshing={refreshing} onRefresh={refetch}>
+    <TabScreen title={`${t('studentHome.hello')}\n${firstName}!`} mascot="home" refreshing={refreshing} onRefresh={refresh}>
       <DailyWordCard />
-      {loading ? <Skeleton className="h-[156px] rounded-[20px]" /> : all.length > 0 ? <ProgressCard done={completed.length} total={all.length} /> : null}
-      <ListRow
-        icon="solid-book"
-        title={t('studentHome.continueReading')}
-        subtitle={t('studentHome.readingHint')}
-        onPress={() => router.push('/student/league')}
-      />
+      <QueryBoundary
+        fallback={
+          <>
+            <Skeleton className="h-[156px] rounded-[20px]" />
+            <ReadingRow />
+            <WordsRow />
+          </>
+        }
+      >
+        <Progress />
+      </QueryBoundary>
+    </TabScreen>
+  );
+}
+
+/** The progress card and the next school task sit between the static rows, so they share one boundary. */
+function Progress() {
+  const { t } = useTranslation();
+  const content = useContentText();
+  const { all, fresh, completed } = useStudentAssignments();
+  const next = fresh[0];
+  return (
+    <>
+      {all.length > 0 ? <ProgressCard done={completed.length} total={all.length} /> : null}
+      <ReadingRow />
       {next ? (
         <ListRow
           icon="solid-classes"
@@ -83,12 +125,7 @@ export function StudentHomeScreen() {
           onPress={() => router.push(assignmentHref(next))}
         />
       ) : null}
-      <ListRow
-        icon="solid-star"
-        title={t('studentHome.reviewWords')}
-        subtitle={t('studentHome.reviewWordsHint')}
-        onPress={() => router.push('/student/words')}
-      />
-    </TabScreen>
+      <WordsRow />
+    </>
   );
 }

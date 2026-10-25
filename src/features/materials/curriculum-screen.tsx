@@ -1,11 +1,11 @@
-import { useQuery } from '@apollo/client/react';
+import { useSuspenseQuery } from '@apollo/client/react';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useProfile } from '@/features/auth/session';
-import { MATERIALS_GRADE } from '@/features/materials/gql';
+import { MATERIALS_CONTEXT, MATERIALS_GRADE } from '@/features/materials/gql';
 import { sectionName, topicItems, type LibraryItem } from '@/features/materials/library-items';
 import { materialParam } from '@/features/materials/material-ref';
 import { useGrades } from '@/features/materials/use-grades';
@@ -13,8 +13,9 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { ChoiceRow, Dialog } from '@/ui/dialog';
-import { ErrorState, NotReady, Skeleton } from '@/ui/feedback';
+import { NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -69,38 +70,51 @@ function TopicDialog({ topic, items, onClose }: { topic: string; items: LibraryI
   );
 }
 
+type DialogName = 'grade' | 'subject' | null;
+type Topic = { name: string; items: LibraryItem[] };
+
 /** Materials tab: the curriculum for a grade, topic by topic, and the way into the library. */
 export function CurriculumScreen() {
-  const { t, i18n } = useTranslation();
-  const { profileId } = useProfile();
+  const { t } = useTranslation();
   const content = useContentText();
-  const { grades, defaultGrade, error: gradesError, refetch: refetchGrades } = useGrades();
   const [picked, setPicked] = useState<number | null>(null);
-  const [dialog, setDialog] = useState<'grade' | 'subject' | null>(null);
-  const [topic, setTopic] = useState<{ name: string; items: LibraryItem[] } | null>(null);
-  const grade = picked ?? defaultGrade;
-
-  const { data, loading, error, refetch, networkStatus } = useQuery(MATERIALS_GRADE, {
-    variables: { grade: grade ?? 0, teacherId: profileId },
-    skip: grade == null,
-    notifyOnNetworkStatusChange: true,
-  });
-  const topics = (data?.grade?.sections ?? []).map((s) => {
-    const name = sectionName(s.name, s.section, i18n.language, t('materials.section'));
-    return { key: String(s.section), name, items: topicItems(s, data?.grade?.grade ?? null, name) };
-  });
+  const [dialog, setDialog] = useState<DialogName>(null);
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const { refreshing, refresh } = useRefresh(MATERIALS_CONTEXT, MATERIALS_GRADE);
 
   return (
-    <TabScreen
-      title={t('materials.title')}
-      mascot="learning"
-      refreshing={networkStatus === 4}
-      onRefresh={() => void (refetchGrades(), refetch())}
-    >
+    <TabScreen title={t('materials.title')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
+      <QueryBoundary
+        fallback={
+          <CurriculumLayout grade={null} onDialog={setDialog}>
+            <TopicsSkeleton />
+          </CurriculumLayout>
+        }
+      >
+        <Curriculum picked={picked} onPick={setPicked} dialog={dialog} onDialog={setDialog} onTopic={setTopic} />
+      </QueryBoundary>
+
+      {topic ? <TopicDialog topic={content(topic.name)} items={topic.items} onClose={() => setTopic(null)} /> : null}
+      <Dialog visible={dialog === 'subject'} title={t('materials.subject')} onClose={() => setDialog(null)}>
+        <View className="gap-[7px]">
+          <ChoiceRow label={t('materials.kazakhLanguage')} selected onPress={() => setDialog(null)} />
+          <ChoiceRow label={t('materials.kazakhLiterature')} disabled onPress={() => undefined} />
+          <NotReady className="mt-2" />
+        </View>
+      </Dialog>
+    </TabScreen>
+  );
+}
+
+/** Grade and subject pills, the topic list (children), the library row and the quarters note. */
+function CurriculumLayout({ grade, onDialog, children }: { grade: number | null; onDialog: (d: DialogName) => void; children: ReactNode }) {
+  const { t } = useTranslation();
+  return (
+    <>
       <View className="flex-row items-center justify-between gap-2">
         <Pressable
           accessibilityRole="button"
-          onPress={() => setDialog('grade')}
+          onPress={() => onDialog('grade')}
           className="h-11 flex-row items-center gap-2 rounded-[11px] bg-[#f1f6ff] px-3 active:opacity-80"
           style={pillShadow}
         >
@@ -109,7 +123,7 @@ export function CurriculumScreen() {
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          onPress={() => setDialog('subject')}
+          onPress={() => onDialog('subject')}
           className="h-11 flex-row items-center gap-2 rounded-[11px] bg-surface px-3 active:opacity-80"
           style={pillShadow}
         >
@@ -119,46 +133,90 @@ export function CurriculumScreen() {
       </View>
 
       <View className="mt-0.5 gap-2.5">
-        {gradesError || error ? (
-          <ErrorState onRetry={() => void (refetchGrades(), refetch())} />
-        ) : loading || grade == null ? (
-          <>
-            <Skeleton className="h-[72px]" />
-            <Skeleton className="h-[72px]" />
-          </>
-        ) : topics.length ? (
-          topics.map((tp) => (
-            <Row
-              key={tp.key}
-              title={content(tp.name)}
-              hint={t('materials.materialsCount', { count: tp.items.length })}
-              onPress={() => setTopic({ name: tp.name, items: tp.items })}
-            />
-          ))
-        ) : (
-          <View className="items-center rounded-[15px] bg-canvas px-4 py-8">
-            <Text variant="heading" className="text-center">{t('materials.noMaterials')}</Text>
-          </View>
-        )}
+        {children}
         <Row title={t('materials.library')} hint={t('materials.libraryHint')} onPress={() => router.push('/teacher/library')} />
       </View>
       <NotReady title={t('materials.quarters')} body={t('materials.quartersBody')} />
+    </>
+  );
+}
 
-      {topic ? <TopicDialog topic={content(topic.name)} items={topic.items} onClose={() => setTopic(null)} /> : null}
-      <Dialog visible={dialog === 'grade'} title={t('materials.chooseGrade')} onClose={() => setDialog(null)}>
+function TopicsSkeleton() {
+  return (
+    <>
+      <Skeleton className="h-[72px]" />
+      <Skeleton className="h-[72px]" />
+    </>
+  );
+}
+
+function Curriculum({
+  picked,
+  onPick,
+  dialog,
+  onDialog,
+  onTopic,
+}: {
+  picked: number | null;
+  onPick: (grade: number) => void;
+  dialog: DialogName;
+  onDialog: (d: DialogName) => void;
+  onTopic: (topic: Topic) => void;
+}) {
+  const { t } = useTranslation();
+  const { grades, defaultGrade } = useGrades();
+  const grade = picked ?? defaultGrade;
+
+  return (
+    <>
+      <CurriculumLayout grade={grade} onDialog={onDialog}>
+        {grade == null ? (
+          <TopicsSkeleton />
+        ) : (
+          <QueryBoundary fallback={<TopicsSkeleton />}>
+            <Topics grade={grade} onTopic={onTopic} />
+          </QueryBoundary>
+        )}
+      </CurriculumLayout>
+      <Dialog visible={dialog === 'grade'} title={t('materials.chooseGrade')} onClose={() => onDialog(null)}>
         <View className="gap-[7px]">
           {grades.map((g) => (
-            <ChoiceRow key={g} label={t('materials.gradeLabel', { grade: g })} selected={g === grade} onPress={() => (setPicked(g), setDialog(null))} />
+            <ChoiceRow key={g} label={t('materials.gradeLabel', { grade: g })} selected={g === grade} onPress={() => (onPick(g), onDialog(null))} />
           ))}
         </View>
       </Dialog>
-      <Dialog visible={dialog === 'subject'} title={t('materials.subject')} onClose={() => setDialog(null)}>
-        <View className="gap-[7px]">
-          <ChoiceRow label={t('materials.kazakhLanguage')} selected onPress={() => setDialog(null)} />
-          <ChoiceRow label={t('materials.kazakhLiterature')} disabled onPress={() => undefined} />
-          <NotReady className="mt-2" />
-        </View>
-      </Dialog>
-    </TabScreen>
+    </>
+  );
+}
+
+function Topics({ grade, onTopic }: { grade: number; onTopic: (topic: Topic) => void }) {
+  const { t, i18n } = useTranslation();
+  const { profileId } = useProfile();
+  const content = useContentText();
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
+  const topics = (data.grade?.sections ?? []).map((s) => {
+    const name = sectionName(s.name, s.section, i18n.language, t('materials.section'));
+    return { key: String(s.section), name, items: topicItems(s, data.grade?.grade ?? null, name) };
+  });
+
+  if (!topics.length) {
+    return (
+      <View className="items-center rounded-[15px] bg-canvas px-4 py-8">
+        <Text variant="heading" className="text-center">{t('materials.noMaterials')}</Text>
+      </View>
+    );
+  }
+  return (
+    <>
+      {topics.map((tp) => (
+        <Row
+          key={tp.key}
+          title={content(tp.name)}
+          hint={t('materials.materialsCount', { count: tp.items.length })}
+          onPress={() => onTopic({ name: tp.name, items: tp.items })}
+        />
+      ))}
+    </>
   );
 }

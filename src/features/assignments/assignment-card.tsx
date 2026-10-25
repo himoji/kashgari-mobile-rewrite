@@ -1,7 +1,10 @@
+import { useApolloClient } from '@apollo/client/react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { useProfile } from '@/features/auth/session';
+import { PLAYER_ASSIGNMENT, PLAYER_DURYS, PLAYER_LESSON, PLAYER_STUDENT_CLASS, PLAYER_ZHAZYLYM } from '@/features/player/gql';
 import { useContentText } from '@/lib/i18n';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -9,7 +12,34 @@ import { StatusMark } from '@/ui/status-mark';
 import { Text } from '@/ui/text';
 
 import { deadlineLabel, isCompleted, type StudentAssignment } from './map';
-import { assignmentHref, resultHref } from './routes';
+import { assignmentHref, resultHref, type AssignmentRef } from './routes';
+
+/**
+ * Warms the player's query on press-in (same variables as the player), so its suspense query answers
+ * from the cache instead of the skeleton. Oyna games pick their query by game type and are left out.
+ */
+function usePrefetchPlayer() {
+  const client = useApolloClient();
+  const { profileId: studentId } = useProfile();
+  return ({ kind, id }: AssignmentRef) => {
+    const variables = { id, studentId };
+    const warm =
+      kind === 'oqylym' || kind === 'tyndalym'
+        ? client.query({ query: PLAYER_ASSIGNMENT, variables })
+        : kind === 'zhazylym'
+          ? client.query({ query: PLAYER_ZHAZYLYM, variables })
+          : kind === 'durys'
+            ? client.query({ query: PLAYER_DURYS, variables })
+            : kind === 'lesson'
+              ? // The lesson needs the class, which the assignment list already put in the cache.
+                client.query({ query: PLAYER_STUDENT_CLASS, variables: { studentId } }).then(({ data }) => {
+                  const classId = data?.student?.class.id;
+                  return classId ? client.query({ query: PLAYER_LESSON, variables: { ...variables, classId } }) : undefined;
+                })
+              : null;
+    warm?.catch(() => {});
+  };
+}
 
 /** "4 күн қалды", "Бүгін" or "30 қыр." for a past deadline. */
 export function useDeadlineText() {
@@ -36,6 +66,7 @@ export function AssignmentCard({ item, readOnly }: { item: StudentAssignment; re
   const content = useContentText();
   const deadlineText = useDeadlineText();
   const moduleLine = useModuleLine();
+  const prefetch = usePrefetchPlayer();
   const completed = isCompleted(item);
   const showScore = item.state === 'done' && item.score != null;
   const aside = showScore ? null : deadlineText(item.deadline);
@@ -59,7 +90,7 @@ export function AssignmentCard({ item, readOnly }: { item: StudentAssignment; re
       {readOnly ? null : completed ? (
         <Button variant="soft" label={t('assignments.viewResults')} onPress={() => router.push(resultHref(item))} />
       ) : (
-        <Button label={t('assignments.start')} onPress={() => router.push(assignmentHref(item))} />
+        <Button label={t('assignments.start')} onPressIn={() => prefetch(item)} onPress={() => router.push(assignmentHref(item))} />
       )}
     </Card>
   );

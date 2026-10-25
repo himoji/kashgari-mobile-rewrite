@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { skipToken, useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState, type ReactNode } from 'react';
@@ -30,6 +30,7 @@ import { Button } from '@/ui/button';
 import { ChoiceRow, Dialog } from '@/ui/dialog';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 const REVIEW_KINDS: ReviewKind[] = [
@@ -129,20 +130,11 @@ function ScoreCard({ score }: { score: number | null }) {
 
 /** Answer area for each submission kind; returns the current points for gradable kinds. */
 function useSubmissionContent(kind: ReviewKind, id: string) {
-  const zhazylym = useQuery(REVIEW_ZHAZYLYM_SUBMISSION, {
-    variables: { id },
-    skip: kind !== 'zhazylym',
-  });
-  const story = useQuery(REVIEW_MINI_STORY_SUBMISSION, {
-    variables: { id },
-    skip: kind !== 'miniStory',
-  });
-  const assignment = useQuery(REVIEW_ASSIGNMENT_SUBMISSION, {
-    variables: { id },
-    skip: kind !== 'assignment',
-  });
+  const queryKey = useRetryKey();
+  const zhazylym = useSuspenseQuery(REVIEW_ZHAZYLYM_SUBMISSION, kind === 'zhazylym' ? { variables: { id }, queryKey } : skipToken);
+  const story = useSuspenseQuery(REVIEW_MINI_STORY_SUBMISSION, kind === 'miniStory' ? { variables: { id }, queryKey } : skipToken);
+  const assignment = useSuspenseQuery(REVIEW_ASSIGNMENT_SUBMISSION, kind === 'assignment' ? { variables: { id }, queryKey } : skipToken);
   return {
-    loading: zhazylym.loading || story.loading || assignment.loading,
     zhazylym: zhazylym.data?.zhazylymSubmission,
     story: story.data?.miniStorySubmission,
     assignment: assignment.data?.submission,
@@ -160,7 +152,6 @@ function Answers({
 }) {
   const { t } = useTranslation();
   const content = useContentText();
-  if (data.loading) return <Skeleton className="h-40" />;
   if (kind === 'zhazylym' && data.zhazylym) {
     const a = data.zhazylym.assignment;
     const images =
@@ -276,8 +267,7 @@ function Review({
   };
 
   return (
-    <View className="flex-1 bg-surface">
-      <BackBar label={t('classes.school')} />
+    <>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
@@ -363,7 +353,7 @@ function Review({
               <NotReady body={t('review.commentNotReady')} className="mb-3" />
             </Disclosure>
           </View>
-        ) : kind === 'assignment' && !data.loading ? (
+        ) : kind === 'assignment' ? (
           <View className="gap-3 pt-5">
             <ScoreCard score={attempt.score} />
             {hasOpenQuestions ? <NotReady body={t('review.frqNotReady')} /> : null}
@@ -424,7 +414,7 @@ function Review({
           ))}
         </View>
       </Dialog>
-    </View>
+    </>
   );
 }
 
@@ -438,6 +428,26 @@ function useStudentNames(work: Work) {
 /** Teacher reviews one submission: the answer, quiz answers, a 0..10 score, then save or save & next. */
 export function SubmissionScreen() {
   const { t } = useTranslation();
+  return (
+    <View className="flex-1 bg-surface">
+      <BackBar label={t('classes.school')} />
+      <QueryBoundary
+        fallback={
+          <View className="gap-3 px-5 pt-4">
+            <Skeleton className="h-16" />
+            <Skeleton className="h-10" />
+            <Skeleton className="h-40" />
+          </View>
+        }
+      >
+        <Submission />
+      </QueryBoundary>
+    </View>
+  );
+}
+
+function Submission() {
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{ id: string; kind?: string; work?: string }>();
   const school = useTeacherSchool();
   const found = params.work ? findWork(school.classes, params.work) : null;
@@ -446,26 +456,7 @@ export function SubmissionScreen() {
     ? (params.kind as ReviewKind)
     : attempt?.reviewKind;
 
-  if (school.loading) {
-    return (
-      <View className="flex-1 bg-surface">
-        <BackBar label={t('classes.school')} />
-        <View className="gap-3 px-5 pt-4">
-          <Skeleton className="h-16" />
-          <Skeleton className="h-10" />
-          <Skeleton className="h-40" />
-        </View>
-      </View>
-    );
-  }
-  if (!found || !attempt || !kind) {
-    return (
-      <View className="flex-1 bg-surface">
-        <BackBar label={t('classes.school')} />
-        <EmptyState title={t('review.notFound')} />
-      </View>
-    );
-  }
+  if (!found || !attempt || !kind) return <EmptyState title={t('review.notFound')} />;
   const studentName = found.classWork.students.find((s) => s.id === attempt.studentId)?.name ?? '';
   return (
     <Review

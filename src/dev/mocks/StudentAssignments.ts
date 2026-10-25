@@ -105,7 +105,7 @@ export default () => {
           },
         ],
         durysAssignments: [
-          { __typename: 'DurysAssignment', id: 'a4', createdAt: t - 3 * DAY, durysTitle: { __typename: 'DurysTitle', title: 'Тәуелдік жалғауы' }, submission: false },
+          { __typename: 'DurysAssignment', id: 'a4', createdAt: t - 3 * DAY, durysTitle: { __typename: 'DurysTitle', id: 'dt4', title: 'Тәуелдік жалғауы' }, submission: false },
         ],
         lessons: [lesson('l1', 'Табиғат және адам', [20, 15, 10], 3), lesson('l3', 'Қаладағы саяхат', [20, 10], 4)],
       },

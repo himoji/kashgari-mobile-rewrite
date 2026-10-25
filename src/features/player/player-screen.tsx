@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
+import { skipToken, useApolloClient, useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { Redirect, router, useLocalSearchParams, type Href } from 'expo-router';
 import { useMemo, useRef, type ReactNode } from 'react';
 import { View } from 'react-native';
@@ -8,6 +8,7 @@ import { useProfile, useSession } from '@/features/auth/session';
 import { OynaPlayer } from '@/features/oyna/oyna-player';
 import { evictSubmission } from '@/lib/cache';
 import { ErrorState, Skeleton } from '@/ui/feedback';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 import type { Answers } from './engine/types';
@@ -62,6 +63,7 @@ function Loading() {
   );
 }
 
+/** Load errors (with retry), or work the API does not return (deleted, or not this student's). */
 function Failed({ onRetry }: { onRetry?: () => void }) {
   const { t } = useTranslation();
   return (
@@ -139,11 +141,10 @@ function AssignmentPlayer({ kind, id }: { kind: Kind; id: string }) {
   const { t } = useTranslation();
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const { data, loading, error, refetch } = useQuery(PLAYER_ASSIGNMENT, { variables: { id, studentId: profileId } });
-  const a = data?.assignment;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(PLAYER_ASSIGNMENT, { variables: { id, studentId: profileId }, queryKey });
+  const a = data.assignment;
   const activities = useMemo(() => (a ? [assignmentActivity(a, lang)] : []), [a, lang]);
-  if (!data && loading) return <Loading />;
-  if (error && !data) return <Failed onRetry={() => void refetch()} />;
   if (!a) return <Failed />;
   if (a.submission) return <Redirect href={resultHref(kind, id)} />;
   if (a.deadline && a.deadline < now()) return <FocusPage backLabel={t('player.back')}><Notice text={t('player.expired')} /></FocusPage>;
@@ -153,11 +154,10 @@ function AssignmentPlayer({ kind, id }: { kind: Kind; id: string }) {
 function ZhazylymPlayer({ id }: { id: string }) {
   const { t } = useTranslation();
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(PLAYER_ZHAZYLYM, { variables: { id, studentId: profileId } });
-  const z = data?.zhazylym;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(PLAYER_ZHAZYLYM, { variables: { id, studentId: profileId }, queryKey });
+  const z = data.zhazylym;
   const activities = useMemo(() => (z ? [zhazylymActivity(z)] : []), [z]);
-  if (!data && loading) return <Loading />;
-  if (error && !data) return <Failed onRetry={() => void refetch()} />;
   if (!z) return <Failed />;
   if (z.submission) return <Redirect href={resultHref('zhazylym', id)} />;
   if (z.opensAt > now()) return <FocusPage backLabel={t('player.back')}><Notice text={t('player.notOpen')} /></FocusPage>;
@@ -167,36 +167,32 @@ function ZhazylymPlayer({ id }: { id: string }) {
 
 function DurysPlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(PLAYER_DURYS, { variables: { id, studentId: profileId } });
-  const d = data?.durysAssignment;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(PLAYER_DURYS, { variables: { id, studentId: profileId }, queryKey });
+  const d = data.durysAssignment;
   const activities = useMemo(() => (d ? [durysActivity(d)] : []), [d]);
-  if (!data && loading) return <Loading />;
-  if (error && !data) return <Failed onRetry={() => void refetch()} />;
   if (!d) return <Failed />;
   if (d.submission) return <Redirect href={resultHref('durys', id)} />;
   return <Play kind="durys" id={id} title={d.durysTitle.title} activities={activities} />;
 }
 
-/** Lessons need the class to reach each text's assignment. */
+/** Lessons need the class to reach each text's assignment. Suspends: call it inside a `QueryBoundary`. */
 export function useStudentClassId() {
   const { profileId } = useProfile();
-  const q = useQuery(PLAYER_STUDENT_CLASS, { variables: { studentId: profileId } });
-  return { classId: q.data?.student?.class.id, loading: q.loading && !q.data, error: q.error, refetch: q.refetch };
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(PLAYER_STUDENT_CLASS, { variables: { studentId: profileId }, queryKey });
+  return data.student?.class.id;
 }
 
 function LessonPlayer({ id }: { id: string }) {
   const { t } = useTranslation();
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const cls = useStudentClassId();
-  const { data, loading, error, refetch } = useQuery(PLAYER_LESSON, {
-    variables: { id, studentId: profileId, classId: cls.classId ?? '' },
-    skip: !cls.classId,
-  });
+  const classId = useStudentClassId();
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(PLAYER_LESSON, classId ? { variables: { id, studentId: profileId, classId }, queryKey } : skipToken);
   const lesson = data?.lesson;
   const activities = useMemo(() => (lesson ? lessonActivities(lesson, lang) : []), [lesson, lang]);
-  if (cls.loading || (!data && loading)) return <Loading />;
-  if (cls.error || (error && !data)) return <Failed onRetry={() => void (cls.error ? cls.refetch() : refetch())} />;
   if (!lesson) return <Failed />;
   if (lesson.opensAt > now()) return <FocusPage backLabel={t('player.back')}><Notice text={t('player.notOpen')} /></FocusPage>;
   return <Play kind="lesson" id={id} title={lesson.name} activities={activities} />;
@@ -206,16 +202,18 @@ function LessonPlayer({ id }: { id: string }) {
 export function PlayerScreen() {
   const params = useLocalSearchParams<{ kind: Kind; id: string; game?: string }>();
   const { kind, id } = params;
+  // Each kind keeps its own query; the boundary shows the player skeleton while it loads.
+  const load = (player: ReactNode) => <QueryBoundary fallback={<Loading />} errorFallback={(retry) => <Failed onRetry={retry} />}>{player}</QueryBoundary>;
   switch (kind) {
     case 'oqylym':
     case 'tyndalym':
-      return <AssignmentPlayer kind={kind} id={id} />;
+      return load(<AssignmentPlayer kind={kind} id={id} />);
     case 'zhazylym':
-      return <ZhazylymPlayer id={id} />;
+      return load(<ZhazylymPlayer id={id} />);
     case 'durys':
-      return <DurysPlayer id={id} />;
+      return load(<DurysPlayer id={id} />);
     case 'lesson':
-      return <LessonPlayer id={id} />;
+      return load(<LessonPlayer id={id} />);
     case 'oyna':
       return <OynaPlayer id={id} params={params} />;
     default:

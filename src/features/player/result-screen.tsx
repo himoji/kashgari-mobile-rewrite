@@ -1,6 +1,6 @@
-import { useQuery } from '@apollo/client/react';
+import { skipToken, useSuspenseQuery } from '@apollo/client/react';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { ErrorState, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 import { RESULT_ASSIGNMENT, RESULT_DURYS, RESULT_LESSON, RESULT_ZHAZYLYM } from './gql';
@@ -161,6 +162,7 @@ function Loading() {
   );
 }
 
+/** Load errors (with retry), or work the API does not return (deleted, or not this student's). */
 function Failed({ onRetry }: { onRetry?: () => void }) {
   const { t } = useTranslation();
   return (
@@ -173,28 +175,28 @@ function Failed({ onRetry }: { onRetry?: () => void }) {
 function AssignmentResult({ kind, id }: { kind: Kind; id: string }) {
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const { data, loading, error, refetch } = useQuery(RESULT_ASSIGNMENT, { variables: { id, studentId: profileId } });
-  const outcome = useMemo(() => (data?.assignment ? assignmentOutcome(data.assignment, lang) : null), [data, lang]);
-  if (!data && loading) return <Loading />;
-  if (!outcome) return <Failed onRetry={error ? () => void refetch() : undefined} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RESULT_ASSIGNMENT, { variables: { id, studentId: profileId }, queryKey });
+  const outcome = useMemo(() => (data.assignment ? assignmentOutcome(data.assignment, lang) : null), [data, lang]);
+  if (!outcome) return <Failed />;
   return <ResultView kind={kind} id={id} outcome={outcome} />;
 }
 
 function ZhazylymResult({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(RESULT_ZHAZYLYM, { variables: { id, studentId: profileId } });
-  const outcome = useMemo(() => (data?.zhazylym ? zhazylymOutcome(data.zhazylym) : null), [data]);
-  if (!data && loading) return <Loading />;
-  if (!outcome) return <Failed onRetry={error ? () => void refetch() : undefined} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RESULT_ZHAZYLYM, { variables: { id, studentId: profileId }, queryKey });
+  const outcome = useMemo(() => (data.zhazylym ? zhazylymOutcome(data.zhazylym) : null), [data]);
+  if (!outcome) return <Failed />;
   return <ResultView kind="zhazylym" id={id} outcome={outcome} />;
 }
 
 function DurysResult({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(RESULT_DURYS, { variables: { id, studentId: profileId } });
-  const d = data?.durysAssignment;
-  if (!data && loading) return <Loading />;
-  if (!d) return <Failed onRetry={error ? () => void refetch() : undefined} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RESULT_DURYS, { variables: { id, studentId: profileId }, queryKey });
+  const d = data.durysAssignment;
+  if (!d) return <Failed />;
   // Durys only records that the story was finished: no score, no stored answers.
   const outcome: Outcome = { title: d.durysTitle.title, submitted: d.submission, submittedAt: null, score: null, pending: false, review: null };
   return <ResultView kind="durys" id={id} outcome={outcome} />;
@@ -203,14 +205,11 @@ function DurysResult({ id }: { id: string }) {
 function LessonResult({ id }: { id: string }) {
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const cls = useStudentClassId();
-  const { data, loading, error, refetch } = useQuery(RESULT_LESSON, {
-    variables: { id, studentId: profileId, classId: cls.classId ?? '' },
-    skip: !cls.classId,
-  });
+  const classId = useStudentClassId();
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RESULT_LESSON, classId ? { variables: { id, studentId: profileId, classId }, queryKey } : skipToken);
   const outcome = useMemo(() => (data?.lesson ? lessonOutcome(data.lesson, lang) : null), [data, lang]);
-  if (cls.loading || (!data && loading)) return <Loading />;
-  if (!outcome) return <Failed onRetry={error || cls.error ? () => void (cls.error ? cls.refetch() : refetch()) : undefined} />;
+  if (!outcome) return <Failed />;
   return <ResultView kind="lesson" id={id} outcome={outcome} />;
 }
 
@@ -218,16 +217,18 @@ function LessonResult({ id }: { id: string }) {
 export function ResultScreen() {
   const params = useLocalSearchParams<{ kind: Kind; id: string; game?: string }>();
   const { kind, id } = params;
+  // Each kind keeps its own query; the boundary shows the result skeleton while it loads.
+  const load = (result: ReactNode) => <QueryBoundary fallback={<Loading />} errorFallback={(retry) => <Failed onRetry={retry} />}>{result}</QueryBoundary>;
   switch (kind) {
     case 'oqylym':
     case 'tyndalym':
-      return <AssignmentResult kind={kind} id={id} />;
+      return load(<AssignmentResult kind={kind} id={id} />);
     case 'zhazylym':
-      return <ZhazylymResult id={id} />;
+      return load(<ZhazylymResult id={id} />);
     case 'durys':
-      return <DurysResult id={id} />;
+      return load(<DurysResult id={id} />);
     case 'lesson':
-      return <LessonResult id={id} />;
+      return load(<LessonResult id={id} />);
     case 'oyna':
       return <OynaResult id={id} params={params} />;
     default:

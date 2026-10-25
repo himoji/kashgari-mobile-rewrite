@@ -1,8 +1,8 @@
-import { useQuery } from '@apollo/client/react';
+import { useSuspenseQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Heart } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -18,9 +18,10 @@ import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Dialog } from '@/ui/dialog';
-import { EmptyState, ErrorState, NotReady, Skeleton } from '@/ui/feedback';
+import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { IconButton } from '@/ui/icon-button';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -91,25 +92,12 @@ const INITIAL: LibraryFilter = { module: 'all', level: 'all', search: '' };
 
 /** The library: every text and grammar set, filtered by module, CEFR level and grade. */
 export function LibraryScreen() {
-  const { t, i18n } = useTranslation();
-  const { profileId } = useProfile();
-  const { grades, defaultGrade } = useGrades();
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<LibraryFilter>(INITIAL);
   const [pickedGrade, setPickedGrade] = useState<number | null>(null);
   const [open, setOpen] = useState<Open>(null);
   const [notReady, setNotReady] = useState(false);
-  const grade = pickedGrade ?? defaultGrade;
-
-  const texts = useQuery(MATERIALS_GRADE, { variables: { grade: grade ?? 0, teacherId: profileId }, skip: grade == null });
-  const grammar = useQuery(MATERIALS_GRAMMAR);
-  const items = useMemo(
-    () =>
-      libraryItems(texts.data?.grade, grammar.data?.allDurysTitles ?? [], (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
-    [texts.data, grammar.data, i18n.language, t],
-  );
-  const list = filterLibrary(items, filter);
-  const loading = (texts.loading && !texts.data) || (grammar.loading && !grammar.data) || grade == null;
-  const toggle = (which: Exclude<Open, null>) => (o: boolean) => setOpen(o ? which : null);
+  const controls: Controls = { filter, setFilter, open, setOpen, setPickedGrade, onSaved: () => setNotReady(true) };
 
   return (
     <TabScreen
@@ -122,6 +110,48 @@ export function LibraryScreen() {
         <Button variant="strong" className="flex-1" icon="plus" label={t('materials.createAssignment')} onPress={() => router.push('/teacher/assign/new')} />
       </View>
 
+      <QueryBoundary
+        fallback={
+          <LibraryFilters {...controls} grades={[]} grade={null}>
+            <ListSkeleton />
+          </LibraryFilters>
+        }
+      >
+        <Library {...controls} pickedGrade={pickedGrade} />
+      </QueryBoundary>
+
+      <Dialog visible={notReady} title={t('materials.saved')} onClose={() => setNotReady(false)}>
+        <NotReady body={t('materials.savedBody')} />
+      </Dialog>
+    </TabScreen>
+  );
+}
+
+type Controls = {
+  filter: LibraryFilter;
+  setFilter: Dispatch<SetStateAction<LibraryFilter>>;
+  open: Open;
+  setOpen: (open: Open) => void;
+  setPickedGrade: (grade: number) => void;
+  onSaved: () => void;
+};
+
+/** Search and the module / level / grade selects, the saved button, then the list (children). */
+function LibraryFilters({
+  filter,
+  setFilter,
+  open,
+  setOpen,
+  setPickedGrade,
+  onSaved,
+  grades,
+  grade,
+  children,
+}: Controls & { grades: number[]; grade: number | null; children: ReactNode }) {
+  const { t } = useTranslation();
+  const toggle = (which: Exclude<Open, null>) => (o: boolean) => setOpen(o ? which : null);
+  return (
+    <>
       <Card variant="panel" className="z-10 mt-0.5 gap-2.5">
         <View className="h-12 flex-row items-center gap-2.5 rounded-[14px] bg-[#f7f9fd] px-3">
           <Icon name="search" size={20} color={colors.ink} />
@@ -173,7 +203,7 @@ export function LibraryScreen() {
 
       <Pressable
         accessibilityRole="button"
-        onPress={() => setNotReady(true)}
+        onPress={onSaved}
         className="mt-0.5 h-11 flex-row items-center gap-2 self-start rounded-control bg-[#f3f7ff] px-[14px] active:opacity-80"
       >
         <Text className="font-body-semibold text-[14px] leading-[18px] text-link">{t('materials.saved')}</Text>
@@ -182,25 +212,57 @@ export function LibraryScreen() {
         </View>
       </Pressable>
 
-      {texts.error || grammar.error ? (
-        <ErrorState onRetry={() => void (texts.refetch(), grammar.refetch())} />
-      ) : loading ? (
-        <>
-          <Skeleton className="h-[280px]" />
-          <Skeleton className="h-[280px]" />
-        </>
-      ) : list.length ? (
-        list.map((item) => <MaterialCard key={materialParam(item.ref)} item={item} onSave={() => setNotReady(true)} />)
-      ) : (
-        <View>
-          <EmptyState title={t('materials.emptyTitle')} body={t('materials.emptyHint')} />
-          <Button variant="secondary" className="self-center" label={t('materials.clearFilters')} onPress={() => setFilter(INITIAL)} />
-        </View>
-      )}
+      {children}
+    </>
+  );
+}
 
-      <Dialog visible={notReady} title={t('materials.saved')} onClose={() => setNotReady(false)}>
-        <NotReady body={t('materials.savedBody')} />
-      </Dialog>
-    </TabScreen>
+function ListSkeleton() {
+  return (
+    <>
+      <Skeleton className="h-[280px]" />
+      <Skeleton className="h-[280px]" />
+    </>
+  );
+}
+
+function Library({ pickedGrade, ...controls }: Controls & { pickedGrade: number | null }) {
+  const { grades, defaultGrade } = useGrades();
+  const grade = pickedGrade ?? defaultGrade;
+  return (
+    <LibraryFilters {...controls} grades={grades} grade={grade}>
+      {grade == null ? (
+        <ListSkeleton />
+      ) : (
+        <QueryBoundary fallback={<ListSkeleton />}>
+          <LibraryList grade={grade} filter={controls.filter} onClear={() => controls.setFilter(INITIAL)} onSaved={controls.onSaved} />
+        </QueryBoundary>
+      )}
+    </LibraryFilters>
+  );
+}
+
+function LibraryList({ grade, filter, onClear, onSaved }: { grade: number; filter: LibraryFilter; onClear: () => void; onSaved: () => void }) {
+  const { t, i18n } = useTranslation();
+  const { profileId } = useProfile();
+  const queryKey = useRetryKey();
+  const texts = useSuspenseQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
+  const grammar = useSuspenseQuery(MATERIALS_GRAMMAR, { queryKey });
+  const items = useMemo(
+    () =>
+      libraryItems(texts.data.grade, grammar.data.allDurysTitles, (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
+    [texts.data, grammar.data, i18n.language, t],
+  );
+  const list = filterLibrary(items, filter);
+
+  return list.length ? (
+    <>
+      {list.map((item) => <MaterialCard key={materialParam(item.ref)} item={item} onSave={onSaved} />)}
+    </>
+  ) : (
+    <View>
+      <EmptyState title={t('materials.emptyTitle')} body={t('materials.emptyHint')} />
+      <Button variant="secondary" className="self-center" label={t('materials.clearFilters')} onPress={onClear} />
+    </View>
   );
 }

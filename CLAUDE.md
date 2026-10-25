@@ -14,10 +14,21 @@ Expo SDK 57 / RN 0.86 app for Kazakh language learning. Roles: student, teacher,
 ## Session
 `features/auth/session.ts` (zustand, persisted in SecureStore / localStorage on web): one phone or social login yields credentials per content language database (kk/ru/en/fr) and a list of role profiles; `useProfile()` is the active one. The `danatiin-language` header follows the profile's language, independent of the UI language.
 
+Demo: `signInAsDemo()` (sign-in.ts) loads each language database's shared demo account. The API serves it to requests without a token, so demo credentials keep empty tokens and `headersFor` sends no `authorization` header.
+
+## Data (Apollo)
+- Operation names are `<Feature><Thing>` with no `Query`/`Mutation` suffix (codegen adds it: `LeagueStudent` → `LeagueStudentQuery`). JS constants are SCREAMING_CASE. Mock files are named after the operation.
+- Types come from codegen: fragment types or `NonNullable<XQuery['field']>`. When a helper needs a shape, give it a fragment (`ClassLabel`, `FreeResponseGrades`, `RankingsClass`) instead of a hand-written type.
+- Fetch policy comes from `defaultOptions` (cache-and-network, then cache-first). Set one per call only for a reason (result screens `network-only`, the word game `no-cache`, login calls `no-cache`).
+- Screens read data with `useSuspenseQuery` inside `<QueryBoundary>` (`@/ui/query-boundary`): chrome outside, data inside, the screen's skeleton as `fallback`. Pass `queryKey: useRetryKey()` to every suspense query, or retry after an error will not refetch. Pull-to-refresh in the chrome uses `useRefresh(DOC...)`.
+- After a mutation, update the cache instead of refetching everything: return changed fields (normalization updates every screen), `evictEntity` after a delete, `evictFields`/`evictSubmission` (`@/lib/cache`) to make only the screens showing that data refetch. Never `refetchQueries: 'active'`.
+- Every object with an `id` selects it, so it normalizes. Id-less embedded types that need merging are listed in `EMBEDDED` in `src/lib/apollo.ts`.
+- The cache is cleared on profile switch and sign-out. Language databases can reuse ids, so anything that reads more than one account at once uses `no-cache`.
+
 ## Commands
 - `bun run check` lint (oxlint) + typecheck + jest.
 - `bun run codegen` after changing any `gql()` document.
-- `bun run web:mock` web dev server answering GraphQL from `src/dev/mocks/<OperationName>.ts` (dev only, never in release builds). Use it to compare screens with the prototype.
+- `bun run web:mock` web dev server answering GraphQL from `src/dev/mocks/<OperationName>.ts` (dev only, never in release builds). Use it to compare screens with the prototype. Metro inlines `EXPO_PUBLIC_*` and its file watcher can miss edits in some containers: restart with `--clear` after switching mocks on, and restart after edits if the page does not change.
 - No native builds from CI agents; OTA via `.github/workflows/update.yml` on push to `updates`.
 
 ## Rules

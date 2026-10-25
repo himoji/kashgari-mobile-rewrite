@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { REQUEST_CODE, REQUEST_ID } from '@/features/auth/gql';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { formatPhone, isValidPhone, phoneDigits } from '@/features/auth/phone';
-import { signInWithApple, signInWithGoogle } from '@/features/auth/sign-in';
+import { signInAsDemo, signInWithApple, signInWithGoogle } from '@/features/auth/sign-in';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
@@ -16,7 +16,7 @@ export function PhoneScreen() {
   const { t } = useTranslation();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
-  const [social, setSocial] = useState<'apple' | 'google' | null>(null);
+  const [social, setSocial] = useState<'apple' | 'google' | 'demo' | null>(null);
   const [requestId] = useMutation(REQUEST_ID);
   const [requestCode, { loading }] = useMutation(REQUEST_CODE);
 
@@ -34,11 +34,11 @@ export function PhoneScreen() {
     }
   };
 
-  const socialSignIn = async (provider: 'apple' | 'google') => {
+  const socialSignIn = async (provider: 'apple' | 'google' | 'demo') => {
     setSocial(provider);
     setError('');
     try {
-      await (provider === 'apple' ? signInWithApple() : signInWithGoogle());
+      await (provider === 'apple' ? signInWithApple() : provider === 'google' ? signInWithGoogle() : signInAsDemo());
     } catch {
       setError(t('auth.socialFailed'));
     } finally {
@@ -57,6 +57,7 @@ export function PhoneScreen() {
             ) : null}
             <Button className="flex-1" variant="ghost" label={t('auth.google')} loading={social === 'google'} onPress={() => socialSignIn('google')} />
           </View>
+          <Button size="sm" variant="ghost" label={t('auth.demo')} loading={social === 'demo'} onPress={() => socialSignIn('demo')} />
         </>
       }
     >

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useSuspenseQuery } from '@apollo/client/react';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Icon } from '@/ui/icon';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 import { Leaderboard, MiniStoryDetails, QuizletDetails, WordGameDetails, WordleDetails } from './details';
@@ -113,10 +114,10 @@ function NotSubmitted({ name, backLabel }: { name: string; backLabel?: string })
 
 function WordGameResult({ id, backLabel }: { id: string; backLabel?: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_WORD_GAME_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
-  if (loading) return <PlayerLoading />;
-  const game = data?.wordGameGame;
-  if (error || !game) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_WORD_GAME_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only', queryKey });
+  const game = data.wordGameGame;
+  if (!game) return <PlayerError />;
   const sub = game.submission;
   if (!sub) return <NotSubmitted name={game.name} backLabel={backLabel} />;
   return (
@@ -128,10 +129,10 @@ function WordGameResult({ id, backLabel }: { id: string; backLabel?: string }) {
 
 function WordleResult({ id, backLabel }: { id: string; backLabel?: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_WORDLE_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
-  if (loading) return <PlayerLoading />;
-  const game = data?.wordleGame;
-  if (error || !game) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_WORDLE_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only', queryKey });
+  const game = data.wordleGame;
+  if (!game) return <PlayerError />;
   const sub = game.submission;
   if (!sub) return <NotSubmitted name={game.name} backLabel={backLabel} />;
   return (
@@ -144,10 +145,10 @@ function WordleResult({ id, backLabel }: { id: string; backLabel?: string }) {
 
 function QuizletResult({ id, backLabel }: { id: string; backLabel?: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_QUIZLET_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
-  if (loading) return <PlayerLoading />;
-  const game = data?.quizletGame;
-  if (error || !game) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_QUIZLET_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only', queryKey });
+  const game = data.quizletGame;
+  if (!game) return <PlayerError />;
   const sub = game.submission;
   if (!sub) return <NotSubmitted name={game.name} backLabel={backLabel} />;
   return (
@@ -160,10 +161,10 @@ function QuizletResult({ id, backLabel }: { id: string; backLabel?: string }) {
 
 function MiniStoryResult({ id, backLabel }: { id: string; backLabel?: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_MINI_STORY_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
-  if (loading) return <PlayerLoading />;
-  const game = data?.miniStoryGame;
-  if (error || !game) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_MINI_STORY_RESULT, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only', queryKey });
+  const game = data.miniStoryGame;
+  if (!game) return <PlayerError />;
   const sub = game.submission;
   if (!sub) return <NotSubmitted name={game.name} backLabel={backLabel} />;
   return (
@@ -175,6 +176,14 @@ function MiniStoryResult({ id, backLabel }: { id: string; backLabel?: string }) 
 
 /** The student's own result for one Oyna game, with the per-game review and (wordle, quizlet) the class leaderboard. */
 export function OynaResultView({ kind, id, backLabel }: { kind: OynaKind; id: string; backLabel?: string }) {
+  return (
+    <QueryBoundary fallback={<PlayerLoading />} errorFallback={(retry) => <PlayerError onRetry={retry} />}>
+      <GameResult kind={kind} id={id} backLabel={backLabel} />
+    </QueryBoundary>
+  );
+}
+
+function GameResult({ kind, id, backLabel }: { kind: OynaKind; id: string; backLabel?: string }) {
   switch (kind) {
     case 'wordgame':
       return <WordGameResult id={id} backLabel={backLabel} />;

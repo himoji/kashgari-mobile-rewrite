@@ -34,8 +34,9 @@ import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
 import { Dialog } from '@/ui/dialog';
-import { EmptyState, ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon, type IconName } from '@/ui/icon';
+import { QueryBoundary } from '@/ui/query-boundary';
 import { StatusMark } from '@/ui/status-mark';
 import { Text } from '@/ui/text';
 
@@ -98,6 +99,26 @@ const DELETE = {
 /** Teacher's view of one work: status, completion, content, per-student state and management. */
 export function AssignmentDetailScreen() {
   const { t } = useTranslation();
+  return (
+    <View className="flex-1 bg-surface">
+      <BackBar label={t('classes.school')} />
+      <QueryBoundary
+        fallback={
+          <View className="gap-3 px-5 pt-2">
+            <Skeleton className="h-8" />
+            <Skeleton className="h-11" />
+            <Skeleton className="h-20" />
+          </View>
+        }
+      >
+        <AssignmentDetail />
+      </QueryBoundary>
+    </View>
+  );
+}
+
+function AssignmentDetail() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const language = useSession((s) => s.uiLanguage);
   const content = useContentText();
@@ -115,26 +136,7 @@ export function AssignmentDetailScreen() {
   const client = useApolloClient();
   const [remove, removal] = useMutation(DELETE[(work?.typename ?? 'OqylymAssignment') as keyof typeof DELETE]);
 
-  if (school.loading) {
-    return (
-      <View className="flex-1 bg-surface">
-        <BackBar label={t('classes.school')} />
-        <View className="gap-3 px-5 pt-2">
-          <Skeleton className="h-8" />
-          <Skeleton className="h-11" />
-          <Skeleton className="h-20" />
-        </View>
-      </View>
-    );
-  }
-  if (!work || !found) {
-    return (
-      <View className="flex-1 bg-surface">
-        <BackBar label={t('classes.school')} />
-        {school.error ? <ErrorState onRetry={() => void school.refetch()} /> : <EmptyState title={t('teacherAssignments.notFound')} />}
-      </View>
-    );
-  }
+  if (!work || !found) return <EmptyState title={t('teacherAssignments.notFound')} />;
 
   const n = workNumbers(work);
   const names = new Map(found.classWork.students.map((s) => [s.id, s.name]));
@@ -180,8 +182,7 @@ export function AssignmentDetailScreen() {
   };
 
   return (
-    <View className="flex-1 bg-surface">
-      <BackBar label={t('classes.school')} />
+    <>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 38 }}>
         <View className="flex-row items-center justify-between gap-2.5">
           <Text className="font-body text-[11px] leading-[16.5px] text-[#96a4b8]">
@@ -294,6 +295,6 @@ export function AssignmentDetailScreen() {
           />
         </View>
       </Dialog>
-    </View>
+    </>
   );
 }

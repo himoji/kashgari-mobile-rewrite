@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useSuspenseQuery } from '@apollo/client/react';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -9,8 +9,9 @@ import { RANKINGS_CLASSES, RANKINGS_CLASSMATES } from '@/features/rankings/gql';
 import { Podium } from '@/features/rankings/podium';
 import { classRows, rankRows, type RankRow } from '@/features/rankings/rank';
 import { cn } from '@/ui/cn';
-import { EmptyState, ErrorState, NotReady, Skeleton } from '@/ui/feedback';
+import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { IconButton } from '@/ui/icon-button';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -122,29 +123,18 @@ function RankList({ rows }: { rows: RankRow[] }) {
   );
 }
 
-function Ranking({
-  tab,
-  rows,
-  loading,
-  error,
-  onRetry,
-}: {
-  tab: Tab;
-  rows: RankRow[];
-  loading: boolean;
-  error: boolean;
-  onRetry: () => void;
-}) {
+function RankingSkeleton() {
+  return (
+    <View className="gap-3 pt-5">
+      <Skeleton className="h-56" />
+      <Skeleton className="h-20" />
+      <Skeleton className="h-16" />
+    </View>
+  );
+}
+
+function Ranking({ tab, rows }: { tab: Tab; rows: RankRow[] }) {
   const { t } = useTranslation();
-  if (error) return <ErrorState onRetry={onRetry} />;
-  if (loading)
-    return (
-      <View className="gap-3 pt-5">
-        <Skeleton className="h-56" />
-        <Skeleton className="h-20" />
-        <Skeleton className="h-16" />
-      </View>
-    );
   if (!rows.length) return <EmptyState title={t('rankings.empty')} illustration="progress" />;
   const own = rows.find((r) => r.own);
   return (
@@ -158,13 +148,15 @@ function Ranking({
 
 function Classmates() {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(RANKINGS_CLASSMATES, {
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RANKINGS_CLASSMATES, {
     variables: { studentId: profileId },
+    queryKey,
   });
   const rows = useMemo(
     () =>
       rankRows(
-        (data?.student?.class.students ?? []).map((s) => ({
+        (data.student?.class.students ?? []).map((s) => ({
           id: s.id,
           name: s.name,
           score: s.acorns,
@@ -173,33 +165,19 @@ function Classmates() {
       ),
     [data, profileId],
   );
-  return (
-    <Ranking
-      tab="students"
-      rows={rows}
-      loading={loading}
-      error={!!error}
-      onRetry={() => void refetch()}
-    />
-  );
+  return <Ranking tab="students" rows={rows} />;
 }
 
 function SchoolClasses() {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(RANKINGS_CLASSES, {
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(RANKINGS_CLASSES, {
     variables: { studentId: profileId },
+    queryKey,
   });
-  const own = data?.student?.class;
+  const own = data.student?.class;
   const rows = useMemo(() => classRows(own?.teacher.school?.teachers ?? [], own?.id), [own]);
-  return (
-    <Ranking
-      tab="classes"
-      rows={rows}
-      loading={loading}
-      error={!!error}
-      onRetry={() => void refetch()}
-    />
-  );
+  return <Ranking tab="classes" rows={rows} />;
 }
 
 /** League rankings by acorns: classes of the school and classmates. The regional school ranking has no backend. */
@@ -235,10 +213,11 @@ export function RankingsScreen() {
             </View>
             <NotReady body={t('rankings.schoolsNotReady')} className="mt-3" />
           </>
-        ) : tab === 'classes' ? (
-          <SchoolClasses />
         ) : (
-          <Classmates />
+          // Keyed by tab, so a failed tab does not keep its error state on the other one.
+          <QueryBoundary key={tab} fallback={<RankingSkeleton />}>
+            {tab === 'classes' ? <SchoolClasses /> : <Classmates />}
+          </QueryBoundary>
         )}
       </View>
     </TabScreen>

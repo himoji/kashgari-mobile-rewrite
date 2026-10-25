@@ -1,4 +1,4 @@
-import { mapClassWork, type ClassWork, type Work } from '@/features/classes/class-data';
+import { mapClassWork, mapClassWorkCached, type ClassWork, type Work } from '@/features/classes/class-data';
 import type { SchoolPrincipalQuery } from '@/graphql/graphql';
 
 type ApiSchool = NonNullable<SchoolPrincipalQuery['principal']>['school'];
@@ -24,9 +24,13 @@ export interface SchoolData {
 
 const DAY = 86400;
 
-/** Teachers with their classes mapped to the shared ClassWork shape, plus a flat class list. */
-export function mapSchool(school: ApiSchool, now = Date.now() / 1000): SchoolData {
-  const teachers = school.teachers.map((t) => ({ id: t.id, name: t.name, classes: t.classes.map((c) => mapClassWork(c, now)) }));
+/**
+ * Teachers with their classes mapped to the shared ClassWork shape, plus a flat class list. Without
+ * `now` (tests pass one) each class goes through the per-object cache, so a refetch only maps changed classes.
+ */
+export function mapSchool(school: ApiSchool, now?: number): SchoolData {
+  const map = (c: ApiSchool['teachers'][number]['classes'][number]) => (now == null ? mapClassWorkCached(c) : mapClassWork(c, now));
+  const teachers = school.teachers.map((t) => ({ id: t.id, name: t.name, classes: t.classes.map(map) }));
   const seen = new Set<string>();
   const classes = teachers.flatMap((t) =>
     t.classes.flatMap((c) => {

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +13,7 @@ import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
 import type { OynaWordGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 
 import {
   CAPTCHA_LIVES,
@@ -31,19 +32,27 @@ type Game = NonNullable<OynaWordGameQuery['wordGameGame']>;
 
 /** Word game: flashcards, then recognize games, then drills; answers go to the API in one final submit. */
 export function WordGamePlayer({ id }: { id: string }) {
+  return (
+    <QueryBoundary fallback={<PlayerLoading />} errorFallback={(retry) => <PlayerError onRetry={retry} />}>
+      <WordGameStatus id={id} />
+    </QueryBoundary>
+  );
+}
+
+function WordGameStatus({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const status = useQuery(OYNA_WORD_GAME_STATUS, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
-  if (status.loading) return <PlayerLoading />;
-  if (status.error || !status.data?.wordGameGame) return <PlayerError onRetry={() => void status.refetch()} />;
-  if ((status.data.wordGameGame.submission?.time ?? 0) > 0) return <OynaResultView kind="wordgame" id={id} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_WORD_GAME_STATUS, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only', queryKey });
+  if (!data.wordGameGame) return <PlayerError />;
+  if ((data.wordGameGame.submission?.time ?? 0) > 0) return <OynaResultView kind="wordgame" id={id} />;
   return <WordGameLoader id={id} studentId={profileId} />;
 }
 
 function WordGameLoader({ id, studentId }: { id: string; studentId: string }) {
+  const queryKey = useRetryKey();
   // no-cache: the query restarts the captcha drill on the server, so never serve it from cache
-  const { data, loading, error, refetch } = useQuery(OYNA_WORD_GAME, { variables: { id, studentId }, fetchPolicy: 'no-cache' });
-  if (loading) return <PlayerLoading />;
-  if (error || !data?.wordGameGame) return <PlayerError onRetry={() => void refetch()} />;
+  const { data } = useSuspenseQuery(OYNA_WORD_GAME, { variables: { id, studentId }, fetchPolicy: 'no-cache', queryKey });
+  if (!data.wordGameGame) return <PlayerError />;
   return <WordGameRun game={data.wordGameGame} studentId={studentId} />;
 }
 

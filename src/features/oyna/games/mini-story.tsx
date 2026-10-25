@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
@@ -16,15 +16,24 @@ import { evictSubmission } from '@/lib/cache';
 import type { OynaMiniStoryGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 type Game = NonNullable<OynaMiniStoryGameQuery['miniStoryGame']>;
 
 export function MiniStoryPlayer({ id }: { id: string }) {
+  return (
+    <QueryBoundary fallback={<PlayerLoading />} errorFallback={(retry) => <PlayerError onRetry={retry} />}>
+      <MiniStoryLoad id={id} />
+    </QueryBoundary>
+  );
+}
+
+function MiniStoryLoad({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_MINI_STORY_GAME, { variables: { id, studentId: profileId } });
-  if (loading) return <PlayerLoading />;
-  if (error || !data?.miniStoryGame) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_MINI_STORY_GAME, { variables: { id, studentId: profileId }, queryKey });
+  if (!data.miniStoryGame) return <PlayerError />;
   if (data.miniStoryGame.submission) return <OynaResultView kind="ministory" id={id} />;
   return <MiniStoryRun game={data.miniStoryGame} studentId={profileId} />;
 }

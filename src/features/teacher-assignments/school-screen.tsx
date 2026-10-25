@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { ClassesSegment } from '@/features/classes/classes-segment';
 import { ReviewSegment } from '@/features/review/review-segment';
 import { AssignmentsSegment } from '@/features/teacher-assignments/assignments-segment';
+import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
 import { SchoolTabs } from '@/features/teacher-assignments/school-tabs';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
 import { Button } from '@/ui/button';
-import { ErrorState, Skeleton } from '@/ui/feedback';
+import { Skeleton } from '@/ui/feedback';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 
 type Segment = 'assignments' | 'classes' | 'review';
@@ -21,34 +23,14 @@ export function TeacherSchoolScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ tab?: string }>();
   const segment: Segment = SEGMENTS.includes(params.tab as Segment) ? (params.tab as Segment) : 'assignments';
-  const school = useTeacherSchool();
-
-  const body = school.loading ? (
-    <View className="gap-3">
-      <Skeleton className="h-12" />
-      <Skeleton className="h-[102px]" />
-      <Skeleton className="h-[102px]" />
-      <Skeleton className="h-[102px]" />
-    </View>
-  ) : school.error && !school.classes.length ? (
-    <ErrorState onRetry={() => void school.refetch()} />
-  ) : segment === 'assignments' ? (
-    <AssignmentsSegment classes={school.classes} />
-  ) : segment === 'classes' ? (
-    <ClassesSegment
-      classes={school.classes}
-      onOpenClass={(id) => router.push({ pathname: '/teacher/class/[id]', params: { id } })}
-    />
-  ) : (
-    <ReviewSegment classes={school.classes} />
-  );
+  const { refreshing, refresh } = useRefresh(TEACHER_SCHOOL);
 
   return (
     <View className="flex-1">
       <TabScreen
         title={t('classes.school')}
-        refreshing={school.refreshing}
-        onRefresh={() => void school.refetch()}
+        refreshing={refreshing}
+        onRefresh={refresh}
       >
         <View>
           <SchoolTabs
@@ -56,7 +38,9 @@ export function TeacherSchoolScreen() {
             onChange={(tab) => router.setParams({ tab })}
             options={SEGMENTS.map((value) => ({ value, label: t(`classes.tabs.${value}`) }))}
           />
-          {body}
+          <QueryBoundary fallback={<SchoolSkeleton />}>
+            <School segment={segment} />
+          </QueryBoundary>
         </View>
       </TabScreen>
       {segment === 'assignments' ? (
@@ -77,5 +61,30 @@ export function TeacherSchoolScreen() {
         </View>
       ) : null}
     </View>
+  );
+}
+
+function SchoolSkeleton() {
+  return (
+    <View className="gap-3">
+      <Skeleton className="h-12" />
+      <Skeleton className="h-[102px]" />
+      <Skeleton className="h-[102px]" />
+      <Skeleton className="h-[102px]" />
+    </View>
+  );
+}
+
+function School({ segment }: { segment: Segment }) {
+  const school = useTeacherSchool();
+  return segment === 'assignments' ? (
+    <AssignmentsSegment classes={school.classes} />
+  ) : segment === 'classes' ? (
+    <ClassesSegment
+      classes={school.classes}
+      onOpenClass={(id) => router.push({ pathname: '/teacher/class/[id]', params: { id } })}
+    />
+  ) : (
+    <ReviewSegment classes={school.classes} />
   );
 }

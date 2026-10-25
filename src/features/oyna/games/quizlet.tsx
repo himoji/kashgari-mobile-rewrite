@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
@@ -17,14 +17,23 @@ import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
 import type { OynaQuizletGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
+import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 
 type Game = NonNullable<OynaQuizletGameQuery['quizletGame']>;
 
 export function QuizletPlayer({ id }: { id: string }) {
+  return (
+    <QueryBoundary fallback={<PlayerLoading />} errorFallback={(retry) => <PlayerError onRetry={retry} />}>
+      <QuizletLoad id={id} />
+    </QueryBoundary>
+  );
+}
+
+function QuizletLoad({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_QUIZLET_GAME, { variables: { id, studentId: profileId } });
-  if (loading) return <PlayerLoading />;
-  if (error || !data?.quizletGame) return <PlayerError onRetry={() => void refetch()} />;
+  const queryKey = useRetryKey();
+  const { data } = useSuspenseQuery(OYNA_QUIZLET_GAME, { variables: { id, studentId: profileId }, queryKey });
+  if (!data.quizletGame) return <PlayerError />;
   if (data.quizletGame.submission) return <OynaResultView kind="quizlet" id={id} />;
   return <QuizletRun game={data.quizletGame} studentId={profileId} />;
 }

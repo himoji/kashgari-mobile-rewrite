@@ -1,8 +1,8 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 
-import { LOGIN_APPLE, LOGIN_GOOGLE } from '@/features/auth/gql';
-import { resolveProfiles } from '@/features/auth/profiles';
+import { ACCOUNT_PROFILES, LOGIN_APPLE, LOGIN_GOOGLE } from '@/features/auth/gql';
+import { accountProfiles, resolveProfiles } from '@/features/auth/profiles';
 import { useSession, type ContentLanguage, type Credentials } from '@/features/auth/session';
 import { apolloClient } from '@/lib/apollo';
 import { env } from '@/lib/env';
@@ -34,6 +34,34 @@ async function signInWithIdToken(provider: 'google' | 'apple', idToken: string) 
   const credentials = results.filter((c) => c !== null);
   if (!credentials.length) throw new Error('No account for this sign-in');
   await finishSignIn(credentials);
+}
+
+/** Demo databases with roles (fr has none). */
+const DEMO_LANGUAGES: ContentLanguage[] = ['kk', 'ru', 'en'];
+/** Placeholder student profiles left in the demo accounts by class joins. */
+const DEMO_JUNK = 'Сіз (Вы)';
+
+/**
+ * Demo: a request without a token gets each language database's shared demo account (read-mostly;
+ * the API rejects account changes for it). The credentials keep empty tokens, so no header is sent.
+ */
+export async function signInAsDemo() {
+  const results = await Promise.all(
+    DEMO_LANGUAGES.map(async (language) => {
+      try {
+        const { data } = await apolloClient.query({ query: ACCOUNT_PROFILES, context: { language }, fetchPolicy: 'no-cache' });
+        if (!data?.account) return null;
+        const cred: Credentials = { language, accountId: data.account.id, accessToken: '', refreshToken: '' };
+        const profiles = accountProfiles(cred, data.account).filter((p) => p.name !== DEMO_JUNK);
+        return profiles.length ? { cred, profiles } : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  const found = results.filter((r) => r !== null);
+  if (!found.length) throw new Error('No demo account');
+  useSession.getState().signIn(found.map((r) => r.cred), found.flatMap((r) => r.profiles));
 }
 
 export async function signInWithGoogle() {

@@ -35,7 +35,9 @@ function headersFor(credentials: Credentials | null, language?: string): Record<
   const headers: Record<string, string> = {
     'danatiin-language': credentials?.language ?? language ?? 'kk',
   };
-  if (credentials) headers.authorization = bearer(credentials);
+  // Demo credentials carry no token: the API serves its demo account to unauthenticated requests.
+  const token = credentials ? bearer(credentials) : '';
+  if (token) headers.authorization = token;
   return headers;
 }
 
