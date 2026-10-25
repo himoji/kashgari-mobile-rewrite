@@ -3,6 +3,7 @@ import { Pressable, View, type PressableProps } from 'react-native';
 
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
+import { AnimatedPressable, useAnswerMotion } from '@/ui/answer-motion';
 import { cn } from '@/ui/cn';
 import { Icon, type IconName } from '@/ui/icon';
 import { Text } from '@/ui/text';
@@ -24,6 +25,7 @@ type Tone = 'idle' | 'selected' | 'correct' | 'wrong' | 'used';
 
 /** Grey chip from the prototype (word chips, scrambled letters). Pressable when given onPress. */
 export function Chip({ label, big, tone = 'idle', onPress, disabled }: { label: string; big?: boolean; tone?: Tone; onPress?: () => void; disabled?: boolean }) {
+  const { style, ...press } = useAnswerMotion(tone);
   const body = (
     <Text
       className={cn(
@@ -38,15 +40,15 @@ export function Chip({ label, big, tone = 'idle', onPress, disabled }: { label: 
     </Text>
   );
   const cls = cn(
-    'min-w-[35px] items-center rounded-tile px-[11px] py-2',
+    'transition-tone min-w-[35px] items-center rounded-tile px-[11px] py-2',
     tone === 'correct' ? 'bg-[#edf8ef]' : tone === 'wrong' ? 'bg-danger-soft' : tone === 'selected' ? 'bg-[#fff8d6]' : 'bg-[#f3f5f2]',
     tone === 'used' && 'opacity-60',
   );
   if (!onPress) return <View className={cls}>{body}</View>;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} className={cn(cls, 'active:opacity-70')}>
+    <AnimatedPressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} className={cn(cls, 'active:opacity-70')} style={style} {...press}>
       {body}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -60,20 +62,22 @@ const choiceRing: Record<Tone, string> = {
 
 /** Matching tile (student-player-a6): white, yellow when selected, green once matched. */
 export function ListChoice({ tone = 'idle', children, className, ...props }: PressableProps & { tone?: Tone; children: ReactNode; className?: string }) {
+  const { style, ...press } = useAnswerMotion(tone);
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ selected: tone === 'selected', disabled: !!props.disabled }}
       className={cn(
-        'min-h-[52px] justify-center rounded-[14px] px-3 py-2.5 active:opacity-80',
+        'transition-tone min-h-[52px] justify-center rounded-[14px] px-3 py-2.5 active:opacity-80',
         tone === 'selected' ? 'bg-[#fff8d6]' : tone === 'correct' ? 'bg-[#edf8ef]' : tone === 'wrong' ? 'bg-danger-soft' : 'bg-surface',
         className,
       )}
-      style={{ boxShadow: choiceRing[tone] }}
+      style={[{ boxShadow: choiceRing[tone] }, style]}
+      {...press}
       {...props}
     >
       {children}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -95,17 +99,19 @@ export function ChoiceLabel({ children, tone = 'idle', className }: { children: 
 /** A/B/C answer row (student-player-a4). */
 export function OptionRow({ letter, label, tone = 'idle', onPress, disabled }: { letter: string; label: string; tone?: Tone; onPress?: () => void; disabled?: boolean }) {
   const selected = tone === 'selected';
+  const { style, ...press } = useAnswerMotion(tone);
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="radio"
       accessibilityState={{ checked: selected || tone === 'correct', disabled }}
       onPress={onPress}
       disabled={disabled}
       className={cn(
-        'min-h-[52px] flex-row items-center gap-2.5 rounded-[13px] px-3 py-[11px] active:opacity-80',
+        'transition-tone min-h-[52px] flex-row items-center gap-2.5 rounded-[13px] px-3 py-[11px] active:opacity-80',
         selected ? 'bg-[#eef5ff]' : tone === 'correct' ? 'bg-[#edf8ef]' : tone === 'wrong' ? 'bg-danger-soft' : 'bg-surface',
       )}
-      style={{
+      {...press}
+      style={[{
         boxShadow: selected
           ? '0 0 0 1px rgba(59, 134, 255, 0.125)'
           : tone === 'correct'
@@ -113,7 +119,7 @@ export function OptionRow({ letter, label, tone = 'idle', onPress, disabled }: {
             : tone === 'wrong'
               ? '0 0 0 1px rgba(214, 72, 72, 0.3)'
               : '0 2px 3px rgba(36, 38, 49, 0.01)',
-      }}
+      }, style]}
     >
       <View
         className={cn(
@@ -133,7 +139,7 @@ export function OptionRow({ letter, label, tone = 'idle', onPress, disabled }: {
       >
         {label}
       </Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -145,7 +151,7 @@ export function Outline({ label, steps, words }: { label: string; steps?: Outlin
   const ct = useContentText();
   return (
     <View className="mt-5 rounded-control bg-[#f7f9fc]">
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} className="flex-row items-center justify-between gap-3 p-3">
+      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} className="press flex-row items-center justify-between gap-3 p-3">
         <Text className="font-body-medium text-[12px] leading-[18px] text-muted">{label}</Text>
         <View style={{ transform: [{ rotate: open ? '180deg' : '0deg' }] }}>
           <Icon name="down" size={16} color={colors.muted} />
@@ -160,7 +166,7 @@ export function Outline({ label, steps, words }: { label: string; steps?: Outlin
               accessibilityState={{ selected: s.active, disabled: !s.onPress }}
               disabled={!s.onPress}
               onPress={s.onPress}
-              className={cn('h-12 flex-row items-center gap-3 rounded-control px-2.5', s.active && 'bg-[#fff8d6]')}
+              className={cn('press h-12 flex-row items-center gap-3 rounded-control px-2.5', s.active ? 'bg-[#fff8d6]' : 'bg-transparent')}
             >
               <Icon name={s.done ? 'check' : s.icon} size={18} color={s.done ? colors.success : colors.ink} />
               <Text className={cn('font-body text-[15px] leading-[22.5px]', s.active && 'font-body-semibold')}>

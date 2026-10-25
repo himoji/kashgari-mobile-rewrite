@@ -3,8 +3,10 @@ import type { ReactNode } from 'react';
 import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { haptics } from '@/lib/haptics';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
+import { AnimatedPressable, useAnswerMotion } from '@/ui/answer-motion';
 import { cn } from '@/ui/cn';
 import { Icon, type IconName } from '@/ui/icon';
 import { Text } from '@/ui/text';
@@ -26,7 +28,7 @@ export function FocusHeader({ label, onBack }: { label: string; onBack?: () => v
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={onBack ?? leave}
-        className="h-11 flex-row items-center gap-1.5 self-start rounded-[24px] pl-2 pr-3 active:bg-canvas"
+        className="press h-11 flex-row items-center gap-1.5 self-start rounded-[24px] pl-2 pr-3 active:bg-canvas"
       >
         <View className="h-[22px] w-[22px] items-center justify-center">
           <Icon name="back" size={20} color={colors.ink} />
@@ -57,7 +59,7 @@ export function WordChip({ word, onPress, large, dim }: { word: string; onPress?
   );
   const className = cn('justify-center rounded-tile bg-[#f3f5f2] px-[11px]', large ? 'min-w-[35px] items-center py-2' : 'py-2', dim && 'opacity-35');
   return onPress ? (
-    <Pressable accessibilityRole="button" onPress={onPress} disabled={dim} className={cn(className, 'min-h-[44px] active:opacity-70')}>
+    <Pressable accessibilityRole="button" onPress={onPress} disabled={dim} className={cn(className, 'press min-h-[44px] active:opacity-70')}>
       {label}
     </Pressable>
   ) : (
@@ -104,14 +106,19 @@ export function OptionRow({
   onPress?: () => void;
   className?: string;
 }) {
+  const { style, ...press } = useAnswerMotion(state);
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="radio"
       accessibilityState={{ selected: state === 'selected', disabled: !onPress }}
       disabled={!onPress}
-      onPress={onPress}
-      className={cn('min-h-[52px] flex-row items-center gap-[10px] rounded-[13px] border px-3 py-[11px]', optionBox[state], className)}
-      style={{ boxShadow: state === 'selected' ? '0 0 0 1px rgba(59,134,255,0.125)' : '0 2px 3px rgba(36,38,49,0.01)' }}
+      onPress={() => {
+        if (state !== 'selected') haptics.selection();
+        onPress?.();
+      }}
+      {...press}
+      className={cn('transition-tone min-h-[52px] flex-row items-center gap-[10px] rounded-[13px] border px-3 py-[11px]', optionBox[state], className)}
+      style={[{ boxShadow: state === 'selected' ? '0 0 0 1px rgba(59,134,255,0.125)' : '0 2px 3px rgba(36,38,49,0.01)' }, style]}
     >
       {letter ? (
         <View className={cn('h-[26px] w-[26px] items-center justify-center rounded-[8px]', letterBox[state])}>
@@ -120,7 +127,7 @@ export function OptionRow({
       ) : null}
       <Text className={cn('flex-1 font-body text-[14px] leading-[20px]', optionText[state])}>{label}</Text>
       {state === 'correct' ? <Icon name="check" size={18} color="#2f6b3f" /> : state === 'wrong' ? <Icon name="close" size={18} color={colors.danger} /> : null}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -169,7 +176,7 @@ export function SoftIconButton({ icon, label, onPress, disabled }: { icon: IconN
       accessibilityLabel={label}
       disabled={disabled}
       onPress={onPress}
-      className={cn('h-11 w-11 items-center justify-center rounded-control bg-[#f2f7ff] active:opacity-70', disabled && 'opacity-40')}
+      className={cn('press h-11 w-11 items-center justify-center rounded-control bg-[#f2f7ff] active:opacity-70', disabled && 'opacity-40')}
     >
       <Icon name={icon} size={19} color={colors.ink} />
     </Pressable>

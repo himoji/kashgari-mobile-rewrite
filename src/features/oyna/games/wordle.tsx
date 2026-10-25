@@ -21,6 +21,7 @@ import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
+import { haptics } from '@/lib/haptics';
 import type { OynaWordleGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -65,7 +66,7 @@ export function WordleRow({ letters, states, length, size }: { letters: string; 
       {Array.from({ length }, (_, i) => {
         const tone = states?.[i] ?? (chars[i] ? 'typed' : 'empty');
         return (
-          <View key={i} className={cn('items-center justify-center rounded-[9px] border', cellTone[tone])} style={{ width: size, height: size }}>
+          <View key={i} className={cn('transition-tone items-center justify-center rounded-[9px] border', cellTone[tone])} style={{ width: size, height: size }}>
             <Text className={cn('font-body-semibold text-[22px] leading-[28px]', tone === 'absent' && 'text-subtle', tone === 'correct' && 'text-[#1b6e4f]')}>
               {chars[i] ? ct(chars[i]!) : ''}
             </Text>
@@ -92,7 +93,7 @@ function Keyboard({ rows, states, onKey, onDelete }: { rows: string[][]; states:
                 accessibilityLabel={k}
                 onPress={() => onKey(k)}
                 className={cn(
-                  'h-10 max-w-[34px] flex-1 items-center justify-center rounded-lg active:opacity-70',
+                  'press h-10 max-w-[34px] flex-1 items-center justify-center rounded-lg active:opacity-70',
                   s === 'correct' ? 'bg-[#e8f6ef]' : s === 'present' ? 'bg-[#fff8d6]' : s === 'absent' ? 'bg-[#e3e6ec]' : 'bg-canvas',
                 )}
                 style={{ boxShadow: 'inset 0 0 0 1px #d3d5de' }}
@@ -106,7 +107,7 @@ function Keyboard({ rows, states, onKey, onDelete }: { rows: string[][]; states:
               accessibilityRole="button"
               accessibilityLabel={t('oyna.deleteLetter')}
               onPress={onDelete}
-              className="h-10 w-[52px] items-center justify-center rounded-lg bg-track active:opacity-70"
+              className="press h-10 w-[52px] items-center justify-center rounded-lg bg-track active:opacity-70"
             >
               <Icon name="delete" size={20} color={colors.link} />
             </Pressable>
@@ -135,24 +136,22 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
     update: (cache) => evictSubmission(cache, { __typename: 'OynaGameWordle', id: game.id }, studentId),
   });
 
-  const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, () => {
-    showToast(t('oyna.timeUp'));
-    void send();
-  });
+  const send = async (time: number) => {
+    // No try/catch around the result checks: the compiler can't optimise those yet.
+    const ok = await submit({
+      variables: { gameId: game.id, studentId, data: { time, guesses: wordleGuessesPayload(words, guesses) } },
+    }).then(({ data }) => !!data?.wordleSubmit, () => false);
+    setConfirm(false);
+    if (ok) {
+      haptics.success();
+      setSubmitted(true);
+    } else showToast(t('oyna.submitFailed'));
+  };
 
-  async function send() {
-    try {
-      const { data } = await submit({
-        variables: { gameId: game.id, studentId, data: { time: clock.spent(), guesses: wordleGuessesPayload(words, guesses) } },
-      });
-      setConfirm(false);
-      if (data?.wordleSubmit) setSubmitted(true);
-      else showToast(t('oyna.submitFailed'));
-    } catch {
-      setConfirm(false);
-      showToast(t('oyna.submitFailed'));
-    }
-  }
+  const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, (spent) => {
+    showToast(t('oyna.timeUp'));
+    void send(spent);
+  });
 
   if (submitted) return <OynaResultView kind="wordle" id={game.id} />;
 
@@ -173,15 +172,17 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
   const check = async () => {
     if ([...typed].length !== length || checking) return;
     setChecking(true);
-    let valid = true;
-    try {
-      const { data } = await client.query({ query: OYNA_WORDLE_CHECK, variables: { word: typed } });
-      valid = data?.wordleCheckWord !== false;
-    } catch {
-      // the old app accepted the guess when the dictionary check failed
-    }
+    // the old app accepted the guess when the dictionary check failed
+    const valid = await client.query({ query: OYNA_WORDLE_CHECK, variables: { word: typed } }).then(
+      ({ data }) => data?.wordleCheckWord !== false,
+      () => true,
+    );
     setChecking(false);
-    if (!valid) return showToast(t('oyna.notAWord'));
+    if (!valid) {
+      haptics.error();
+      return showToast(t('oyna.notAWord'));
+    }
+    if (isSolved([...mine, typed], target)) haptics.success();
     setGuesses((all) => all.map((g, i) => (i === wordIndex ? [...g, typed] : g)));
     setTyped('');
   };
@@ -207,7 +208,7 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
       title={ct(game.name)}
       caption={words.length > 1 ? `${t('oyna.stepOf', { n: wordIndex + 1, total: words.length })} · ${t('oyna.kinds.wordle')}` : t('oyna.kinds.wordle')}
       progress={words.length > 1 ? doneCount / words.length : undefined}
-      timer={clock.remaining}
+      timer={clock.timer}
       outline={words.length > 1 ? <Outline label={t('oyna.order', { done: doneCount, total: words.length })} steps={words.map((_, i) => ({ label: `${t('oyna.word')} ${i + 1}`, icon: 'game', active: i === wordIndex, done: isWordDone(guesses[i] ?? [], words[i] ?? '') }))} /> : undefined}
       footer={
         <PlayerActions
@@ -234,7 +235,7 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
       ) : (
         <Keyboard rows={keyboardRows(language)} states={keyStates(mine, target)} onKey={type} onDelete={() => setTyped([...typed].slice(0, -1).join(''))} />
       )}
-      <ConfirmSubmit visible={confirm} loading={submitting} onCancel={() => setConfirm(false)} onConfirm={() => void send()} />
+      <ConfirmSubmit visible={confirm} loading={submitting} onCancel={() => setConfirm(false)} onConfirm={() => void send(clock.spent())} />
     </PlayerFrame>
   );
 }

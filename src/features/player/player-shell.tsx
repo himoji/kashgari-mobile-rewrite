@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, Modal, Pressable, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView, type KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { useContentText } from '@/lib/i18n';
+import { haptics } from '@/lib/haptics';
+import { motion, pageIn, toastIn, toastOut } from '@/lib/motion';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
+import { useModalMotion } from '@/ui/dialog';
 import { Icon, type IconName } from '@/ui/icon';
+import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
 
 import { isStepComplete } from './engine/checking';
@@ -62,7 +67,7 @@ function ActionButton({ label, icon, iconAfter, onPress, loading }: { label: str
       accessibilityRole="button"
       onPress={onPress}
       disabled={loading}
-      className="h-[46px] flex-1 flex-row items-center justify-center gap-2 rounded-control bg-attention px-[13px] active:opacity-90"
+      className="press h-[46px] flex-1 flex-row items-center justify-center gap-2 rounded-control bg-attention px-[13px] active:opacity-90"
     >
       {iconAfter ? null : glyph}
       <Text className="font-body-semibold text-[14px] leading-[18px] text-white">{label}</Text>
@@ -75,14 +80,21 @@ function Toast({ message }: { message: string | null }) {
   const insets = useSafeAreaInsets();
   if (!message) return null;
   return (
-    <View
+    <Animated.View
+      key={message}
+      entering={toastIn}
+      exiting={toastOut}
       pointerEvents="none"
-      accessibilityLiveRegion="polite"
-      className="absolute inset-x-10 rounded-[13px] bg-surface px-[15px] py-3"
-      style={{ top: Math.max(insets.top, 28) + 42, boxShadow: '0 5px 24px rgba(48,62,88,0.11)' }}
+      style={{ position: 'absolute', left: 40, right: 40, top: Math.max(insets.top, 28) + 42 }}
     >
-      <Text className="font-body text-[13px] leading-[20px] text-[#6d84a5]">{message}</Text>
-    </View>
+      <View
+        accessibilityLiveRegion="polite"
+        className="rounded-[13px] bg-surface px-[15px] py-3"
+        style={{ boxShadow: '0 5px 24px rgba(48,62,88,0.11)' }}
+      >
+        <Text className="font-body text-[13px] leading-[20px] text-[#6d84a5]">{message}</Text>
+      </View>
+    </Animated.View>
   );
 }
 
@@ -108,36 +120,41 @@ export function ConfirmSheet({
 }) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { mounted, backdrop, panel } = useModalMotion(visible, 32, motion.sheet);
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+    <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <View className="flex-1 justify-end">
-        <Pressable accessibilityLabel={t('common.actions.close')} className="absolute inset-0 bg-[rgba(36,38,49,0.2)]" onPress={onClose} />
-        <View className="rounded-t-[22px] bg-surface pt-3" style={{ paddingBottom: insets.bottom + 4, boxShadow: '0 12px 40px rgba(58,38,12,0.15)' }}>
-          <View className="mb-[9px] h-1 w-10 self-center rounded bg-[#dce1eb]" />
-          <View className="mb-3 flex-row items-center justify-between gap-3 py-[10px] pl-5 pr-3">
-            <Text className="flex-1 font-body-medium text-[20px] leading-[26px] text-ink">{title}</Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('common.actions.close')}
-              onPress={onClose}
-              className="h-8 w-8 items-center justify-center rounded-tile bg-[#f3f6fb] active:opacity-70"
-            >
-              <Icon name="close" size={16} color={colors.muted} />
-            </Pressable>
+        <Animated.View style={[StyleSheet.absoluteFill, backdrop]}>
+          <Pressable accessibilityLabel={t('common.actions.close')} className="flex-1 bg-[rgba(36,38,49,0.2)]" onPress={onClose} />
+        </Animated.View>
+        <Animated.View style={panel}>
+          <View className="rounded-t-[22px] bg-surface pt-3" style={{ paddingBottom: insets.bottom + 4, boxShadow: '0 12px 40px rgba(58,38,12,0.15)' }}>
+            <View className="mb-[9px] h-1 w-10 self-center rounded bg-[#dce1eb]" />
+            <View className="mb-3 flex-row items-center justify-between gap-3 py-[10px] pl-5 pr-3">
+              <Text className="flex-1 font-body-medium text-[20px] leading-[26px] text-ink">{title}</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('common.actions.close')}
+                onPress={onClose}
+                className="press h-8 w-8 items-center justify-center rounded-tile bg-[#f3f6fb] active:opacity-70"
+              >
+                <Icon name="close" size={16} color={colors.muted} />
+              </Pressable>
+            </View>
+            <Text className="mb-[14px] px-5 font-body text-[15px] leading-[23.25px] text-meta">{body}</Text>
+            <View className="mt-4 flex-row gap-2 px-5 pb-4 pt-3">
+              <Pressable
+                accessibilityRole="button"
+                onPress={onClose}
+                className="press h-11 flex-1 items-center justify-center rounded-control bg-surface px-4 active:bg-canvas"
+                style={{ boxShadow: 'inset 0 0 0 1px #d3d5de' }}
+              >
+                <Text className="font-body-semibold text-[13px] leading-[16.25px] text-ink">{cancelLabel}</Text>
+              </Pressable>
+              <Button className="h-11 flex-1" label={confirmLabel} loading={busy} onPress={onConfirm} />
+            </View>
           </View>
-          <Text className="mb-[14px] px-5 font-body text-[15px] leading-[23.25px] text-meta">{body}</Text>
-          <View className="mt-4 flex-row gap-2 px-5 pb-4 pt-3">
-            <Pressable
-              accessibilityRole="button"
-              onPress={onClose}
-              className="h-11 flex-1 items-center justify-center rounded-control bg-surface px-4 active:bg-canvas"
-              style={{ boxShadow: 'inset 0 0 0 1px #d3d5de' }}
-            >
-              <Text className="font-body-semibold text-[13px] leading-[16.25px] text-ink">{cancelLabel}</Text>
-            </Pressable>
-            <Button className="h-11 flex-1" label={confirmLabel} loading={busy} onPress={onConfirm} />
-          </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -166,7 +183,7 @@ function Outline({
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((v) => !v)}
-        className="h-11 flex-row items-center justify-between gap-3 px-3"
+        className="press h-11 flex-row items-center justify-between gap-3 px-3"
       >
         <Text className="font-body-medium text-[12px] leading-[18px] text-muted">
           {many ? `${t('player.activityOrder')} · ${done.size}/${steps.length}` : t('player.words')}
@@ -183,7 +200,7 @@ function Outline({
                 accessibilityRole="button"
                 accessibilityState={{ selected: current }}
                 onPress={() => onJump(i)}
-                className={cn('min-h-12 flex-row items-center gap-3 rounded-control px-[10px] py-1.5', current && 'bg-warning-soft')}
+                className={cn('press min-h-12 flex-row items-center gap-3 rounded-control px-[10px] py-1.5', current ? 'bg-warning-soft' : 'bg-transparent')}
               >
                 <Icon name={done.has(s.id) ? 'check' : stepIcon[s.label]} size={18} color={done.has(s.id) ? '#2f6b3f' : colors.ink} />
                 <Text className={cn('flex-1 text-[15px] leading-[22.5px] text-ink', current ? 'font-body-semibold' : 'font-body')}>
@@ -282,6 +299,7 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
     setBusy(true);
     try {
       await onSubmit(answers, timing);
+      haptics.success();
       setConfirm(false);
     } catch {
       setConfirm(false);
@@ -314,16 +332,12 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
             {t(`player.labels.${step.display ?? step.label}`)}
           </Text>
           {many ? (
-            <View
-              accessibilityRole="progressbar"
-              accessibilityValue={{ min: 0, max: 100, now: pct }}
-              className="h-[5px] overflow-hidden rounded-lg bg-[#edf2fa]"
-            >
-              <View className="h-full rounded-lg bg-primary" style={{ width: `${pct}%` }} />
-            </View>
+            <ProgressBar value={pct / 100} className="h-[5px] rounded-lg bg-[#edf2fa]" fillClassName="rounded-lg bg-primary" />
           ) : null}
         </View>
-        <StepView key={step.id} step={shown} answer={answers[step.id]} onAnswer={setAnswer} mode={mode} />
+        <Animated.View key={step.id} entering={pageIn}>
+          <StepView step={shown} answer={answers[step.id]} onAnswer={setAnswer} mode={mode} />
+        </Animated.View>
         {mode === 'play' && done.has(step.id) ? (
           <View className="mt-4 flex-row items-center gap-2">
             <Icon name="check" size={18} color="#2f6b3f" />
@@ -341,7 +355,7 @@ export function PlayerShell({ title, steps, mode, initialAnswers, words = [], ba
             accessibilityRole="button"
             accessibilityLabel={t('player.previous')}
             onPress={() => goTo(index - 1)}
-            className="h-[46px] w-[46px] items-center justify-center rounded-control bg-[#f2f6fd] active:opacity-80"
+            className="press h-[46px] w-[46px] items-center justify-center rounded-control bg-[#f2f6fd] active:opacity-80"
           >
             <Icon name="back" size={18} color={colors.ink} />
           </Pressable>
