@@ -93,8 +93,8 @@ function ReaderBody({
     <>
       <ScrollView
         ref={scroll}
-        contentContainerClassName="px-5 pt-2"
-        contentContainerStyle={{ paddingBottom: 110 + insets.bottom }}
+        // One style object: next to contentContainerClassName, native drops the class (no side padding).
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 110 + insets.bottom }}
       >
         {children}
       </ScrollView>

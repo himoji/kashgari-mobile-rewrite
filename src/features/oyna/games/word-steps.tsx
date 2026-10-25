@@ -32,6 +32,7 @@ import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { useAnswerMotion } from '@/ui/answer-motion';
 import { cn } from '@/ui/cn';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
@@ -102,7 +103,7 @@ export function CardsStep({ words }: { words: GameWord[] }) {
           setFlipped((f) => !f);
         }}
         className={cn('press items-center justify-center gap-3.5 rounded-[20px] px-[18px] py-6 active:opacity-95', pictures ? 'min-h-[260px]' : 'min-h-[180px]')}
-        style={{ backgroundImage: 'linear-gradient(140deg, #4a93ff, #1e75f4)', boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }}
+        style={[gradient('card'), { boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }]}
       >
         {/* On both sides, as in the old app: the picture is a hint for the word, not part of the answer. */}
         {card.imageUrl ? (

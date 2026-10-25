@@ -11,6 +11,7 @@ import { PlayerActions, leavePlayer } from '@/features/oyna/player-frame';
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
@@ -45,7 +46,7 @@ function ResultState({ points, maxPoints }: Pick<ResultSummary, 'points' | 'maxP
   return (
     <View
       className="mb-6 items-center gap-[5px] rounded-sheet px-[18px] pb-[26px] pt-6"
-      style={{ backgroundImage: 'radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.14), transparent 65%)', backgroundColor: '#20996d' }}
+      style={[gradient('result'), { backgroundColor: '#20996d' }]}
     >
       <View className="mb-2.5 h-[38px] w-[38px] items-center justify-center rounded-full bg-white/15">
         <Icon name="check" size={20} color={colors.white} />

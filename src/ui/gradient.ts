@@ -14,6 +14,14 @@ const gradients = {
   dockFade: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 60%)',
   login: 'radial-gradient(ellipse at 5% 0%, #fff0df 0, transparent 48%), radial-gradient(ellipse at 100% 100%, #e8f3ff 0, transparent 45%)',
   result: 'radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.14), transparent 65%)',
+  /** Blue flashcards. */
+  card: 'linear-gradient(140deg, #4a93ff, #1e75f4)',
+  /** White rising behind a floating action at the bottom of a list. */
+  fadeUp: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 25%)',
+  /** Rankings podium stands: first, second, third. */
+  gold: 'linear-gradient(110deg, #ffe9a3, #f5d475)',
+  silver: 'linear-gradient(110deg, #f0f4fc, #dce4f0)',
+  bronze: 'linear-gradient(110deg, #fbede3, #ecccb3)',
 } as const;
 
 export type GradientName = keyof typeof gradients;

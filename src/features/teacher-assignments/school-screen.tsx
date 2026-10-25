@@ -12,6 +12,7 @@ import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-sch
 import { useTabParam } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/feedback';
+import { gradient } from '@/ui/gradient';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { TabScreen } from '@/ui/tab-screen';
@@ -52,10 +53,7 @@ export function TeacherSchoolScreen() {
         <View
           pointerEvents="box-none"
           className="absolute inset-x-0 px-6 pb-2 pt-3"
-          style={{
-            bottom: Math.max(insets.bottom, 14) + 76,
-            backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 25%)',
-          } as object}
+          style={[gradient('fadeUp'), { bottom: Math.max(insets.bottom, 14) + 76 }]}
         >
           <Button
             icon="plus"

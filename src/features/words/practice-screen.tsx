@@ -15,6 +15,7 @@ import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { NotReady } from '@/ui/feedback';
 import { BackBar } from '@/ui/back-bar';
+import { gradient } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { ProgressBar } from '@/ui/progress-bar';
 import { Text } from '@/ui/text';
@@ -75,8 +76,8 @@ function Flashcards({ words }: { words: SavedWord[] }) {
             haptics.selection();
             setFlipped((f) => !f);
           }}
-          className="press h-[180px] items-center justify-center gap-3.5 rounded-[20px] bg-[linear-gradient(140deg,#4a93ff,#1e75f4)] px-[18px] py-6"
-          style={{ boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }}
+          className="press h-[180px] items-center justify-center gap-3.5 rounded-[20px] px-[18px] py-6"
+          style={[gradient('card'), { boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }]}
         >
           <Text className="font-body text-[11px] leading-[16px] text-subtle">
             {flipped ? t('words.meaning') : t('words.word')}

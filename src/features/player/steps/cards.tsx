@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useWordTextAudio } from '@/features/dictionary/word-audio';
 import { useContentText } from '@/lib/i18n';
+import { gradient } from '@/ui/gradient';
 import { Text } from '@/ui/text';
 
 import type { CardsStep, StepViewProps } from '../engine/types';
@@ -30,8 +31,8 @@ export function CardsView({ step }: StepViewProps<CardsStep>) {
         accessibilityState={{ selected: flipped }}
         accessibilityHint={t('player.flipCard')}
         onPress={() => setFlipped((v) => !v)}
-        className="h-[180px] items-center justify-center gap-[14px] overflow-hidden rounded-[20px] bg-[linear-gradient(140deg,#4a93ff,#1e75f4)] px-[18px] py-6 active:opacity-95"
-        style={{ boxShadow: '0 8px 20px rgba(30,117,244,0.1)' }}
+        className="h-[180px] items-center justify-center gap-[14px] overflow-hidden rounded-[20px] px-[18px] py-6 active:opacity-95"
+        style={[gradient('card'), { boxShadow: '0 8px 20px rgba(30,117,244,0.1)' }]}
       >
         <View
           pointerEvents="none"

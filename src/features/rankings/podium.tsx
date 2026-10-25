@@ -2,14 +2,14 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { RankRow } from '@/features/rankings/rank';
-import { cn } from '@/ui/cn';
+import { gradient, type GradientName } from '@/ui/gradient';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
-const STANDS = [
-  { height: 108, gradient: 'bg-[linear-gradient(110deg,#ffe9a3,#f5d475)]', color: '#6b4b0d' },
-  { height: 82, gradient: 'bg-[linear-gradient(110deg,#f0f4fc,#dce4f0)]', color: '#506580' },
-  { height: 62, gradient: 'bg-[linear-gradient(110deg,#fbede3,#ecccb3)]', color: '#805737' },
+const STANDS: { height: number; gradient: GradientName; color: string }[] = [
+  { height: 108, gradient: 'gold', color: '#6b4b0d' },
+  { height: 82, gradient: 'silver', color: '#506580' },
+  { height: 62, gradient: 'bronze', color: '#805737' },
 ];
 
 function Place({ row, place }: { row: RankRow; place: number }) {
@@ -33,11 +33,8 @@ function Place({ row, place }: { row: RankRow; place: number }) {
         <Text className="font-body-semibold text-[17px] leading-[23px]">{row.score}</Text>
       </View>
       <View
-        className={cn(
-          'w-full items-center justify-center rounded-b-[5px] rounded-t-[13px]',
-          stand.gradient,
-        )}
-        style={{ height: stand.height }}
+        className="w-full items-center justify-center rounded-b-[5px] rounded-t-[13px]"
+        style={[gradient(stand.gradient), { height: stand.height }]}
       >
         <Text
           className="font-body-semibold text-[33px] leading-[40px]"
