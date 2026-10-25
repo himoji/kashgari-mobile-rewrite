@@ -50,7 +50,8 @@ function ListenButton({ url }: { url: string }) {
       variant="soft"
       className="mt-4 self-start"
       icon={status.playing ? 'pause' : 'play'}
-      label={status.playing ? t('materials.pause') : t('materials.listen')}
+      label={status.error ? t('common.states.audioError') : status.playing ? t('materials.pause') : t('materials.listen')}
+      loading={status.playing && status.isBuffering}
       onPress={() => (status.playing ? player.pause() : player.play())}
     />
   );

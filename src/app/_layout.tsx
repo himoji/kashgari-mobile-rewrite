@@ -2,6 +2,7 @@ import '@/global.css';
 import '@/lib/i18n';
 
 import { ApolloProvider } from '@apollo/client/react';
+import { setAudioModeAsync } from 'expo-audio';
 import { useFonts } from 'expo-font';
 import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,6 +18,8 @@ import { fonts } from '@/theme/fonts';
 import { ErrorState } from '@/ui/feedback';
 
 void SplashScreen.preventAutoHideAsync();
+// Listening tasks and word pronunciation must play with the iOS ringer switch off.
+setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
 
 export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
   return (

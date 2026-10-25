@@ -1,7 +1,7 @@
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useContentText } from '@/lib/i18n';
@@ -90,11 +90,19 @@ function AudioCard({ url, title }: { url: string; title: string }) {
           onPress={toggle}
           className="h-11 w-11 items-center justify-center rounded-control bg-primary-strong sheen active:opacity-90"
         >
-          <Icon name={status.playing ? 'pause' : 'play'} size={18} color={colors.white} />
+          {status.playing && status.isBuffering ? (
+            <ActivityIndicator size="small" color={colors.white} />
+          ) : (
+            <Icon name={status.playing ? 'pause' : 'play'} size={18} color={colors.white} />
+          )}
         </Pressable>
         <View className="flex-1">
           <Text variant="strong" numberOfLines={1}>{content(title)}</Text>
-          <Text variant="caption">{t('player.labels.listening')}</Text>
+          {status.error ? (
+            <Text variant="caption" className="text-late">{t('common.states.audioError')}</Text>
+          ) : (
+            <Text variant="caption">{t('player.labels.listening')}</Text>
+          )}
         </View>
         <Text className="font-body-medium text-[12px] text-hint">
           {clock(status.currentTime)}
