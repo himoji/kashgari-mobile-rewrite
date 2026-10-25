@@ -14,6 +14,7 @@ export const LEAGUE_STUDENT = gql(`
   }
 `);
 
+// Text only: the page count needs the words, and `image` is an inline base64 picture (10 MB for the kk list).
 export const LEAGUE_BOOKS = gql(`
   query LeagueBooks($complexity: Int!) {
     oqylymTextsByComplexity(complexity: $complexity) {
@@ -21,7 +22,6 @@ export const LEAGUE_BOOKS = gql(`
       title
       paragraphs {
         text
-        image
       }
     }
   }

@@ -1,4 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
+import { useDeferredValue } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +9,7 @@ import { ReviewSegment } from '@/features/review/review-segment';
 import { AssignmentsSegment } from '@/features/teacher-assignments/assignments-segment';
 import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
+import { useTabParam } from '@/lib/navigation';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
@@ -21,8 +23,9 @@ const SEGMENTS: Segment[] = ['assignments', 'classes', 'review'];
 export function TeacherSchoolScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ tab?: string }>();
-  const segment: Segment = SEGMENTS.includes(params.tab as Segment) ? (params.tab as Segment) : 'assignments';
+  const [segment, setSegment] = useTabParam(SEGMENTS, 'assignments');
+  // The pill moves on the tap; the section renders right after, without holding the tap up.
+  const shown = useDeferredValue(segment);
   const { refreshing, refresh } = useRefresh(TEACHER_SCHOOL);
 
   return (
@@ -37,15 +40,15 @@ export function TeacherSchoolScreen() {
           <SegmentedTabs
             variant="section"
             value={segment}
-            onChange={(tab) => router.setParams({ tab })}
+            onChange={setSegment}
             options={SEGMENTS.map((value) => ({ value, label: t(`classes.tabs.${value}`) }))}
           />
           <QueryBoundary fallback={<SchoolSkeleton />}>
-            <School segment={segment} />
+            <School segment={shown} />
           </QueryBoundary>
         </View>
       </TabScreen>
-      {segment === 'assignments' ? (
+      {shown === 'assignments' ? (
         <View
           pointerEvents="box-none"
           className="absolute inset-x-0 px-6 pb-2 pt-3"

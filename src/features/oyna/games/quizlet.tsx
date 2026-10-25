@@ -18,6 +18,7 @@ import { evictSubmission } from '@/lib/cache';
 import { haptics } from '@/lib/haptics';
 import type { OynaQuizletGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
+import { usePrefetchImages } from '@/lib/images';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { showToast } from '@/ui/toast';
 
@@ -112,6 +113,7 @@ function QuizletRun({ game, studentId }: { game: Game; studentId: string }) {
   // matched words are kept per API board index; empty boards are skipped when playing
   const all = cleanBoards(game.boards);
   const boards = all.map((cards, at) => ({ cards, at })).filter((b) => b.cards.length > 0);
+  usePrefetchImages(all.flat().map((c) => c.imageUrl));
   const [index, setIndex] = useState(0);
   const [matched, setMatched] = useState<string[][]>(() => all.map(() => []));
   const [confirm, setConfirm] = useState(false);

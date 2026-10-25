@@ -45,7 +45,7 @@ type Documents = {
     "\n  query WordAudio($word: String!) {\n    word(wordCyrillic: $word) {\n      id\n      url\n    }\n  }\n": typeof types.WordAudioDocument,
     "\n  mutation DictionaryRequestDefinition($word: String!) {\n    requestDefinition(word: $word)\n  }\n": typeof types.DictionaryRequestDefinitionDocument,
     "\n  query LeagueStudent($studentId: ID!) {\n    student(id: $studentId) {\n      id\n      acorns\n      account {\n        id\n        languageLevel\n      }\n    }\n  }\n": typeof types.LeagueStudentDocument,
-    "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n        image\n      }\n    }\n  }\n": typeof types.LeagueBooksDocument,
+    "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n      }\n    }\n  }\n": typeof types.LeagueBooksDocument,
     "\n  query MaterialsContext($teacherId: ID!) {\n    teacher(id: $teacherId) {\n      id\n      classes {\n        id\n        grade\n      }\n    }\n    allGrades {\n      grade\n      name\n    }\n  }\n": typeof types.MaterialsContextDocument,
     "\n  query MaterialsGrade($grade: Int!, $teacherId: ID!) {\n    grade(grade: $grade) {\n      grade\n      sections {\n        section\n        name {\n          kazakh\n          russian\n          english\n        }\n        oqylymTexts(teacherId: $teacherId) {\n          id\n          title\n          complexity\n          thumbnail(size: W256, url: true)\n        }\n        tyndalymTexts(teacherId: $teacherId) {\n          id\n          title\n          complexity\n          thumbnail(size: W256, url: true)\n        }\n      }\n    }\n  }\n": typeof types.MaterialsGradeDocument,
     "\n  query MaterialsGrammar {\n    allDurysTitles {\n      id\n      title\n    }\n  }\n": typeof types.MaterialsGrammarDocument,
@@ -142,7 +142,7 @@ const documents: Documents = {
     "\n  query WordAudio($word: String!) {\n    word(wordCyrillic: $word) {\n      id\n      url\n    }\n  }\n": types.WordAudioDocument,
     "\n  mutation DictionaryRequestDefinition($word: String!) {\n    requestDefinition(word: $word)\n  }\n": types.DictionaryRequestDefinitionDocument,
     "\n  query LeagueStudent($studentId: ID!) {\n    student(id: $studentId) {\n      id\n      acorns\n      account {\n        id\n        languageLevel\n      }\n    }\n  }\n": types.LeagueStudentDocument,
-    "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n        image\n      }\n    }\n  }\n": types.LeagueBooksDocument,
+    "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n      }\n    }\n  }\n": types.LeagueBooksDocument,
     "\n  query MaterialsContext($teacherId: ID!) {\n    teacher(id: $teacherId) {\n      id\n      classes {\n        id\n        grade\n      }\n    }\n    allGrades {\n      grade\n      name\n    }\n  }\n": types.MaterialsContextDocument,
     "\n  query MaterialsGrade($grade: Int!, $teacherId: ID!) {\n    grade(grade: $grade) {\n      grade\n      sections {\n        section\n        name {\n          kazakh\n          russian\n          english\n        }\n        oqylymTexts(teacherId: $teacherId) {\n          id\n          title\n          complexity\n          thumbnail(size: W256, url: true)\n        }\n        tyndalymTexts(teacherId: $teacherId) {\n          id\n          title\n          complexity\n          thumbnail(size: W256, url: true)\n        }\n      }\n    }\n  }\n": types.MaterialsGradeDocument,
     "\n  query MaterialsGrammar {\n    allDurysTitles {\n      id\n      title\n    }\n  }\n": types.MaterialsGrammarDocument,
@@ -349,7 +349,7 @@ export function gql(source: "\n  query LeagueStudent($studentId: ID!) {\n    stu
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n        image\n      }\n    }\n  }\n"): (typeof documents)["\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n        image\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n      }\n    }\n  }\n"): (typeof documents)["\n  query LeagueBooks($complexity: Int!) {\n    oqylymTextsByComplexity(complexity: $complexity) {\n      id\n      title\n      paragraphs {\n        text\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

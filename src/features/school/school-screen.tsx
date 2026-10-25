@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useDeferredValue, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +8,7 @@ import { classRows, teacherRows } from '@/features/school/school-data';
 import { ClassTable, TeacherCard } from '@/features/school/school-parts';
 import { SCHOOL_PRINCIPAL } from '@/features/school/gql';
 import { useSchool } from '@/features/school/use-school';
+import { useTabParam } from '@/lib/navigation';
 import { cn } from '@/ui/cn';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
@@ -42,8 +43,9 @@ function SchoolSkeleton() {
 
 function School() {
   const { t } = useTranslation();
-  const params = useLocalSearchParams<{ tab?: string }>();
-  const segment: Segment = SEGMENTS.includes(params.tab as Segment) ? (params.tab as Segment) : 'teachers';
+  const [segment, setSegment] = useTabParam(SEGMENTS, 'teachers');
+  // The pill moves on the tap; the section renders right after, without holding the tap up.
+  const shown = useDeferredValue(segment);
   const { school } = useSchool();
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -63,11 +65,11 @@ function School() {
       <SegmentedTabs
         variant="section"
         value={segment}
-        onChange={(tab) => router.setParams({ tab })}
+        onChange={setSegment}
         options={SEGMENTS.map((value) => ({ value, label: t(`principal.${value}`) }))}
       />
-      <SegmentPanel id={segment}>
-        {segment === 'teachers' ? (
+      <SegmentPanel id={shown}>
+        {shown === 'teachers' ? (
           <View className="gap-3">
             {teacherRows(school).map((row) => (
               <TeacherCard key={row.id} {...row} onOpen={() => router.push({ pathname: '/principal/teacher/[id]', params: { id: row.id } })} />

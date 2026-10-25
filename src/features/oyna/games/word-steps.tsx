@@ -84,6 +84,8 @@ export function CardsStep({ words }: { words: GameWord[] }) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const card = words[index]!;
+  // Room for a picture on every card once any has one, so the controls don't jump between cards.
+  const pictures = words.some((w) => w.imageUrl);
   const go = (i: number) => {
     setIndex(i);
     setFlipped(false);
@@ -99,11 +101,12 @@ export function CardsStep({ words }: { words: GameWord[] }) {
           haptics.selection();
           setFlipped((f) => !f);
         }}
-        className="press min-h-[180px] items-center justify-center gap-3.5 rounded-[20px] px-[18px] py-6 active:opacity-95"
+        className={cn('press items-center justify-center gap-3.5 rounded-[20px] px-[18px] py-6 active:opacity-95', pictures ? 'min-h-[260px]' : 'min-h-[180px]')}
         style={{ backgroundImage: 'linear-gradient(140deg, #4a93ff, #1e75f4)', boxShadow: '0 8px 20px rgba(30, 117, 244, 0.1)' }}
       >
-        {flipped && card.imageUrl ? (
-          <Image source={{ uri: card.imageUrl }} style={{ width: 72, height: 72, borderRadius: 14 }} contentFit="cover" />
+        {/* On both sides, as in the old app: the picture is a hint for the word, not part of the answer. */}
+        {card.imageUrl ? (
+          <Image source={{ uri: card.imageUrl }} recyclingKey={card.imageUrl} transition={120} style={{ width: 112, height: 112, borderRadius: 16 }} contentFit="cover" />
         ) : null}
         <Text className="text-center font-body-semibold text-[28px] leading-[36px] text-white">{ct(card.word)}</Text>
         <Text className="text-center font-body text-[13px] leading-[20px] text-white/85">

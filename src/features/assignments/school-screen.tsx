@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -59,14 +59,16 @@ export function SchoolScreen() {
 function School({ segment, onSegment }: { segment: Segment; onSegment: (s: Segment) => void }) {
   const { t } = useTranslation();
   const { fresh, completed } = useStudentAssignments();
-  const list = segment === 'new' ? fresh : completed;
+  // The pill moves on the tap; the other list renders right after, without holding the tap up.
+  const shown = useDeferredValue(segment);
+  const list = shown === 'new' ? fresh : completed;
 
   return (
     <>
       <Segments value={segment} onChange={onSegment} counts={{ new: fresh.length, completed: completed.length }} />
       {list.length === 0 ? (
-        <SegmentPanel id={segment}>
-          {segment === 'new' ? (
+        <SegmentPanel id={shown}>
+          {shown === 'new' ? (
             <EmptyState illustration="classroom" title={t('assignments.empty.new')} body={t('assignments.empty.newBody')} />
           ) : (
             <EmptyState illustration="progress" title={t('assignments.empty.completed')} />

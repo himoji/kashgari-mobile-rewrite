@@ -1,6 +1,6 @@
-import { router, useNavigation, type Href } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation, type Href } from 'expo-router';
 import { usePreventRemove, type NavigationAction } from 'expo-router/react-navigation';
-import { useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 
 /** Goes back, or to `fallback` when the screen was opened directly (a link or a reload). */
 export function goBack(fallback: Href = '/') {
@@ -41,4 +41,26 @@ export function useLeaveGuard(dirty: boolean) {
       released.current = on;
     },
   };
+}
+
+/**
+ * A page section kept in `?tab=` (links open a given section). The switch answers from state at once;
+ * the URL follows in a transition, since a params update re-renders the whole route.
+ */
+export function useTabParam<T extends string>(tabs: readonly T[], fallback: T) {
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const fromUrl = tabs.includes(tab as T) ? (tab as T) : fallback;
+  const [value, setValue] = useState(fromUrl);
+  const [seen, setSeen] = useState(fromUrl);
+  // A link to another section.
+  if (fromUrl !== seen) {
+    setSeen(fromUrl);
+    setValue(fromUrl);
+  }
+  const change = (next: T) => {
+    setValue(next);
+    setSeen(next);
+    startTransition(() => router.setParams({ tab: next }));
+  };
+  return [value, change] as const;
 }

@@ -14,6 +14,7 @@ import { useSessionClock } from '@/features/oyna/use-session-clock';
 import { evictSubmission } from '@/lib/cache';
 import type { OynaWordGameQuery } from '@/graphql/graphql';
 import { haptics } from '@/lib/haptics';
+import { usePrefetchImages } from '@/lib/images';
 import { useContentText } from '@/lib/i18n';
 import { pageIn } from '@/lib/motion';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
@@ -88,6 +89,7 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
   const topic = game.topicName ?? '';
   const matchPairs = game.drill.match ?? [];
   const mcqQuestions = game.drill.mcq ?? [];
+  usePrefetchImages([...words.map((w) => w.imageUrl), ...mcqQuestions.flatMap((q) => q.options.map((o) => o.imageUrl))]);
 
   const markDone = (s: WordStep) => setDone((d) => new Set(d).add(s));
   const matchComplete = matchPairs.length > 0 && match.matched.length === new Set(matchPairs.map((p) => p.word)).size;
