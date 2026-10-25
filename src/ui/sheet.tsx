@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Backdrop } from '@/ui/backdrop';
 import { Text } from '@/ui/text';
@@ -10,11 +11,12 @@ type Props = { title: string; description?: string; onClose?: () => void; childr
 
 /** Bottom sheet from the design (rounded top, handle, display title). Render it inside a transparent modal route. */
 export function Sheet({ title, description, onClose, children }: Props) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   useEscape(onClose);
   return (
     <View className="flex-1 justify-end">
-      <Backdrop color="#24263155" blur={3} label="close" onPress={onClose} />
+      <Backdrop color="#24263155" blur={3} label={t('common.actions.close')} onPress={onClose} />
       <View className="max-h-[85%] rounded-t-sheet bg-surface px-5 pt-3" style={{ paddingBottom: insets.bottom + 24 }}>
         <View className="mb-5 h-1 w-10 self-center rounded bg-[#dce1eb]" />
         <ScrollView bounces={false}>

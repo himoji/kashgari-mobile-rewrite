@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { useSession } from '@/features/auth/session';
 import { workNumbers, type ClassWork, type Work } from '@/features/classes/class-data';
 import { shortDate } from '@/features/classes/format';
 import { WorkCard } from '@/features/classes/work-card';
@@ -20,7 +19,6 @@ export const workHref = (w: Pick<Work, 'kind' | 'id'>): Href =>
 /** "Тапсырмалар" segment: search, class filter and every work with its completion. */
 export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {
   const { t } = useTranslation();
-  const language = useSession((s) => s.uiLanguage);
   const [query, setQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const classFilter = useSchoolFilters((s) => s.classFilter.assignments);
@@ -54,7 +52,7 @@ export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {
               key={w.key}
               name={w.name}
               className={w.className}
-              date={shortDate(w.date, language)}
+              date={shortDate(w.date, t)}
               status={w.status}
               done={n.done}
               total={n.total}

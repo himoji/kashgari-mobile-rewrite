@@ -1,17 +1,10 @@
-import type { UiLanguage } from '@/features/auth/session';
 import type { ClassLabelFragment } from '@/graphql/graphql';
 
-const MONTHS: Record<UiLanguage, string[]> = {
-  kk: ['қаң.', 'ақп.', 'нау.', 'сәу.', 'мам.', 'мау.', 'шіл.', 'там.', 'қыр.', 'қаз.', 'қар.', 'жел.'],
-  ru: ['янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июн.', 'июл.', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'],
-  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-};
-
-/** The design's short date: "4 қаз.", "4 окт.", "4 Oct". Takes unix seconds. */
-export function shortDate(seconds: number | null | undefined, language: UiLanguage): string {
+/** The design's short date: "4 қаз.", "4 окт.", "4 Oct". Takes unix seconds and `t` for the month names. */
+export function shortDate(seconds: number | null | undefined, t: (key: string) => string): string {
   if (!seconds) return '—';
   const d = new Date(seconds * 1000);
-  return `${d.getDate()} ${MONTHS[language][d.getMonth()]}`;
+  return `${d.getDate()} ${t(`assignments.months.${d.getMonth()}`)}`;
 }
 
 /** "28.09" labels under chart bars. */

@@ -5,7 +5,6 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { useSession } from '@/features/auth/session';
 import { StudentAvatar } from '@/features/classes/class-avatar';
 import { workNumbers, type Work } from '@/features/classes/class-data';
 import { shortDate } from '@/features/classes/format';
@@ -121,7 +120,6 @@ export function AssignmentDetailScreen() {
 function AssignmentDetail() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const language = useSession((s) => s.uiLanguage);
   const content = useContentText();
   const { kind, id } = useLocalSearchParams<{ kind: string; id: string }>();
   const school = useTeacherSchool();
@@ -187,7 +185,7 @@ function AssignmentDetail() {
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 38 }}>
         <View className="flex-row items-center justify-between gap-2.5">
           <Text className="font-body text-[11px] leading-[16.5px] text-[#96a4b8]">
-            {work.className} · {shortDate(work.date, language)}
+            {work.className} · {shortDate(work.date, t)}
           </Text>
           <StatusMark status={work.status === 'published' ? 'done' : 'pending'} label={t(`classes.status.${work.status}`)} size={16} />
         </View>
