@@ -39,6 +39,7 @@ import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon, type IconName } from '@/ui/icon';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { StatusMark } from '@/ui/status-mark';
+import { showToast } from '@/ui/toast';
 import { Text } from '@/ui/text';
 
 function Disclosure({ label, count, defaultOpen = false, children }: { label: string; count?: number; defaultOpen?: boolean; children: ReactNode }) {
@@ -152,28 +153,32 @@ function AssignmentDetail() {
   const visible = work.status !== 'draft';
   const toggling = assignmentVisibility.loading || lessonVisibility.loading;
 
+  // The optimistic switch rolls back on failure; the toast says why it flipped back.
+  const visibilityFailed = () => showToast(t('teacherAssignments.visibilityFailed'), 'error');
   const toggleVisibility = () => {
     if (work.kind === 'lesson') {
       // updateLesson answers a Boolean, so the new value is written into the cached lesson by hand.
-      void setLessonVisible({
+      setLessonVisible({
         variables: { id: work.id, visible: !visible },
         optimisticResponse: { updateLesson: true },
         update: (cache, { data }) => {
           if (!data?.updateLesson) return;
           cache.modify({ id: cache.identify({ __typename: 'Lesson', id: work.id }), fields: { visible: () => !visible } });
         },
-      });
+      }).then(({ data }) => {
+        if (!data?.updateLesson) visibilityFailed();
+      }, visibilityFailed);
     } else {
-      void setAssignmentVisible({
+      setAssignmentVisible({
         variables: { id: work.id, visible: !visible },
         optimisticResponse: { updateAssignment: { __typename: work.typename as 'OqylymAssignment', id: work.id, visible: !visible } },
-      });
+      }).catch(visibilityFailed);
     }
   };
   const deleteWork = async () => {
     const result = await remove({ variables: { id: work.id } }).catch(() => null);
     setConfirmDelete(false);
-    if (!result?.data) return;
+    if (!result?.data) return showToast(t('teacherAssignments.deleteFailed'), 'error');
     goBack();
     evictEntity(client.cache, work.typename, work.id);
   };

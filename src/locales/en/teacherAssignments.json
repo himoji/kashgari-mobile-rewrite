@@ -23,5 +23,7 @@
   "flashcards": "Flashcards",
   "editName": "Name",
   "editDeadline": "New deadline",
-  "daysFromToday": "In {{count}} days"
+  "daysFromToday": "In {{count}} days",
+  "deleteFailed": "Couldn't delete the assignment. Try again.",
+  "visibilityFailed": "Couldn't change who sees the assignment. Try again."
 }

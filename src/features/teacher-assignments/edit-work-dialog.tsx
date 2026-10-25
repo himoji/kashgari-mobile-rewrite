@@ -28,8 +28,9 @@ export function EditWorkDialog({ work, visible, onClose }: { work: Work; visible
   const [save, { loading, error }] = useMutation(TEACHER_EDIT_ASSIGNMENT);
 
   const submit = async () => {
-    await save({ variables: { id: work.id, name: name.trim() || work.name, deadline: days ? deadlineIn(days) : work.date } });
-    onClose();
+    // A failure keeps the dialog open with the error line below.
+    const result = await save({ variables: { id: work.id, name: name.trim() || work.name, deadline: days ? deadlineIn(days) : work.date } }).catch(() => null);
+    if (result?.data) onClose();
   };
 
   return (

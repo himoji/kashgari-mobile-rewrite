@@ -23,5 +23,7 @@
   "flashcards": "Карточки слов",
   "editName": "Название",
   "editDeadline": "Новый срок",
-  "daysFromToday": "Через {{count}} дн."
+  "daysFromToday": "Через {{count}} дн.",
+  "deleteFailed": "Не удалось удалить задание. Попробуйте ещё раз.",
+  "visibilityFailed": "Не удалось изменить видимость задания. Попробуйте ещё раз."
 }

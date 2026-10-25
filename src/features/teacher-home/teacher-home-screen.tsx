@@ -11,6 +11,7 @@ import { colors } from '@/theme/colors';
 import { Icon } from '@/ui/icon';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
+import { showToast } from '@/ui/toast';
 
 const art = {
   assign: require('@/assets/images/actions/assign.webp'),
@@ -47,7 +48,7 @@ export function TeacherHomeScreen() {
     <TabScreen
       title={t('teacherHome.greeting', { name: firstName(data?.teacher?.name ?? profile.name) })}
       refreshing={networkStatus === 4}
-      onRefresh={() => void refetch()}
+      onRefresh={() => void refetch().catch(() => showToast(t('common.refreshFailed'), 'error'))}
     >
       <ActionCard image="assign" title={t('teacherHome.assign')} href="/teacher/assign/new" />
       <ActionCard
