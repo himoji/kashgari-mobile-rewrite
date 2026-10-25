@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
+import { dialogIn } from '@/lib/motion';
 import { colors } from '@/theme/colors';
 import { Backdrop } from '@/ui/backdrop';
 import { cn } from '@/ui/cn';
@@ -23,22 +25,24 @@ export function DialogCard({
   return (
     <View className="flex-1 items-center justify-center px-10">
       <Backdrop color="#30415a38" blur={8} label={t('common.actions.close')} onPress={onClose} />
-      <View
-        accessibilityViewIsModal
-        className={cn('w-full max-w-[310px] rounded-sheet bg-surface px-5 pb-5 pt-12', className)}
-        style={{ boxShadow: '0 18px 65px rgba(34, 50, 72, 0.19)' }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('common.actions.close')}
-          onPress={onClose}
-          hitSlop={6}
-          className="absolute right-2.5 top-2.5 h-8 w-8 items-center justify-center rounded-tile bg-[#f3f6fb] active:opacity-80"
+      <Animated.View entering={dialogIn} style={{ width: '100%', maxWidth: 310 }}>
+        <View
+          accessibilityViewIsModal
+          className={cn('w-full rounded-sheet bg-surface px-5 pb-5 pt-12', className)}
+          style={{ boxShadow: '0 18px 65px rgba(34, 50, 72, 0.19)' }}
         >
-          <Icon name="close" size={16} color={colors.subtle} />
-        </Pressable>
-        {children}
-      </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.actions.close')}
+            onPress={onClose}
+            hitSlop={6}
+            className="press absolute right-2.5 top-2.5 h-8 w-8 items-center justify-center rounded-tile bg-[#f3f6fb] active:opacity-80"
+          >
+            <Icon name="close" size={16} color={colors.subtle} />
+          </Pressable>
+          {children}
+        </View>
+      </Animated.View>
     </View>
   );
 }

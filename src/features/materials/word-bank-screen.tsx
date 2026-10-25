@@ -23,7 +23,7 @@ function WordRow({ word, onEdit }: { word: string; onEdit: () => void }) {
   const meaning = [def?.translationRussian, def?.translationEnglish].filter(Boolean).join(' · ');
   return (
     <View className="flex-row items-center justify-between gap-3 py-3">
-      <Pressable accessibilityRole="button" className="flex-1" onPress={() => router.push({ pathname: '/word', params: { word } })}>
+      <Pressable accessibilityRole="button" className="press flex-1" onPress={() => router.push({ pathname: '/word', params: { word } })}>
         <Text className="font-body-bold text-[16px] leading-[24px]">{content(word)}</Text>
         <Text className="font-body text-[15px] leading-[23.25px] text-meta">{meaning || ' '}</Text>
       </Pressable>
@@ -40,7 +40,7 @@ export function WordBankScreen() {
   return (
     <>
       <Stack.Screen options={{ presentation: 'transparentModal', animation: 'fade' }} />
-      <Sheet title={t('materials.wordBank')} onClose={() => goBack()}>
+      <Sheet title={t('materials.wordBank')} tall onClose={() => goBack()}>
         <QueryBoundary
           fallback={
             <View className="gap-3">
@@ -82,7 +82,7 @@ function WordBank({ onEdit }: { onEdit: () => void }) {
               accessibilityRole="tab"
               accessibilityState={{ selected: i === topic }}
               onPress={() => setTopic(i)}
-              className={cn('h-9 justify-center rounded-tile px-3', i === topic ? 'bg-primary-strong' : 'bg-track')}
+              className={cn('press h-9 justify-center rounded-tile px-3', i === topic ? 'bg-primary-strong' : 'bg-track')}
             >
               <Text className={cn('font-body-semibold text-[12px]', i === topic ? 'text-white' : 'text-link')}>{content(tp.name)}</Text>
             </Pressable>
