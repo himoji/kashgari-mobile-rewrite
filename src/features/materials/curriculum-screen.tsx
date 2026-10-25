@@ -83,7 +83,7 @@ export function CurriculumScreen() {
   const { refreshing, refresh } = useRefresh(MATERIALS_CONTEXT, MATERIALS_GRADE);
 
   return (
-    <TabScreen title={t('materials.title')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
+    <TabScreen title={t('materials.title')} refreshing={refreshing} onRefresh={refresh}>
       <QueryBoundary
         fallback={
           <CurriculumLayout grade={null} onDialog={setDialog}>

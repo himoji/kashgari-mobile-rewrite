@@ -14,8 +14,10 @@ import { mapAssignments, sortCompleted, sortNew } from './map';
 export function useStudentAssignments() {
   const { profileId } = useProfile();
   const queryKey = useRetryKey();
-  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId }, queryKey });
-  const cls = data.student?.class;
+  // errorPolicy 'all': one broken field (the API can throw on a lesson submission's createdAt)
+  // must not blank the whole list; that field comes back null instead.
+  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId }, queryKey, errorPolicy: 'all' });
+  const cls = data?.student?.class;
   return useMemo(() => {
     const all = mapAssignments(cls);
     return { all, fresh: sortNew(all), completed: sortCompleted(all) };

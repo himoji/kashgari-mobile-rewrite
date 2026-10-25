@@ -102,7 +102,6 @@ export function LibraryScreen() {
   return (
     <TabScreen
       title={t('materials.title')}
-      mascot="learning"
       actions={<IconButton tone="glass" icon="back" label={t('common.actions.back')} onPress={() => router.back()} />}
     >
       <View className="flex-row gap-2">

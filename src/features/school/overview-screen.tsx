@@ -18,6 +18,9 @@ import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
+/** Home shows the first few teachers and classes; the School tab has the full lists. */
+const PREVIEW = 3;
+
 /** Principal home: school and period pickers, KPI tiles, module usage, teacher activity, teachers and classes. */
 export function PrincipalOverviewScreen() {
   const { t } = useTranslation();
@@ -124,15 +127,15 @@ function Overview() {
       <View className="mt-[18px]">
         <SectionHead title={t('principal.teachers')} onViewAll={() => router.navigate({ pathname: '/principal/school', params: { tab: 'teachers' } })} />
         <View className="gap-3">
-          {teacherRows(school).map((row) => (
+          {teacherRows(school).slice(0, PREVIEW).map((row) => (
             <TeacherCard key={row.id} {...row} onOpen={() => openTeacher(row.id)} />
           ))}
         </View>
       </View>
 
       <View className="mt-[18px]">
-        <SectionHead title={t('principal.classes')} />
-        <ClassTable schoolName={school.name} classes={classRows(school)} onOpen={openClass} />
+        <SectionHead title={t('principal.classes')} onViewAll={() => router.navigate({ pathname: '/principal/school', params: { tab: 'classes' } })} />
+        <ClassTable schoolName={school.name} classes={classRows(school).slice(0, PREVIEW)} onOpen={openClass} />
       </View>
     </View>
   );

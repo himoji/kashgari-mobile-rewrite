@@ -45,7 +45,7 @@ function ProgressCard({ done, total }: { done: number; total: number }) {
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push('/student/results')}
-          className="self-start rounded-[11px] bg-white px-[14px] py-2 active:opacity-90"
+          className="min-h-[37px] self-start justify-center rounded-[11px] bg-white px-[14px] py-2 active:opacity-90"
           style={{ boxShadow: 'inset 0 1px 3px rgba(109,160,230,0.44), 0 2px 5px rgba(22,88,180,0.07)' }}
         >
           <Text className="font-body-semibold text-[12px] leading-[18px] text-link">{t('studentHome.results')}</Text>

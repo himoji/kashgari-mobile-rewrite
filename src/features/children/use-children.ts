@@ -38,8 +38,8 @@ export function useChildName(childId: string): string | undefined {
  */
 export function useChildAssignments(studentId: string) {
   const queryKey = useRetryKey();
-  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId }, queryKey });
-  const cls = data.student?.class;
+  const { data } = useSuspenseQuery(STUDENT_ASSIGNMENTS, { variables: { studentId }, queryKey, errorPolicy: 'all' });
+  const cls = data?.student?.class;
   const all = useMemo(() => mapAssignments(cls), [cls]);
   return { all };
 }

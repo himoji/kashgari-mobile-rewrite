@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { ProgressLine } from '@/features/classes/progress-line';
@@ -89,19 +89,23 @@ export function Panel({ title, children }: { title: string; children: ReactNode 
 
 /** Bars like the prototype's chart: value on top, label below; the first bar can be orange. */
 export function Bars({ points, highlightFirst, scale }: { points: { label: string; value: number; text: string }[]; highlightFirst?: boolean; scale: number }) {
-  return (
-    <View className="mt-3 h-[190px] flex-row items-end justify-around gap-1.5 px-3 pt-3">
-      {points.map((p, i) => (
-        <View key={`${p.label}-${i}`} className="flex-1 items-center justify-end gap-1.5">
-          <Text className="font-body-medium text-[13px] leading-[19.5px]">{p.text}</Text>
-          <View
-            className={cn('w-11 rounded-b-[4px] rounded-t-[10px]', highlightFirst && i === 0 ? 'bg-attention' : 'bg-[#68c6a3]')}
-            style={{ height: Math.max(4, p.value * scale) }}
-          />
-          <Text className="font-body text-[12px] leading-[17.4px] text-body" numberOfLines={1}>{p.label}</Text>
-        </View>
-      ))}
+  // Up to five columns share the width as in the design; a school with more classes scrolls sideways.
+  const scroll = points.length > 5;
+  const columns = points.map((p, i) => (
+    <View key={`${p.label}-${i}`} className={cn('items-center justify-end gap-1.5', scroll ? 'w-[56px]' : 'flex-1')}>
+      <Text className="font-body-medium text-[13px] leading-[19.5px]">{p.text}</Text>
+      <View
+        className={cn('w-11 rounded-b-[4px] rounded-t-[10px]', highlightFirst && i === 0 ? 'bg-attention' : 'bg-[#68c6a3]')}
+        style={{ height: Math.max(4, p.value * scale) }}
+      />
+      <Text className="font-body text-[12px] leading-[17.4px] text-body" numberOfLines={1}>{p.label}</Text>
     </View>
+  ));
+  if (!scroll) return <View className="mt-3 h-[190px] flex-row items-end justify-around gap-1.5 px-3 pt-3">{columns}</View>;
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3" contentContainerClassName="h-[190px] items-end gap-1.5 px-3 pt-3">
+      {columns}
+    </ScrollView>
   );
 }
 

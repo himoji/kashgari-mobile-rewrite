@@ -50,18 +50,15 @@ function Place({ row, place }: { row: RankRow; place: number }) {
   );
 }
 
-/** Top three on stands: second, first, third. */
+/** Top three on stands: second, first, third. Empty places keep their slot so the stands keep their width. */
 export function Podium({ rows }: { rows: RankRow[] }) {
   const { t } = useTranslation();
-  const order = [1, 0, 2].filter((i) => rows[i]);
   return (
     <View
       accessibilityLabel={t('rankings.topThree')}
       className="mb-[22px] flex-row items-end gap-[5px] pt-5"
     >
-      {order.map((i) => (
-        <Place key={rows[i]!.id} row={rows[i]!} place={i} />
-      ))}
+      {[1, 0, 2].map((i) => (rows[i] ? <Place key={rows[i].id} row={rows[i]} place={i} /> : <View key={i} className="flex-1" />))}
     </View>
   );
 }

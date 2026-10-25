@@ -41,7 +41,7 @@ export function SegmentedTabs<T extends string>({ value, options, onChange, vari
               {o.label}
             </Text>
             {o.count != null ? (
-              <Text className={cn('ml-1 text-[11px] text-body', selected ? 'font-body-semibold' : 'font-body-medium')}>{o.count}</Text>
+              <Text className={cn('ml-[6px] text-[11px] text-body', selected ? 'font-body-semibold' : 'font-body-medium')}>{o.count}</Text>
             ) : null}
           </Pressable>
         );

@@ -39,8 +39,11 @@ export function ProfileScreen() {
     setSaved(true);
   };
 
+  // The design keeps the mascot and the orange save button for learners; staff screens are plain and blue.
+  const learner = profile.role === 'student' || profile.role === 'parent';
+
   return (
-    <TabScreen title={t('profile.title')} mascot="settings">
+    <TabScreen title={t('profile.title')} mascot={learner ? 'settings' : undefined}>
       <Card variant="panel">
         <View className="flex-row items-center gap-3">
           <Avatar name={profile.name} />
@@ -53,7 +56,7 @@ export function ProfileScreen() {
           items={[
             { label: t('profile.school'), value: profile.school },
             { label: t('profile.class'), value: profile.className },
-            { label: t('profile.phone'), value: profile.login },
+            { label: t(profile.login?.includes('@') ? 'profile.email' : 'profile.phone'), value: profile.login },
           ]}
         />
       </Card>
@@ -88,7 +91,7 @@ export function ProfileScreen() {
           />
         </Field>
         <Button
-          variant="attention"
+          variant={learner ? 'attention' : 'strong'}
           className="mt-1"
           icon={saved && !dirty ? 'check' : undefined}
           label={saved && !dirty ? t('profile.saved') : t('profile.saveChanges')}

@@ -1,6 +1,6 @@
 {
   "title": "Game",
-  "back": "Assignments",
+  "back": "School",
   "stepOf": "Step {{n}} / {{total}}",
   "kinds": {
     "wordgame": "Word game",

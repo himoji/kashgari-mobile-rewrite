@@ -9,7 +9,7 @@ const card = cva('', {
     variant: {
       panel: 'rounded-card bg-surface p-[14px] shadow-panel',
       item: 'rounded-[16.5px] bg-surface p-[13px] shadow-item',
-      action: 'rounded-card bg-surface px-[14px] py-[17px] shadow-card',
+      action: 'min-h-[88px] justify-center rounded-card bg-surface px-[14px] py-[17px] shadow-card',
       blue: 'rounded-[20px] bg-primary sheen px-[15px] py-[17px] shadow-blue',
       muted: 'rounded-card bg-canvas p-[14px]',
     },

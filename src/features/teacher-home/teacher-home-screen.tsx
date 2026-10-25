@@ -46,7 +46,6 @@ export function TeacherHomeScreen() {
   return (
     <TabScreen
       title={t('teacherHome.greeting', { name: firstName(data?.teacher?.name ?? profile.name) })}
-      mascot="home"
       refreshing={networkStatus === 4}
       onRefresh={() => void refetch()}
     >

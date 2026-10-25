@@ -119,7 +119,8 @@ export function mapAssignments(cls: ClassData | undefined, now = Date.now() / 10
         game: oynaGame[g.__typename],
         title: g.name,
         minutes: minutesOf(g.duration),
-        state: sub ? 'done' : 'notStarted',
+        // Mini stories are graded by the teacher: no points yet means the answer waits for review.
+        state: sub ? (sub.points == null ? 'waiting' : 'done') : 'notStarted',
         score: sub?.points != null ? pct(sub.points, g.maxPoints) : undefined,
         submittedAt: sub?.createdAt,
         createdAt: g.createdAt,
