@@ -6,18 +6,28 @@ import { JoinClass } from '@/features/auth/join-class';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { useActiveProfile, useSession, type Profile } from '@/features/auth/session';
 import { goBack } from '@/lib/navigation';
+import { colors } from '@/theme/colors';
 import { Avatar } from '@/ui/avatar';
+import { cn } from '@/ui/cn';
+import { Icon } from '@/ui/icon';
 import { Sheet } from '@/ui/sheet';
 import { Text } from '@/ui/text';
 
-/** `showLanguage`: the login owns accounts in several learning languages, so each row names its own. */
-function AccountOption({ profile, showLanguage, onPress }: { profile: Profile; showLanguage: boolean; onPress: () => void }) {
+/**
+ * `showLanguage`: the login owns accounts in several learning languages, so each row names its own.
+ * `active`: the profile in use (when switching), highlighted with a check.
+ */
+function AccountOption({ profile, showLanguage, active, onPress }: { profile: Profile; showLanguage: boolean; active: boolean; onPress: () => void }) {
   const { t } = useTranslation();
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       onPress={onPress}
-      className="min-h-[76px] flex-row items-center gap-3 rounded-[14px] border border-[#e7edf5] bg-surface p-3 active:bg-canvas"
+      className={cn(
+        'min-h-[76px] flex-row items-center gap-3 rounded-[14px] border p-3 active:bg-canvas',
+        active ? 'border-primary bg-primary-soft' : 'border-[#e7edf5] bg-surface',
+      )}
     >
       <Avatar name={profile.name} size={38} square />
       <View className="flex-1">
@@ -26,7 +36,7 @@ function AccountOption({ profile, showLanguage, onPress }: { profile: Profile; s
           {[showLanguage && t(`auth.learning.${profile.language}`), t(`common.roles.${profile.role}`), profile.className, profile.school].filter(Boolean).join(' · ')}
         </Text>
       </View>
-      <Text className="font-body text-[24px] text-link">›</Text>
+      {active ? <Icon name="check" size={20} color={colors.primary} /> : <Text className="font-body text-[24px] text-link">›</Text>}
     </Pressable>
   );
 }
@@ -35,6 +45,7 @@ function AccountOption({ profile, showLanguage, onPress }: { profile: Profile; s
 export function AccountsScreen() {
   const { t } = useTranslation();
   const profiles = useSession((s) => s.profiles);
+  const activeKey = useSession((s) => s.activeKey);
   const setActive = useSession((s) => s.setActive);
   const signOut = useSession((s) => s.signOut);
   const switching = !!useActiveProfile();
@@ -53,7 +64,7 @@ export function AccountsScreen() {
     >
       <View className="gap-2.5">
         {profiles.map((p) => (
-          <AccountOption key={p.key} profile={p} showLanguage={manyLanguages} onPress={() => choose(p.key)} />
+          <AccountOption key={p.key} profile={p} showLanguage={manyLanguages} active={p.key === activeKey} onPress={() => choose(p.key)} />
         ))}
       </View>
       <Pressable onPress={signOut} className="press mt-2 min-h-11 justify-center">
