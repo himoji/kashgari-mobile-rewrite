@@ -10,6 +10,8 @@ const gradients = {
   sheen: 'linear-gradient(112deg, transparent 8%, rgba(255, 255, 255, 0.19) 29%, rgba(255, 255, 255, 0.04) 49%, transparent 67%)',
   /** Orange workspace behind every tab: fades to white under the hero. */
   workspace: 'linear-gradient(180deg, #ff8d22 0px, #ffbf83 130px, #ffffff 284px)',
+  /** Behind a tab's scroll content: orange where a pull-to-refresh opens the top, white where the bottom bounces. */
+  overscroll: 'linear-gradient(180deg, #ff8d22 50%, #ffffff 50%)',
   dock: 'linear-gradient(107deg, rgba(255, 255, 255, 0.85) 9.66%, rgba(198, 232, 255, 0.78) 154.53%)',
   dockFade: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 60%)',
   login: 'radial-gradient(ellipse at 5% 0%, #fff0df 0, transparent 48%), radial-gradient(ellipse at 100% 100%, #e8f3ff 0, transparent 45%)',
