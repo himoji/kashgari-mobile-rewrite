@@ -14,5 +14,7 @@
   "active": "Active",
   "inactive": "Inactive",
   "noClasses": "No classes",
-  "noTeachers": "No teachers yet"
+  "noTeachers": "No teachers yet",
+  "noSchool": "No school linked",
+  "noSchoolBody": "No school is linked to this principal profile yet. Contact your school administrator."
 }

@@ -10,7 +10,7 @@ import { SCHOOL_PRINCIPAL } from '@/features/school/gql';
 import { useSchool } from '@/features/school/use-school';
 import { SchoolTabs } from '@/features/teacher-assignments/school-tabs';
 import { cn } from '@/ui/cn';
-import { EmptyState, ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 
@@ -47,7 +47,7 @@ function School() {
   const { school } = useSchool();
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  if (!school) return <ErrorState />;
+  if (!school) return <EmptyState title={t('principal.noSchool')} body={t('principal.noSchoolBody')} illustration="classroom" />;
   return (
     <View>
       <View className={cn('mb-3', pickerOpen && 'z-30')}>
