@@ -13,6 +13,7 @@ import { cn } from '@/ui/cn';
 import { Dialog } from '@/ui/dialog';
 import { Skeleton } from '@/ui/feedback';
 import { Icon, type IconName } from '@/ui/icon';
+import { KeyboardFooter } from '@/ui/keyboard';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
@@ -122,37 +123,39 @@ export function ComposerButton({ kind, icon, label, onPress }: { kind: 'add' | '
   );
 }
 
-export function Footer({ stage, busy, onDraft, onBack, onNext }: { stage: Stage; busy: boolean; onDraft: () => void; onBack: () => void; onNext: () => void }) {
+export function Footer({ stage, busy, aboveDone, onDraft, onBack, onNext }: { stage: Stage; busy: boolean; aboveDone?: boolean; onDraft: () => void; onBack: () => void; onNext: () => void }) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   return (
-    <View
-      className="absolute inset-x-0 bottom-0 flex-row items-center gap-2 bg-white/95 px-5 pt-3"
-      style={{ paddingBottom: insets.bottom + 18, boxShadow: '0 -4px 16px rgba(36,38,49,0.016)' }}
-    >
-      <Pressable accessibilityRole="button" disabled={busy} onPress={onDraft} className="h-[46px] items-center justify-center rounded-control bg-[#f3f7ff] px-2.5 active:opacity-80">
-        <Text className="font-body-semibold text-[12px] leading-[18px] text-link">{t('assign.draft')}</Text>
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('assign.previous')}
-        disabled={busy}
-        onPress={onBack}
-        className="h-11 w-11 items-center justify-center rounded-tile bg-[#f5f8fc] active:opacity-80"
+    <KeyboardFooter aboveDone={aboveDone}>
+      <View
+        className="flex-row items-center gap-2 bg-white/95 px-5 pt-3"
+        style={{ paddingBottom: insets.bottom + 18, boxShadow: '0 -4px 16px rgba(36,38,49,0.016)' }}
       >
-        <Icon name="back" size={20} color={colors.ink} />
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        disabled={busy}
-        onPress={onNext}
-        className="h-[46px] flex-1 flex-row items-center justify-center gap-[7px] rounded-control bg-primary-strong active:bg-[#0667e7]"
-      >
-        {busy ? <ActivityIndicator color="#fff" /> : null}
-        <Text className="font-body-semibold text-[12px] leading-[18px] text-white">{stage === 3 ? t('assign.assign') : t('assign.next')}</Text>
-        <Icon name="arrow" size={16} color={colors.white} />
-      </Pressable>
-    </View>
+        <Pressable accessibilityRole="button" disabled={busy} onPress={onDraft} className="h-[46px] items-center justify-center rounded-control bg-[#f3f7ff] px-2.5 active:opacity-80">
+          <Text className="font-body-semibold text-[12px] leading-[18px] text-link">{t('assign.draft')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('assign.previous')}
+          disabled={busy}
+          onPress={onBack}
+          className="h-11 w-11 items-center justify-center rounded-tile bg-[#f5f8fc] active:opacity-80"
+        >
+          <Icon name="back" size={20} color={colors.ink} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          disabled={busy}
+          onPress={onNext}
+          className="h-[46px] flex-1 flex-row items-center justify-center gap-[7px] rounded-control bg-primary-strong active:bg-[#0667e7]"
+        >
+          {busy ? <ActivityIndicator color="#fff" /> : null}
+          <Text className="font-body-semibold text-[12px] leading-[18px] text-white">{stage === 3 ? t('assign.assign') : t('assign.next')}</Text>
+          <Icon name="arrow" size={16} color={colors.white} />
+        </Pressable>
+      </View>
+    </KeyboardFooter>
   );
 }
 

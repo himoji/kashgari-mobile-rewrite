@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client/react';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -46,13 +47,14 @@ import { className } from '@/features/classes/format';
 import { evictFields } from '@/lib/cache';
 import { useProfile } from '@/features/auth/session';
 import { kindFlags, parseMaterialParam } from '@/features/materials/material-ref';
-import { goBack } from '@/lib/navigation';
+import { goBack, useLeaveGuard } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
-import { ChoiceRow, Dialog } from '@/ui/dialog';
+import { ChoiceRow, ConfirmDialog, Dialog } from '@/ui/dialog';
 import { NotReady } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { NumberPadDone } from '@/ui/keyboard';
 import { SegmentedTabs } from '@/ui/segmented-tabs';
 import { Text } from '@/ui/text';
 
@@ -82,6 +84,8 @@ export function AssignScreen() {
   const [errors, setErrors] = useState<{ content?: ContentError; class?: boolean; duration?: boolean }>({});
   const [notice, setNotice] = useState<Notice>(null);
   const [done, setDone] = useState<'assigned' | 'draft' | null>(null);
+  const [removingText, setRemovingText] = useState(false);
+  const [durationFocused, setDurationFocused] = useState(false);
   const pendingDefaults = useRef(false);
   const label = (type: BlockType) => t(`assign.blocks.${type}`);
 
@@ -156,13 +160,17 @@ export function AssignScreen() {
     }
   };
 
+  // The text is what every exercise is generated from: removing it empties the assignment.
+  const removeText = () => {
+    setRemovingText(false);
+    setSource(null);
+    setBlocks([]);
+  };
   const removeBlock = (block: Block) => {
     setMenu(null);
-    // The text is what every exercise is generated from: removing it empties the assignment.
-    if (['reading', 'listening', 'grammar'].includes(block.type)) {
-      setSource(null);
-      setBlocks([]);
-    } else setBlocks((bs) => bs.filter((b) => b.key !== block.key));
+    if (!['reading', 'listening', 'grammar'].includes(block.type)) setBlocks((bs) => bs.filter((b) => b.key !== block.key));
+    else if (blocks.length > 1) setRemovingText(true);
+    else removeText();
   };
   const moveUp = (block: Block) => {
     setMenu(null);
@@ -240,6 +248,9 @@ export function AssignScreen() {
     setErrors({});
   };
 
+  // Started work is lost on leaving (back link, Android back, iOS swipe); a published one is not.
+  const guard = useLeaveGuard(!done && stage > 1 && (blocks.length > 0 || !!name.trim()));
+
   const formatDay = (iso: string) =>
     formatIsoDay(iso, t('assign.months', { returnObjects: true }) as string[], t('assign.weekdays', { returnObjects: true }) as string[], i18n.language === 'en');
   const chosenClass = classes.find((c) => c.id === classId);
@@ -247,9 +258,8 @@ export function AssignScreen() {
 
   return (
     <View className="flex-1 bg-surface">
-      <Stack.Screen options={{ gestureEnabled: stage === 1 }} />
       <BackBar label={t('assign.back')} />
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 120 }}>
+      <KeyboardAwareScrollView bottomOffset={100} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 120 }}>
         <Text className="font-body-semibold text-[23px] leading-[30px]">{t('assign.title')}</Text>
         <StageNav stage={stage} onGo={(s) => (setStage(s), setErrors({}))} />
 
@@ -352,6 +362,8 @@ export function AssignScreen() {
                           value={duration}
                           onChangeText={(v) => setDuration(v.replace(/\D/g, ''))}
                           keyboardType="number-pad"
+                          onFocus={() => setDurationFocused(true)}
+                          onBlur={() => setDurationFocused(false)}
                           maxLength={3}
                           accessibilityLabel={t('assign.duration')}
                           className="h-10 w-[90px] rounded-tile bg-[#f3f7fc] px-2.5 font-body text-[14px] text-ink"
@@ -381,17 +393,19 @@ export function AssignScreen() {
             {errorText ? <View className="mt-4"><ComposerError>{errorText}</ComposerError></View> : null}
           </>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {stage > 1 ? (
         <Footer
           stage={stage}
           busy={busy}
+          aboveDone={durationFocused}
           onDraft={() => void publish(false)}
           onBack={() => (setStage((s) => (s - 1) as Stage), setErrors({}))}
           onNext={goNext}
         />
       ) : null}
+      <NumberPadDone visible={durationFocused} />
 
       <AddDialog visible={dialog === 'add'} onClose={() => setDialog(null)} onMaterial={() => setDialog('material')} onType={addType} />
       <MaterialPicker visible={dialog === 'material'} grades={grades} onClose={() => setDialog(null)} onPick={(s) => applySource(s)} />
@@ -446,6 +460,28 @@ export function AssignScreen() {
         ) : null}
       </Dialog>
 
+      <ConfirmDialog
+        visible={removingText}
+        title={t('assign.removeTextTitle')}
+        body={t('assign.removeTextBody')}
+        confirmLabel={t('assign.remove')}
+        cancelLabel={t('assign.cancel')}
+        destructive
+        onConfirm={removeText}
+        onClose={() => setRemovingText(false)}
+      />
+
+      <ConfirmDialog
+        visible={guard.asking}
+        title={t('assign.leaveTitle')}
+        body={t('assign.leaveBody')}
+        confirmLabel={t('assign.leave')}
+        cancelLabel={t('assign.stay')}
+        destructive
+        onConfirm={guard.leave}
+        onClose={guard.stay}
+      />
+
       <Dialog visible={dialog === 'preview'} title={t('assign.previewAsStudent')} onClose={() => setDialog(null)}>
         <NotReady body={t('assign.previewBody')} />
         {source ? (
@@ -465,7 +501,7 @@ export function AssignScreen() {
       <Dialog visible={!!done} title={done === 'draft' ? t('assign.draftSaved') : t('assign.assigned')} onClose={() => goBack()}>
         {done === 'draft' ? <Text className="mb-4 font-body text-[13px] leading-[20px] text-muted">{t('assign.draftHint')}</Text> : null}
         <View className="gap-2">
-          <Button label={t('assign.toSchool')} onPress={() => (setDone(null), router.replace('/teacher/school'))} />
+          <Button label={t('assign.toSchool')} onPress={() => (guard.release(), setDone(null), router.replace('/teacher/school'))} />
           <Button variant="soft" label={t('assign.newOne')} onPress={reset} />
         </View>
       </Dialog>

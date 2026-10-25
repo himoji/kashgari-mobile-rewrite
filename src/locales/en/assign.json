@@ -111,5 +111,11 @@
     "Thursday",
     "Friday",
     "Saturday"
-  ]
+  ],
+  "leaveTitle": "Discard this assignment?",
+  "leaveBody": "What you've set up so far will be lost.",
+  "leave": "Discard",
+  "stay": "Keep editing",
+  "removeTextTitle": "Remove the text?",
+  "removeTextBody": "Every exercise is made from this text, so all sections will be removed too."
 }
