@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client/react';
 import { Image } from 'expo-image';
-import { Heart } from 'lucide-react-native';
 import { useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -453,7 +452,7 @@ export function CaptchaStep({
       <Hint>{t('oyna.captchaHint', { topic: ct(topic) })}</Hint>
       <View className="mb-4 flex-row items-center gap-1.5" accessibilityLabel={`${t('oyna.lives')}: ${state.lives}`}>
         {Array.from({ length: CAPTCHA_LIVES }, (_, i) => (
-          <Heart key={i} size={20} color={colors.attention} fill={i < state.lives ? colors.attention : 'transparent'} />
+          <Icon key={i} name={i < state.lives ? 'solid-heart' : 'heart'} size={20} color={colors.attention} />
         ))}
       </View>
       {state.finished ? (

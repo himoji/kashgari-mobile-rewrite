@@ -1,5 +1,4 @@
 import { useApolloClient, useMutation, useSuspenseQuery } from '@apollo/client/react';
-import { Delete } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +25,7 @@ import type { OynaWordleGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
+import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
@@ -108,7 +108,7 @@ function Keyboard({ rows, states, onKey, onDelete }: { rows: string[][]; states:
               onPress={onDelete}
               className="h-10 w-[52px] items-center justify-center rounded-lg bg-track active:opacity-70"
             >
-              <Delete size={20} color={colors.link} />
+              <Icon name="delete" size={20} color={colors.link} />
             </Pressable>
           ) : null}
         </View>

@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Heart } from 'lucide-react-native';
 import { useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +58,7 @@ function MaterialCard({ item, onSave }: { item: LibraryItem; onSave: () => void 
               onPress={onSave}
               className="-mr-1 -mt-2 h-11 w-11 items-center justify-center rounded-full bg-[#fafbfe] active:opacity-70"
             >
-              <Heart size={21} color={colors.subtle} strokeWidth={1.6} />
+              <Icon name="heart" size={21} color={colors.subtle} />
             </Pressable>
           </View>
           <Text className="mt-1.5 font-body-semibold text-[16px] leading-[21.6px]">{content(item.title)}</Text>
