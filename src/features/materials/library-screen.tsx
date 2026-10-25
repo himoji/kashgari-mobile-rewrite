@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@apollo/client/react';
+import { useBackgroundQuery, useReadQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
@@ -240,12 +240,14 @@ function LibraryList({ grade, filter, onClear, onSaved }: { grade: number; filte
   const { t, i18n } = useTranslation();
   const { profileId } = useProfile();
   const queryKey = useRetryKey();
-  const texts = useSuspenseQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
-  const grammar = useSuspenseQuery(MATERIALS_GRAMMAR, { queryKey });
+  // Both requests start before either is read, so the grade and the grammar list load in parallel.
+  const [gradeRef] = useBackgroundQuery(MATERIALS_GRADE, { variables: { grade, teacherId: profileId }, queryKey });
+  const [grammarRef] = useBackgroundQuery(MATERIALS_GRAMMAR, { queryKey });
+  const { data: texts } = useReadQuery(gradeRef);
+  const { data: grammar } = useReadQuery(grammarRef);
   const items = useMemo(
-    () =>
-      libraryItems(texts.data.grade, grammar.data.allDurysTitles, (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
-    [texts.data, grammar.data, i18n.language, t],
+    () => libraryItems(texts.grade, grammar.allDurysTitles, (s) => sectionName(s.name, s.section, i18n.language, t('materials.section'))),
+    [texts, grammar, i18n.language, t],
   );
   const list = filterLibrary(items, filter);
 
