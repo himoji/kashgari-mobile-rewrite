@@ -48,7 +48,7 @@ function ClueRow({ entry, active, filled, onPress }: { entry: CrosswordEntry; ac
       accessibilityState={{ selected: active, disabled: !onPress }}
       disabled={!onPress}
       onPress={onPress}
-      className={cn('min-h-[48px] flex-row items-center gap-[10px] rounded-[12px] px-[10px] py-[6px]', active ? 'bg-[#eef5ff]' : 'active:bg-canvas')}
+      className={cn('min-h-[48px] flex-row items-center gap-[10px] rounded-[12px] px-[10px] py-[6px]', active ? 'bg-[#eef5ff] active:bg-[#eef5ff]' : 'active:bg-canvas')}
     >
       <View className={cn('h-[26px] w-[26px] items-center justify-center rounded-[8px]', active ? 'bg-primary-strong' : 'bg-[#f1f5fb]')}>
         <Text className={cn('font-body-semibold text-[12px] leading-[20px]', active ? 'text-white' : 'text-[#8a95a7]')}>{entry.number}</Text>

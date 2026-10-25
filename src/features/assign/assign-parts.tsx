@@ -36,7 +36,7 @@ export function StageNav({ stage, onGo }: { stage: Stage; onGo: (s: Stage) => vo
             accessibilityState={{ selected: active, disabled: n > stage }}
             disabled={n >= stage}
             onPress={() => onGo(n)}
-            className="flex-1 items-center gap-[7px]"
+            className="press flex-1 items-center gap-[7px]"
           >
             <View
               className="h-[30px] w-[30px] items-center justify-center rounded-full"
@@ -174,7 +174,7 @@ export function AddDialog({ visible, onClose, onMaterial, onType }: { visible: b
               accessibilityRole="button"
               accessibilityState={{ expanded }}
               onPress={() => setOpen(expanded ? '' : g.key)}
-              className="h-[42px] flex-row items-center justify-between"
+              className="press h-[42px] flex-row items-center justify-between"
             >
               <Text className="font-body text-[11px] leading-[16.5px] text-[#99a8bd]">{t(`assign.groups.${g.key}`)}</Text>
               <View style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}>
@@ -227,7 +227,7 @@ export function MaterialPicker({ visible, grades, onClose, onPick }: { visible: 
               accessibilityRole="radio"
               accessibilityState={{ selected: g === grade }}
               onPress={() => setPicked(g)}
-              className={cn('h-9 justify-center rounded-tile px-3', g === grade ? 'bg-primary-strong' : 'bg-track')}
+              className={cn('press h-9 justify-center rounded-tile px-3', g === grade ? 'bg-primary-strong' : 'bg-track')}
             >
               <Text className={cn('font-body-semibold text-[12px]', g === grade ? 'text-white' : 'text-link')}>{t('materials.gradeLabel', { grade: g })}</Text>
             </Pressable>

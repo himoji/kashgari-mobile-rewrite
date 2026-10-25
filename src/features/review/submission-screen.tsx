@@ -58,7 +58,7 @@ function Disclosure({
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((o) => !o)}
-        className="h-11 flex-row items-center justify-between gap-3"
+        className="press h-11 flex-row items-center justify-between gap-3"
       >
         <Text
           className={
@@ -281,7 +281,7 @@ function Review({
             accessibilityRole="button"
             accessibilityLabel={t('review.student')}
             onPress={() => setPickerOpen(true)}
-            className="flex-1"
+            className="press flex-1"
           >
             <Text className="font-body-semibold text-[12px] leading-[18px]" numberOfLines={1}>
               {studentName}

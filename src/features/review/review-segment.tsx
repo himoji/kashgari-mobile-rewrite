@@ -65,7 +65,7 @@ export function ReviewSegment({ classes }: { classes: ClassWork[] }) {
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               onPress={() => setState(key)}
-              className="h-[38px] flex-row items-center gap-1.5"
+              className="press h-[38px] flex-row items-center gap-1.5"
               style={selected ? { boxShadow: `0 2px 0 ${colors.primary}` } : undefined}
             >
               <Text className={cn('font-body text-[12px] leading-[18px]', selected ? 'text-link' : 'text-subtle')}>{label}</Text>

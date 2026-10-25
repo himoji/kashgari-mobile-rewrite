@@ -48,7 +48,7 @@ function Disclosure({ label, count, defaultOpen = false, children }: { label: st
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((o) => !o)}
-        className="h-[52px] flex-row items-center gap-[9px]"
+        className="press h-[52px] flex-row items-center gap-[9px]"
       >
         <Text className="flex-1 font-body text-[13px] leading-[19.5px] text-[#7b8faa]">{label}</Text>
         {count != null ? <Text className="font-body text-[11px] leading-[16px] text-[#a3b2c8]">{count}</Text> : null}
@@ -206,7 +206,7 @@ function AssignmentDetail() {
             </Text>
             <Text className="flex-1 font-body text-[11px] leading-[16.5px] text-[#9aacbf]">{t('teacherAssignments.submitted')}</Text>
             {n.pending ? (
-              <Pressable accessibilityRole="button" onPress={openReview} className="flex-row items-center gap-[5px] py-[3px]">
+              <Pressable accessibilityRole="button" onPress={openReview} className="press flex-row items-center gap-[5px] py-[3px]">
                 <Text className="font-body text-[11px] leading-[16.5px] text-[#719bd5]">{t('teacherAssignments.toReview', { count: n.pending })}</Text>
                 <Icon name="arrow" size={14} color={colors.ink} />
               </Pressable>

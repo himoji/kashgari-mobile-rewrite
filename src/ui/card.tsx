@@ -25,5 +25,5 @@ export function Card({ variant, className, ...props }: ViewProps & CardVariant &
 
 /** A card that is one tap target (the design's "whole card is the action" rule). */
 export function PressableCard({ variant, className, ...props }: PressableProps & CardVariant & { className?: string }) {
-  return <Pressable accessibilityRole="button" className={cn(card({ variant }), 'active:opacity-80', className)} {...props} />;
+  return <Pressable accessibilityRole="button" className={cn(card({ variant }), 'press-row active:opacity-90', className)} {...props} />;
 }

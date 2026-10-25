@@ -56,7 +56,7 @@ export function AccountsScreen() {
           <AccountOption key={p.key} profile={p} showLanguage={manyLanguages} onPress={() => choose(p.key)} />
         ))}
       </View>
-      <Pressable onPress={signOut} className="mt-2 min-h-11 justify-center">
+      <Pressable onPress={signOut} className="press mt-2 min-h-11 justify-center">
         <Text className="font-body text-[13px] text-link">{t('auth.otherNumber')}</Text>
       </Pressable>
     </Sheet>
