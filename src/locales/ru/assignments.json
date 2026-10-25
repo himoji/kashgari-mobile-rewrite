@@ -2,6 +2,7 @@
   "tabs": { "new": "Новые", "completed": "Выполнено" },
   "start": "Начать",
   "viewResults": "Посмотреть результаты",
+  "closed": "Сдача закрыта",
   "min": "мин",
   "modules": { "oqylym": "Чтение", "tyndalym": "Аудирование", "durys": "Грамматика", "oyna": "Игры", "lesson": "Урок", "zhazylym": "Письмо" },
   "state": { "done": "Выполнено", "waiting": "Ожидает оценки", "inProgress": "В процессе", "overdue": "Просрочено", "notStarted": "Не начато" },

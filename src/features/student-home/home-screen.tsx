@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
+import { canStart } from '@/features/assignments/map';
 import { assignmentHref } from '@/features/assignments/routes';
 import { useStudentAssignments } from '@/features/assignments/use-student-assignments';
 import { useProfile } from '@/features/auth/session';
@@ -112,7 +113,7 @@ function Progress() {
   const { t } = useTranslation();
   const content = useContentText();
   const { all, fresh, completed } = useStudentAssignments();
-  const next = fresh[0];
+  const next = fresh.find(canStart);
   return (
     <>
       {all.length > 0 ? <ProgressCard done={completed.length} total={all.length} /> : null}

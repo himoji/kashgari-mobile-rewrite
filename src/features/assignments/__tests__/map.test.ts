@@ -1,7 +1,7 @@
 import fixture from '@/dev/mocks/StudentAssignments';
 import type { StudentAssignmentsQuery } from '@/graphql/graphql';
 
-import { averageScore, deadlineLabel, mapAssignments, sortCompleted, sortNew } from '../map';
+import { averageScore, canStart, deadlineLabel, mapAssignments, sortCompleted, sortNew } from '../map';
 
 const cls = (fixture() as unknown as StudentAssignmentsQuery).student!.class;
 const now = Date.now() / 1000;
@@ -46,6 +46,12 @@ describe('mapAssignments', () => {
     expect(sortNew(all)).toHaveLength(7);
     expect(sortCompleted(all).map((a) => a.id)).toEqual(['a1', 'a2', 'a6']);
     expect(averageScore(sortCompleted(all))).toBe(89);
+  });
+
+  it('starts only open work: overdue and submitted work have nothing to start', () => {
+    expect(canStart(byId.a7!)).toBe(false);
+    expect(canStart(byId.a2!)).toBe(false);
+    expect(canStart(byId.l1!)).toBe(true);
   });
 });
 
