@@ -2,7 +2,8 @@ import { skipToken, useMutation, useSuspenseQuery } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ActivityIndicator, Keyboard, Pressable, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -23,15 +24,19 @@ import {
 import { submissionHref } from '@/features/review/routes';
 import { parseScore } from '@/features/review/score';
 import { findWork, useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
+import { haptics } from '@/lib/haptics';
 import { useContentText } from '@/lib/i18n';
+import { useLeaveGuard } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
 import { ChoiceRow, Dialog } from '@/ui/dialog';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { KeyboardFooter, NumberPadDone } from '@/ui/keyboard';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
+import { showToast } from '@/ui/toast';
 
 const REVIEW_KINDS: ReviewKind[] = [
   'assignment',
@@ -245,32 +250,71 @@ function Review({
   const value = input ?? (points == null ? '' : String(points));
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [scoreFocused, setScoreFocused] = useState(false);
+  /** Which button started the running save, for its spinner. */
+  const [savingWith, setSavingWith] = useState<'save' | 'next'>('save');
   const [gradeZhazylym, zState] = useMutation(REVIEW_GRADE_ZHAZYLYM);
   const [gradeStory, sState] = useMutation(REVIEW_GRADE_MINI_STORY);
   const saving = zState.loading || sState.loading;
   const hasOpenQuestions = !!data.assignment?.freeResponse?.questions.length;
 
+  // A typed score that isn't saved yet: previous/next, the student picker and back all ask first.
+  const unsaved = gradable && input != null && input !== (points == null ? '' : String(points));
+  const guard = useLeaveGuard(unsaved);
+
   const go = (target: Attempt | undefined) =>
     target && router.replace(submissionHref(target, work.key));
 
-  const save = async (next: boolean) => {
+  /** Saves the typed score; false (with the error shown) when it is invalid or the API refused it. */
+  const persist = async () => {
     const score = parseScore(value);
-    if (score == null) return setError(t('review.scoreRange'));
+    if (score == null) {
+      setError(t('review.scoreRange'));
+      return false;
+    }
     setError(null);
     const variables = { id: attempt.id, points: score };
     const result = await (
       kind === 'zhazylym' ? gradeZhazylym({ variables }) : gradeStory({ variables })
     ).catch(() => null);
-    if (!result?.data) return setError(t('review.saveFailed'));
-    if (next && nav.nextPending) go(nav.nextPending);
-    else setSaved(true);
+    if (!result?.data) {
+      setError(t('review.saveFailed'));
+      return false;
+    }
+    // The cache now holds the saved points, so the field shows them again.
+    setInput(null);
+    haptics.success();
+    return true;
+  };
+
+  const save = async (next: boolean) => {
+    Keyboard.dismiss();
+    setSavingWith(next ? 'next' : 'save');
+    if (!(await persist())) return;
+    if (next && nav.nextPending) {
+      showToast(t('review.gradeSaved'), 'success');
+      guard.release();
+      go(nav.nextPending);
+    } else setSaved(true);
+  };
+
+  const saveAndLeave = async () => {
+    setSavingWith('next');
+    if (!(await persist())) return guard.stay();
+    showToast(t('review.gradeSaved'), 'success');
+    guard.leave();
   };
 
   return (
     <>
-      <ScrollView
+      <KeyboardAwareScrollView
+        bottomOffset={100}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: gradable ? insets.bottom + 100 : 40,
+        }}
       >
         <Text className="mb-2 font-body-semibold text-[26px] leading-[31.2px]">
           {content(work.name)}
@@ -337,6 +381,8 @@ function Review({
                   )}
                   keyboardType="number-pad"
                   accessibilityLabel={t('review.score')}
+                  onFocus={() => setScoreFocused(true)}
+                  onBlur={() => setScoreFocused(false)}
                   maxLength={2}
                   className="h-11 w-[74px] rounded-[11px] bg-[#f4f7fc] px-3 text-center font-body text-[16px] text-ink"
                 />
@@ -360,45 +406,73 @@ function Review({
             {hasOpenQuestions ? <NotReady body={t('review.frqNotReady')} /> : null}
           </View>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {gradable ? (
-        <View
-          className="flex-row items-center gap-2.5 bg-white/95 px-5 pt-3"
-          style={{
-            paddingBottom: insets.bottom + 18,
-            boxShadow: '0 -4px 16px rgba(36,38,49,0.016)',
-          }}
-        >
-          {nav.nextPending ? (
-            <Button
-              variant="soft"
-              label={t('review.save')}
-              disabled={saving}
-              onPress={() => void save(false)}
-              className="h-[46px] w-[92px] bg-[#f3f7ff] px-2.5"
-            />
-          ) : null}
-          <Pressable
-            accessibilityRole="button"
-            disabled={saving}
-            onPress={() => void save(!!nav.nextPending)}
-            className="h-[46px] flex-1 flex-row items-center justify-center gap-2 rounded-control bg-primary-strong px-2.5 active:opacity-90 disabled:opacity-60"
+        <KeyboardFooter aboveDone={scoreFocused}>
+          <View
+            className="flex-row items-center gap-2.5 bg-white/95 px-5 pt-3"
+            style={{
+              paddingBottom: insets.bottom + 18,
+              boxShadow: '0 -4px 16px rgba(36,38,49,0.016)',
+            }}
           >
-            {saved && !nav.nextPending ? (
-              <Icon name="check" size={18} color={colors.white} />
+            {nav.nextPending ? (
+              <Button
+                variant="soft"
+                label={t('review.save')}
+                disabled={!value}
+                loading={saving && savingWith === 'save'}
+                onPress={() => void save(false)}
+                className="h-[46px] w-[92px] bg-[#f3f7ff] px-2.5"
+              />
             ) : null}
-            <Text className="font-body-semibold text-[12px] leading-[18px] text-white">
-              {nav.nextPending
-                ? t('review.saveNext')
-                : saved
-                  ? t('review.saved')
-                  : t('review.save')}
-            </Text>
-            {nav.nextPending ? <Icon name="arrow" size={18} color={colors.white} /> : null}
-          </Pressable>
-        </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: saving || !value, busy: saving }}
+              disabled={saving || !value}
+              onPress={() => void save(!!nav.nextPending)}
+              className="h-[46px] flex-1 flex-row items-center justify-center gap-2 rounded-control bg-primary-strong px-2.5 active:opacity-90 disabled:opacity-60"
+            >
+              {saving && (savingWith === 'next' || !nav.nextPending) ? (
+                <ActivityIndicator color={colors.white} />
+              ) : saved && !nav.nextPending ? (
+                <Icon name="check" size={18} color={colors.white} />
+              ) : null}
+              <Text className="font-body-semibold text-[12px] leading-[18px] text-white">
+                {nav.nextPending
+                  ? t('review.saveNext')
+                  : saved
+                    ? t('review.saved')
+                    : t('review.save')}
+              </Text>
+              {nav.nextPending ? <Icon name="arrow" size={18} color={colors.white} /> : null}
+            </Pressable>
+          </View>
+        </KeyboardFooter>
       ) : null}
+      {gradable ? <NumberPadDone visible={scoreFocused} /> : null}
+
+      <Dialog visible={guard.asking} title={t('review.unsavedTitle')} onClose={guard.stay}>
+        <Text className="mb-4 font-body text-[13px] leading-[20px] text-muted">
+          {t('review.unsavedBody')}
+        </Text>
+        <View className="flex-row gap-2">
+          <Button
+            variant="secondary"
+            className="flex-1"
+            label={t('review.discard')}
+            disabled={saving}
+            onPress={guard.leave}
+          />
+          <Button
+            className="flex-1"
+            label={t('review.save')}
+            loading={saving}
+            onPress={() => void saveAndLeave()}
+          />
+        </View>
+      </Dialog>
 
       <Dialog visible={pickerOpen} title={t('review.student')} onClose={() => setPickerOpen(false)}>
         <View className="gap-[7px]">

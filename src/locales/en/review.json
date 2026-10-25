@@ -32,5 +32,9 @@
   "commentNotReady": "Saving comments is not available yet.",
   "true": "True",
   "false": "False",
-  "notFound": "Response not found"
+  "notFound": "Response not found",
+  "unsavedTitle": "Save the score?",
+  "unsavedBody": "You entered a score for this student but didn't save it.",
+  "discard": "Don't save",
+  "gradeSaved": "Score saved"
 }
