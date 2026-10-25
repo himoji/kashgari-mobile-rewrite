@@ -3,13 +3,15 @@ import { SetContextLink } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { print } from 'graphql';
+import { OperationTypeNode } from 'graphql';
 import { jwtDecode } from 'jwt-decode';
-import { map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 
 import introspection from '@/graphql/possible-types';
 import { AUTH_REFRESH } from '@/features/auth/gql';
 import { activeCredentials, sameCredentials, useSession, type Credentials } from '@/features/auth/session';
 import { env } from '@/lib/env';
+import { onReconnect } from '@/lib/network';
 
 /**
  * Per-operation context:
@@ -120,6 +122,22 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   }
 });
 
+/**
+ * A query that cannot reach the API (fetch rejects with a TypeError) answers from the cache when the
+ * cache holds all of it, so cache-and-network screens keep their data offline instead of throwing
+ * the background refresh's error to their boundary. Server and GraphQL errors pass through.
+ */
+const offlineLink = new ApolloLink((operation, forward) =>
+  forward(operation).pipe(
+    catchError((error: unknown) => {
+      if (operation.operationType !== OperationTypeNode.QUERY || !(error instanceof TypeError)) throw error;
+      const data = operation.client.cache.readQuery({ query: operation.query, variables: operation.variables });
+      if (!data) throw error;
+      return of({ data });
+    }),
+  ),
+);
+
 const httpLink = new HttpLink({ uri: env.graphqlUrl });
 
 /**
@@ -153,7 +171,7 @@ const networkLink =
     : ApolloLink.from([authLink, refreshLink, httpLink]);
 
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([errorLink, networkLink]),
+  link: ApolloLink.from([errorLink, offlineLink, networkLink]),
   cache: new InMemoryCache({
     possibleTypes: introspection.possibleTypes,
     typePolicies: Object.fromEntries(EMBEDDED.map((type) => [type, { merge: true }])),
@@ -168,4 +186,11 @@ export const apolloClient = new ApolloClient({
 useSession.subscribe((state, prev) => {
   const signedOut = state.credentials.length === 0 && prev.credentials.length > 0;
   if (state.activeKey !== prev.activeKey || signedOut) void apolloClient.clearStore();
+});
+
+/** Back online: queries that failed refetch on their own (suspense boundaries retry themselves). */
+onReconnect(() => {
+  for (const query of apolloClient.getObservableQueries('active')) {
+    if (query.getCurrentResult().error) void query.refetch().catch(() => undefined);
+  }
 });

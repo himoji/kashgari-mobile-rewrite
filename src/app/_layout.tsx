@@ -16,6 +16,7 @@ import { useActiveProfile, useSession } from '@/features/auth/session';
 import { apolloClient } from '@/lib/apollo';
 import { fonts } from '@/theme/fonts';
 import { ErrorState } from '@/ui/feedback';
+import { OfflineBanner } from '@/ui/offline-banner';
 
 void SplashScreen.preventAutoHideAsync();
 // Listening tasks and word pronunciation must play with the iOS ringer switch off.
@@ -45,6 +46,7 @@ export default function RootLayout() {
         <ApolloProvider client={apolloClient}>
           <StatusBar style="dark" />
           <RootStack />
+          <OfflineBanner />
         </ApolloProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>

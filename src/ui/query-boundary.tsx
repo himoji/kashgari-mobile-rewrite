@@ -4,23 +4,33 @@ import { Component, createContext, Suspense, useContext, useState, useTransition
 import Animated from 'react-native-reanimated';
 
 import { contentIn } from '@/lib/motion';
+import { useOnline } from '@/lib/network';
 import { ErrorState, ScreenSkeleton } from '@/ui/feedback';
 
-type CatchProps = { children: ReactNode; onRetry: () => void; render?: (retry: () => void) => ReactNode };
+type CatchProps = {
+  children: ReactNode;
+  online: boolean;
+  onRetry: () => void;
+  render?: (retry: () => void) => ReactNode;
+};
 
 class Catch extends Component<CatchProps, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
+  // Both updates land in one render, so the children retry with the new key.
+  retry = () => {
+    this.props.onRetry();
+    this.setState({ failed: false });
+  };
+  componentDidUpdate(prev: CatchProps) {
+    // Back online: a failed screen loads again without a tap on Retry.
+    if (this.state.failed && this.props.online && !prev.online) this.retry();
+  }
   render() {
     if (!this.state.failed) return this.props.children;
-    // Both updates land in one render, so the children retry with the new key.
-    const retry = () => {
-      this.props.onRetry();
-      this.setState({ failed: false });
-    };
-    return this.props.render ? this.props.render(retry) : <ErrorState onRetry={retry} />;
+    return this.props.render ? this.props.render(this.retry) : <ErrorState onRetry={this.retry} />;
   }
 }
 
@@ -37,6 +47,7 @@ export const BoundaryGap = createContext(0);
  * state with retry when it fails. Keep the screen's chrome (title, back bar) outside, so only the
  * data area changes. Full-screen routes with no chrome outside pass `errorFallback` to keep their
  * own page (and its back button) around the error. Loaded content fades in (180ms) over the skeleton's place.
+ * A failed boundary retries by itself when the device comes back online.
  */
 export function QueryBoundary({
   children,
@@ -52,8 +63,9 @@ export function QueryBoundary({
 }) {
   const [attempt, setAttempt] = useState(0);
   const gap = useContext(BoundaryGap);
+  const online = useOnline();
   return (
-    <Catch onRetry={() => setAttempt((n) => n + 1)} render={errorFallback}>
+    <Catch online={online} onRetry={() => setAttempt((n) => n + 1)} render={errorFallback}>
       <Attempt.Provider value={attempt}>
         <Suspense fallback={fallback ?? <ScreenSkeleton />}>
           <Animated.View entering={fade ? contentIn : undefined} style={{ flexGrow: 1, gap }}>

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
+import { useOnline } from '@/lib/network';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -31,11 +32,15 @@ export function EmptyState({ title, body, illustration = 'materials' }: { title:
   );
 }
 
+/** Says "no internet" while the device is offline, otherwise `message` or the generic server error. */
 export function ErrorState({ onRetry, message }: { onRetry?: () => void; message?: string }) {
   const { t } = useTranslation();
+  const online = useOnline();
   return (
     <View className="items-center gap-3 px-6 py-10">
-      <Text variant="heading" className="text-center">{message ?? t('common.states.error')}</Text>
+      <Text variant="heading" className="text-center">
+        {online ? (message ?? t('common.states.error')) : t('common.states.offline')}
+      </Text>
       {onRetry ? <Button variant="secondary" label={t('common.actions.retry')} onPress={onRetry} /> : null}
     </View>
   );

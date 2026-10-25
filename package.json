@@ -19,6 +19,7 @@
     "@apollo/client": "^4.2.9",
     "@expo-google-fonts/golos-text": "^0.4.2",
     "@expo-google-fonts/onest": "^0.4.2",
+    "@react-native-community/netinfo": "12.0.1",
     "@react-native-google-signin/google-signin": "^16.1.4",
     "@shopify/flash-list": "^2.3.2",
     "class-variance-authority": "^0.7.1",
@@ -86,6 +87,7 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
+      "^@react-native-community/netinfo$": "<rootDir>/node_modules/@react-native-community/netinfo/jest/netinfo-mock.js",
       "^@/assets/(.*)$": "<rootDir>/assets/$1",
       "^@/(.*)$": "<rootDir>/src/$1"
     }

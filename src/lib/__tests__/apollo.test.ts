@@ -1,5 +1,7 @@
+import { gql } from '@apollo/client';
+
 import { useSession, type Credentials } from '@/features/auth/session';
-import { needsRefresh, refreshed } from '@/lib/apollo';
+import { apolloClient, needsRefresh, refreshed } from '@/lib/apollo';
 
 const jwt = (exp: number) => `h.${btoa(JSON.stringify({ exp }))}.s`;
 const now = () => Math.floor(Date.now() / 1000);
@@ -60,5 +62,32 @@ describe('refreshed', () => {
     await expect(refreshed(kk)).resolves.toEqual(kk);
     await refreshed(kk);
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('offline', () => {
+  const QUERY = gql`
+    query OfflineProbe($id: ID!) {
+      node(id: $id) {
+        id
+        name
+      }
+    }
+  `;
+
+  it('answers a query from the cache when fetch fails, and fails without cached data', async () => {
+    globalThis.fetch = jest.fn(async () => {
+      throw new TypeError('Network request failed');
+    }) as unknown as typeof globalThis.fetch;
+    apolloClient.cache.writeQuery({
+      query: QUERY,
+      variables: { id: '1' },
+      data: { node: { __typename: 'Node', id: '1', name: 'cached' } },
+    });
+    const cached = await apolloClient.query({ query: QUERY, variables: { id: '1' }, fetchPolicy: 'network-only' });
+    expect(cached.data).toEqual({ node: { __typename: 'Node', id: '1', name: 'cached' } });
+    await expect(
+      apolloClient.query({ query: QUERY, variables: { id: '2' }, fetchPolicy: 'network-only' }),
+    ).rejects.toThrow('Network request failed');
   });
 });
