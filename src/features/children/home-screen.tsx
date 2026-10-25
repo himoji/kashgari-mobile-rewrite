@@ -1,4 +1,4 @@
-import { router, type Href } from 'expo-router';
+import { router } from 'expo-router';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,7 @@ export function ParentHomeScreen() {
   const { t } = useTranslation();
   const { name } = useProfile();
   const { children, loading, error, refreshing, refetch } = useChildren();
-  const addChild = () => router.push('/parent/add-child' as Href);
+  const addChild = () => router.push('/parent/add-child');
 
   return (
     <TabScreen mascot="home" title={t('parent.hello', { name: name.split(' ')[0] ?? name })} refreshing={refreshing} onRefresh={refetch}>

@@ -10,6 +10,7 @@ import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
+import { evictSubmission } from '@/lib/cache';
 import type { OynaWordGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 
@@ -65,7 +66,9 @@ function WordGameRun({ game, studentId }: { game: Game; studentId: string }) {
   const [confirm, setConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const clock = useSessionClock(null, !submitted);
-  const [submit, { loading: submitting }] = useMutation(OYNA_WORD_GAME_SUBMIT, { refetchQueries: 'active' });
+  const [submit, { loading: submitting }] = useMutation(OYNA_WORD_GAME_SUBMIT, {
+    update: (cache) => evictSubmission(cache, { __typename: 'OynaGameWordGame', id: game.id }, studentId),
+  });
 
   const step = steps[index]!;
   const last = index === steps.length - 1;

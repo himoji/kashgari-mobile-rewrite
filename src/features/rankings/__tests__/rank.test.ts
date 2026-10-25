@@ -17,10 +17,10 @@ describe('rankRows', () => {
 
 describe('classRows', () => {
   it('sums acorns per class and drops duplicate classes', () => {
-    const c7a = { id: '7a', grade: 7, letter: 'А', students: [{ acorns: 10 }, { acorns: 5 }] };
+    const c7a = { id: '7a', grade: 7, letter: 'А', students: [{ id: 's1', acorns: 10 }, { id: 's2', acorns: 5 }] };
     const rows = classRows(
       [
-        { classes: [c7a, { id: '8b', grade: 8, letter: 'Б', students: [{ acorns: 30 }] }] },
+        { classes: [c7a, { id: '8b', grade: 8, letter: 'Б', students: [{ id: 's3', acorns: 30 }] }] },
         { classes: [c7a] },
       ],
       '7a',

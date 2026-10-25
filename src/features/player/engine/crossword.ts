@@ -1,8 +1,10 @@
+import type { GameCrosswordDirection } from '@/graphql/graphql';
+
 /**
  * Crossword: words placed across (HORIZONTAL) or down (VERTICAL) on a grid of up to 10×10, each with a clue.
  * Letters are stored per cell, so crossing words share them.
  */
-export type CrosswordDirection = 'HORIZONTAL' | 'VERTICAL';
+export type CrosswordDirection = GameCrosswordDirection;
 export type CrosswordWord = { row: number; col: number; direction: CrosswordDirection; clue: string; length: number; word?: string | null };
 
 export type CrosswordEntry = CrosswordWord & {

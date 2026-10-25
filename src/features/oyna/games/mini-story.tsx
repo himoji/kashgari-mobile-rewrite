@@ -12,6 +12,7 @@ import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
+import { evictSubmission } from '@/lib/cache';
 import type { OynaMiniStoryGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -21,7 +22,7 @@ type Game = NonNullable<OynaMiniStoryGameQuery['miniStoryGame']>;
 
 export function MiniStoryPlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_MINI_STORY_GAME, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
+  const { data, loading, error, refetch } = useQuery(OYNA_MINI_STORY_GAME, { variables: { id, studentId: profileId } });
   if (loading) return <PlayerLoading />;
   if (error || !data?.miniStoryGame) return <PlayerError onRetry={() => void refetch()} />;
   if (data.miniStoryGame.submission) return <OynaResultView kind="ministory" id={id} />;
@@ -36,7 +37,9 @@ function MiniStoryRun({ game, studentId }: { game: Game; studentId: string }) {
   const [text, setText] = useState('');
   const [confirm, setConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [submit, { loading: submitting }] = useMutation(OYNA_MINI_STORY_SUBMIT, { refetchQueries: 'active' });
+  const [submit, { loading: submitting }] = useMutation(OYNA_MINI_STORY_SUBMIT, {
+    update: (cache) => evictSubmission(cache, { __typename: 'OynaGameMiniStory', id: game.id }, studentId),
+  });
   const used = usedWords(game.words, text);
 
   const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, () => {

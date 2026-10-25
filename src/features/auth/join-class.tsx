@@ -42,7 +42,7 @@ export function JoinClass() {
       const found = await Promise.all(
         credentials.map((c) =>
           apolloClient
-            .query({ query: CHECK_CLASS, variables: { classId }, context: { credentials: c }, fetchPolicy: 'network-only' })
+            .query({ query: CHECK_CLASS, variables: { classId }, context: { credentials: c }, fetchPolicy: 'no-cache' })
             .then(({ data }) => (data?.class ? c : null))
             .catch(() => null),
         ),
@@ -53,6 +53,7 @@ export function JoinClass() {
         mutation: ADD_STUDENT,
         variables: { accountId: owner.accountId, studentName: name.trim(), classId },
         context: { credentials: owner },
+        fetchPolicy: 'no-cache',
       });
       const profiles = await resolveProfiles(credentials);
       useSession.getState().signIn(credentials, profiles);

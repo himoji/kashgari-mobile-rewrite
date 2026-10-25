@@ -1,13 +1,11 @@
 import { gql } from '@/graphql';
 
 export const ASSIGN_CLASSES = gql(`
-  query AssignClassesQuery($teacherId: ID!) {
+  query AssignClasses($teacherId: ID!) {
     teacher(id: $teacherId) {
       id
       classes {
-        id
-        grade
-        letter
+        ...ClassLabel
       }
     }
   }
@@ -15,7 +13,7 @@ export const ASSIGN_CLASSES = gql(`
 
 /** Ready-made materials for the picker: one grade's texts plus the grammar sets. */
 export const ASSIGN_MATERIALS = gql(`
-  query AssignMaterialsQuery($grade: Int!, $teacherId: ID!) {
+  query AssignMaterials($grade: Int!, $teacherId: ID!) {
     grade(grade: $grade) {
       grade
       sections {
@@ -39,7 +37,7 @@ export const ASSIGN_MATERIALS = gql(`
 
 /** Title of a material opened from the library ("Тағайындау"). */
 export const ASSIGN_MATERIAL = gql(`
-  query AssignMaterialQuery($id: ID!, $oqylym: Boolean!, $tyndalym: Boolean!, $grammar: Boolean!) {
+  query AssignMaterial($id: ID!, $oqylym: Boolean!, $tyndalym: Boolean!, $grammar: Boolean!) {
     oqylymText(id: $id) @include(if: $oqylym) {
       id
       title
@@ -57,7 +55,7 @@ export const ASSIGN_MATERIAL = gql(`
 
 /** The API drafts every exercise type from the text; the teacher picks which ones to keep. */
 export const ASSIGN_GAMES = gql(`
-  query AssignGamesQuery($textId: ID!) {
+  query AssignGames($textId: ID!) {
     generateGames(textId: $textId) {
       wordShuffle(type: Teacher) {
         pairs {
@@ -113,7 +111,7 @@ export const ASSIGN_GAMES = gql(`
 `);
 
 export const ASSIGN_CREATE_TEXT = gql(`
-  mutation AssignCreateTextMutation($teacherId: ID!, $text: String!) {
+  mutation AssignCreateText($teacherId: ID!, $text: String!) {
     createOqylymText(teacherId: $teacherId, text: $text) {
       id
       title
@@ -122,7 +120,7 @@ export const ASSIGN_CREATE_TEXT = gql(`
 `);
 
 export const ASSIGN_CREATE_OQYLYM = gql(`
-  mutation AssignCreateOqylymMutation($classId: ID!, $assignment: OqylymAssignmentInput!, $visible: Boolean!) {
+  mutation AssignCreateOqylym($classId: ID!, $assignment: OqylymAssignmentInput!, $visible: Boolean!) {
     createOqylymAssignment(classId: $classId, assignment: $assignment, visible: $visible) {
       id
     }
@@ -130,7 +128,7 @@ export const ASSIGN_CREATE_OQYLYM = gql(`
 `);
 
 export const ASSIGN_CREATE_TYNDALYM = gql(`
-  mutation AssignCreateTyndalymMutation($classId: ID!, $assignment: TyndalymAssignmentInput!, $visible: Boolean!) {
+  mutation AssignCreateTyndalym($classId: ID!, $assignment: TyndalymAssignmentInput!, $visible: Boolean!) {
     createTyndalymAssignment(classId: $classId, assignment: $assignment, visible: $visible) {
       id
     }
@@ -138,7 +136,7 @@ export const ASSIGN_CREATE_TYNDALYM = gql(`
 `);
 
 export const ASSIGN_CREATE_GRAMMAR = gql(`
-  mutation AssignCreateGrammarMutation($classId: ID!, $titleId: ID!) {
+  mutation AssignCreateGrammar($classId: ID!, $titleId: ID!) {
     createDurysAssignment(classId: $classId, data: { titleId: $titleId }) {
       id
     }

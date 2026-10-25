@@ -2,7 +2,7 @@ import { gql } from '@/graphql';
 
 /** The parent's children: each child account with its student profiles (class, school, teacher). */
 export const CHILDREN = gql(`
-  query ChildrenQuery($parentId: ID!) {
+  query Children($parentId: ID!) {
     parent(id: $parentId) {
       id
       name
@@ -14,9 +14,7 @@ export const CHILDREN = gql(`
           id
           name
           class {
-            id
-            grade
-            letter
+            ...ClassLabel
             teacher { id name school { id name } }
           }
         }
@@ -27,7 +25,7 @@ export const CHILDREN = gql(`
 
 /** A child's vocabulary: learned words and words still being learned (`isPending`). */
 export const CHILD_WORDS = gql(`
-  query ChildrenWordsQuery($studentId: ID!) {
+  query ChildrenWords($studentId: ID!) {
     student(id: $studentId) {
       id
       words { word level isPending }

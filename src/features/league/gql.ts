@@ -2,7 +2,7 @@ import { gql } from '@/graphql';
 
 /** League points are the student's acorns; the account level picks which free texts to offer. */
 export const LEAGUE_STUDENT = gql(`
-  query LeagueStudentQuery($studentId: ID!) {
+  query LeagueStudent($studentId: ID!) {
     student(id: $studentId) {
       id
       acorns
@@ -15,7 +15,7 @@ export const LEAGUE_STUDENT = gql(`
 `);
 
 export const LEAGUE_BOOKS = gql(`
-  query LeagueBooksQuery($complexity: Int!) {
+  query LeagueBooks($complexity: Int!) {
     oqylymTextsByComplexity(complexity: $complexity) {
       id
       title

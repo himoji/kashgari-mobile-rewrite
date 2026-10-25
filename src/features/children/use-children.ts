@@ -24,7 +24,7 @@ export function useChildren() {
 
 /** A child's school work from every module: the student's own assignments query, asked for the child. */
 export function useChildAssignments(studentId: string) {
-  const query = useQuery(STUDENT_ASSIGNMENTS, { variables: { studentId }, fetchPolicy: 'cache-and-network' });
+  const query = useQuery(STUDENT_ASSIGNMENTS, { variables: { studentId } });
   const cls = query.data?.student?.class;
   const all = useMemo(() => mapAssignments(cls), [cls]);
   return {

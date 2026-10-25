@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { useWordTextAudio } from '@/features/dictionary/word-audio';
 import { useContentText } from '@/lib/i18n';
 import { Text } from '@/ui/text';
 
 import type { CardsStep, StepViewProps } from '../engine/types';
 import { SoftIconButton, StepHeading } from '../parts';
-import { useWordAudio } from '../use-word-audio';
 
 /** "Сөздерді үйрену": one blue card at a time; tap flips it to the meaning. */
 export function CardsView({ step }: StepViewProps<CardsStep>) {
@@ -15,8 +15,8 @@ export function CardsView({ step }: StepViewProps<CardsStep>) {
   const content = useContentText();
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const speak = useWordAudio();
   const card = step.cards[index];
+  const speak = useWordTextAudio(card?.word ?? '');
   if (!card) return null;
   const go = (next: number) => {
     setIndex(next);
@@ -46,7 +46,7 @@ export function CardsView({ step }: StepViewProps<CardsStep>) {
         <Text className="min-w-9 text-center font-body-medium text-[13px] leading-[19.5px] text-[#7a8090]" aria-live="polite">
           {index + 1} / {step.cards.length}
         </Text>
-        <SoftIconButton icon="audio" label={t('player.pronunciation')} onPress={() => void speak(card.word).catch(() => undefined)} />
+        <SoftIconButton icon="audio" label={t('player.pronunciation')} disabled={!speak} onPress={() => speak?.()} />
         <SoftIconButton icon="arrow" label={t('player.next')} disabled={index === step.cards.length - 1} onPress={() => go(index + 1)} />
       </View>
     </View>

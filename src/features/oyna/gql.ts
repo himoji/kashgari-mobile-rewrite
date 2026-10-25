@@ -71,13 +71,6 @@ export const OYNA_WORD_GAME_RESULT = gql(`
   }
 `);
 
-/** Pronunciation for flashcards: the dictionary entry's id and slug build the kashgari.kz audio URL. */
-export const OYNA_WORD_AUDIO = gql(`
-  query OynaWordAudio($word: String!) {
-    word(wordCyrillic: $word) { id url }
-  }
-`);
-
 // ---- Wordle ----
 
 export const OYNA_WORDLE_GAME = gql(`

@@ -2,7 +2,7 @@ import { gql } from '@/graphql';
 
 /** Everything a teacher grades by hand: open answers, writing and mini stories without a grade yet. */
 export const TEACHER_HOME = gql(`
-  query TeacherHomeQuery($teacherId: ID!) {
+  query TeacherHome($teacherId: ID!) {
     teacher(id: $teacherId) {
       id
       name
@@ -13,10 +13,7 @@ export const TEACHER_HOME = gql(`
           submissions {
             id
             freeResponse {
-              questions {
-                answer
-                grade
-              }
+              ...FreeResponseGrades
             }
           }
         }

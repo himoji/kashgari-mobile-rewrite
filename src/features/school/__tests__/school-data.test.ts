@@ -1,8 +1,8 @@
-import fixture from '@/dev/mocks/SchoolPrincipalQuery';
-import type { SchoolPrincipalQueryQuery } from '@/graphql/graphql';
+import fixture from '@/dev/mocks/SchoolPrincipal';
+import type { SchoolPrincipalQuery } from '@/graphql/graphql';
 import { averageScore, classRows, isActiveTeacher, mapSchool, teacherActivity, teacherRows } from '@/features/school/school-data';
 
-const api = (fixture() as unknown as SchoolPrincipalQueryQuery).principal!.school;
+const api = (fixture() as unknown as SchoolPrincipalQuery).principal!.school;
 const at = (m: number, d: number) => Math.floor(new Date(2026, m, d, 12).getTime() / 1000);
 const now = at(9, 22);
 const school = mapSchool(api, now);

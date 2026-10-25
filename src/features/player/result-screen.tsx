@@ -13,7 +13,7 @@ import { ErrorState, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
-import { ResultAssignmentQuery as AssignmentDoc, ResultDurysQuery, ResultLessonQuery as LessonDoc, ResultZhazylymQuery as ZhazylymDoc } from './gql';
+import { RESULT_ASSIGNMENT, RESULT_DURYS, RESULT_LESSON, RESULT_ZHAZYLYM } from './gql';
 import { assignmentOutcome, lessonOutcome, zhazylymOutcome, type Outcome } from './modules/outcome';
 import { FocusHeader, leave } from './parts';
 import { FocusPage, Notice, useStudentClassId } from './player-screen';
@@ -26,7 +26,7 @@ const date = (secs: number) => {
   return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
 };
 
-const playHref = (kind: Kind, id: string) => ({ pathname: '/student/play/[kind]/[id]', params: { kind, id } }) as unknown as Href;
+const playHref = (kind: Kind, id: string): Href => ({ pathname: '/student/play/[kind]/[id]', params: { kind, id } });
 
 // ---------- view ----------
 
@@ -173,7 +173,7 @@ function Failed({ onRetry }: { onRetry?: () => void }) {
 function AssignmentResult({ kind, id }: { kind: Kind; id: string }) {
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const { data, loading, error, refetch } = useQuery(AssignmentDoc, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(RESULT_ASSIGNMENT, { variables: { id, studentId: profileId } });
   const outcome = useMemo(() => (data?.assignment ? assignmentOutcome(data.assignment, lang) : null), [data, lang]);
   if (!data && loading) return <Loading />;
   if (!outcome) return <Failed onRetry={error ? () => void refetch() : undefined} />;
@@ -182,7 +182,7 @@ function AssignmentResult({ kind, id }: { kind: Kind; id: string }) {
 
 function ZhazylymResult({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(ZhazylymDoc, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(RESULT_ZHAZYLYM, { variables: { id, studentId: profileId } });
   const outcome = useMemo(() => (data?.zhazylym ? zhazylymOutcome(data.zhazylym) : null), [data]);
   if (!data && loading) return <Loading />;
   if (!outcome) return <Failed onRetry={error ? () => void refetch() : undefined} />;
@@ -191,7 +191,7 @@ function ZhazylymResult({ id }: { id: string }) {
 
 function DurysResult({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(ResultDurysQuery, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(RESULT_DURYS, { variables: { id, studentId: profileId } });
   const d = data?.durysAssignment;
   if (!data && loading) return <Loading />;
   if (!d) return <Failed onRetry={error ? () => void refetch() : undefined} />;
@@ -204,10 +204,9 @@ function LessonResult({ id }: { id: string }) {
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
   const cls = useStudentClassId();
-  const { data, loading, error, refetch } = useQuery(LessonDoc, {
+  const { data, loading, error, refetch } = useQuery(RESULT_LESSON, {
     variables: { id, studentId: profileId, classId: cls.classId ?? '' },
     skip: !cls.classId,
-    fetchPolicy: 'cache-and-network',
   });
   const outcome = useMemo(() => (data?.lesson ? lessonOutcome(data.lesson, lang) : null), [data, lang]);
   if (cls.loading || (!data && loading)) return <Loading />;

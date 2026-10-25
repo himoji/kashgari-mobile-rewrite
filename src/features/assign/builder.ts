@@ -1,7 +1,7 @@
-import type { AssignGamesQueryQuery, GamesInput } from '@/graphql/graphql';
+import type { AssignGamesQuery, GamesInput } from '@/graphql/graphql';
 import type { MaterialRef } from '@/features/materials/material-ref';
 
-export type Games = AssignGamesQueryQuery['generateGames'];
+export type Games = AssignGamesQuery['generateGames'];
 
 /** Block types from the design's "Қосу" sheet, plus the grammar set a grammar material brings. */
 export type BlockType =

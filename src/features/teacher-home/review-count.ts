@@ -1,6 +1,7 @@
-import type { TeacherHomeQueryQuery } from '@/graphql/graphql';
+import { hasUngradedAnswer } from '@/features/classes/class-data';
+import type { TeacherHomeQuery } from '@/graphql/graphql';
 
-type Teacher = NonNullable<TeacherHomeQueryQuery['teacher']>;
+type Teacher = NonNullable<TeacherHomeQuery['teacher']>;
 
 /**
  * Answers waiting for the teacher: open-question answers without a grade, and writing / mini-story
@@ -12,8 +13,7 @@ export function countAwaitingReview(teacher: Pick<Teacher, 'classes'> | null | u
   for (const cls of teacher.classes) {
     for (const assignment of cls.assignments) {
       for (const submission of assignment.submissions) {
-        const open = submission.freeResponse?.questions ?? [];
-        if (open.some((q) => q.answer != null && q.answer.trim() !== '' && q.grade == null)) count += 1;
+        if (hasUngradedAnswer(submission.freeResponse)) count += 1;
       }
     }
     for (const writing of cls.zhazylymAssignments) count += writing.submissions.filter((s) => s.points == null).length;

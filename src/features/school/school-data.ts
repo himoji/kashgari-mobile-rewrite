@@ -1,7 +1,7 @@
 import { mapClassWork, type ClassWork, type Work } from '@/features/classes/class-data';
-import type { SchoolPrincipalQueryQuery } from '@/graphql/graphql';
+import type { SchoolPrincipalQuery } from '@/graphql/graphql';
 
-type ApiSchool = NonNullable<SchoolPrincipalQueryQuery['principal']>['school'];
+type ApiSchool = NonNullable<SchoolPrincipalQuery['principal']>['school'];
 
 export interface SchoolTeacher {
   id: string;

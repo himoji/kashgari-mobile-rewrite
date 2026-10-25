@@ -6,19 +6,20 @@ import { useTranslation } from 'react-i18next';
 
 import { useProfile, useSession } from '@/features/auth/session';
 import { OynaPlayer } from '@/features/oyna/oyna-player';
+import { evictSubmission } from '@/lib/cache';
 import { ErrorState, Skeleton } from '@/ui/feedback';
 import { Text } from '@/ui/text';
 
 import type { Answers } from './engine/types';
 import {
-  PlayerAssignmentQuery,
-  PlayerDurysQuery,
-  PlayerLessonQuery,
-  PlayerStudentClassQuery,
-  PlayerSubmitAssignment,
-  PlayerSubmitDurys,
-  PlayerSubmitZhazylym,
-  PlayerZhazylymQuery,
+  PLAYER_ASSIGNMENT,
+  PLAYER_DURYS,
+  PLAYER_LESSON,
+  PLAYER_STUDENT_CLASS,
+  PLAYER_SUBMIT_ASSIGNMENT,
+  PLAYER_SUBMIT_DURYS,
+  PLAYER_SUBMIT_ZHAZYLYM,
+  PLAYER_ZHAZYLYM,
 } from './gql';
 import { buildSubmission } from './modules/assignment';
 import { assignmentActivity, durysActivity, lessonActivities, zhazylymActivity, type Activity } from './modules/activities';
@@ -28,7 +29,7 @@ import { PlayerShell, type Timing } from './player-shell';
 type Kind = 'oqylym' | 'tyndalym' | 'durys' | 'oyna' | 'lesson' | 'zhazylym';
 
 const now = () => Math.floor(Date.now() / 1000);
-const resultHref = (kind: Kind, id: string) => ({ pathname: '/student/result/[kind]/[id]', params: { kind, id } }) as unknown as Href;
+const resultHref = (kind: Kind, id: string): Href => ({ pathname: '/student/result/[kind]/[id]', params: { kind, id } });
 
 /** The design's blue notice (locked or expired work) under the back header. */
 export function Notice({ text }: { text: string }) {
@@ -77,9 +78,9 @@ const flashcardWords = (activities: Activity[]) => [
 /** Submits every activity of the work in order (a lesson submits each of its activities). */
 function useSubmitActivities(kind: Kind, id: string) {
   const { profileId } = useProfile();
-  const [submitAssignment] = useMutation(PlayerSubmitAssignment);
-  const [submitZhazylym] = useMutation(PlayerSubmitZhazylym);
-  const [submitDurys] = useMutation(PlayerSubmitDurys);
+  const [submitAssignment] = useMutation(PLAYER_SUBMIT_ASSIGNMENT);
+  const [submitZhazylym] = useMutation(PLAYER_SUBMIT_ZHAZYLYM);
+  const [submitDurys] = useMutation(PLAYER_SUBMIT_DURYS);
   const client = useApolloClient();
   // A retry after a partial failure must not resend activities that already went through.
   const sent = useRef(new Set<string>());
@@ -111,8 +112,9 @@ function useSubmitActivities(kind: Kind, id: string) {
       sent.current.add(a.group);
     }
     router.replace(resultHref(kind, id));
-    // School lists and home counters show the new submission.
-    void client.refetchQueries({ include: 'active' }).catch(() => undefined);
+    // Lists, home counters and acorns refetch just what the submit changed.
+    for (const a of activities) evictSubmission(client.cache, { __typename: a.typename, id: a.id }, profileId);
+    if (kind === 'lesson') evictSubmission(client.cache, { __typename: 'Lesson', id }, profileId);
   };
 }
 
@@ -137,7 +139,7 @@ function AssignmentPlayer({ kind, id }: { kind: Kind; id: string }) {
   const { t } = useTranslation();
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
-  const { data, loading, error, refetch } = useQuery(PlayerAssignmentQuery, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(PLAYER_ASSIGNMENT, { variables: { id, studentId: profileId } });
   const a = data?.assignment;
   const activities = useMemo(() => (a ? [assignmentActivity(a, lang)] : []), [a, lang]);
   if (!data && loading) return <Loading />;
@@ -151,7 +153,7 @@ function AssignmentPlayer({ kind, id }: { kind: Kind; id: string }) {
 function ZhazylymPlayer({ id }: { id: string }) {
   const { t } = useTranslation();
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(PlayerZhazylymQuery, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(PLAYER_ZHAZYLYM, { variables: { id, studentId: profileId } });
   const z = data?.zhazylym;
   const activities = useMemo(() => (z ? [zhazylymActivity(z)] : []), [z]);
   if (!data && loading) return <Loading />;
@@ -165,7 +167,7 @@ function ZhazylymPlayer({ id }: { id: string }) {
 
 function DurysPlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(PlayerDurysQuery, { variables: { id, studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const { data, loading, error, refetch } = useQuery(PLAYER_DURYS, { variables: { id, studentId: profileId } });
   const d = data?.durysAssignment;
   const activities = useMemo(() => (d ? [durysActivity(d)] : []), [d]);
   if (!data && loading) return <Loading />;
@@ -178,7 +180,7 @@ function DurysPlayer({ id }: { id: string }) {
 /** Lessons need the class to reach each text's assignment. */
 export function useStudentClassId() {
   const { profileId } = useProfile();
-  const q = useQuery(PlayerStudentClassQuery, { variables: { studentId: profileId } });
+  const q = useQuery(PLAYER_STUDENT_CLASS, { variables: { studentId: profileId } });
   return { classId: q.data?.student?.class.id, loading: q.loading && !q.data, error: q.error, refetch: q.refetch };
 }
 
@@ -187,10 +189,9 @@ function LessonPlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
   const lang = useSession((s) => s.definitionLanguage);
   const cls = useStudentClassId();
-  const { data, loading, error, refetch } = useQuery(PlayerLessonQuery, {
+  const { data, loading, error, refetch } = useQuery(PLAYER_LESSON, {
     variables: { id, studentId: profileId, classId: cls.classId ?? '' },
     skip: !cls.classId,
-    fetchPolicy: 'cache-and-network',
   });
   const lesson = data?.lesson;
   const activities = useMemo(() => (lesson ? lessonActivities(lesson, lang) : []), [lesson, lang]);

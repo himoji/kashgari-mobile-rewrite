@@ -1,9 +1,9 @@
 import { averageScore, isCompleted, type StudentAssignment } from '@/features/assignments/map';
 import type { AssignmentKind } from '@/features/assignments/routes';
 import { className } from '@/features/classes/format';
-import type { ChildrenQueryQuery, ChildrenWordsQueryQuery } from '@/graphql/graphql';
+import type { ChildrenQuery, ChildrenWordsQuery } from '@/graphql/graphql';
 
-type ApiParent = NonNullable<ChildrenQueryQuery['parent']>;
+type ApiParent = NonNullable<ChildrenQuery['parent']>;
 
 /** One child as the parent sees it: a student profile of a linked child account. */
 export interface Child {
@@ -66,7 +66,7 @@ export function moduleAssignments(list: StudentAssignment[], kind: AssignmentKin
   return [...open, ...done];
 }
 
-type ApiWord = NonNullable<ChildrenWordsQueryQuery['student']>['words'][number];
+type ApiWord = NonNullable<ChildrenWordsQuery['student']>['words'][number];
 export type ChildWord = { word: string; level: number };
 
 /** Learned words (no longer pending) and words still being learned, each alphabetical. */

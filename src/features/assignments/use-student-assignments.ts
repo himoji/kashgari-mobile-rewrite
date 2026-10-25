@@ -10,7 +10,7 @@ import { mapAssignments, sortCompleted, sortNew } from './map';
 /** The signed-in student's work from every module, split into new and completed. */
 export function useStudentAssignments() {
   const { profileId } = useProfile();
-  const query = useQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId }, fetchPolicy: 'cache-and-network' });
+  const query = useQuery(STUDENT_ASSIGNMENTS, { variables: { studentId: profileId } });
   const cls = query.data?.student?.class;
   const lists = useMemo(() => {
     const all = mapAssignments(cls);

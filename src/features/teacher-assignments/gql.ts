@@ -38,7 +38,7 @@ export const TEACHER_ASSIGNMENT_CONTENT = gql(`
 
 export const TEACHER_UPDATE_ASSIGNMENT_VISIBILITY = gql(`
   mutation TeacherUpdateAssignmentVisibility($id: ID!, $visible: Boolean!) {
-    updateAssignment(assignmentId: $id, data: { visible: $visible, updateDuration: false }) { id visible }
+    updateAssignment(assignmentId: $id, data: { visible: $visible, updateDuration: false }) { __typename id visible }
   }
 `);
 

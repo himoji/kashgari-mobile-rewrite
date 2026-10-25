@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -28,6 +28,7 @@ import {
 import { contentKeysFromGames } from '@/features/teacher-assignments/content-keys';
 import { EditWorkDialog } from '@/features/teacher-assignments/edit-work-dialog';
 import { findWork, useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
+import { evictEntity } from '@/lib/cache';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { BackBar } from '@/ui/back-bar';
@@ -110,7 +111,8 @@ export function AssignmentDetailScreen() {
   const [editing, setEditing] = useState(false);
 
   const [setAssignmentVisible, assignmentVisibility] = useMutation(TEACHER_UPDATE_ASSIGNMENT_VISIBILITY);
-  const [setLessonVisible, lessonVisibility] = useMutation(TEACHER_UPDATE_LESSON_VISIBILITY, { refetchQueries: ['TeacherSchool'] });
+  const [setLessonVisible, lessonVisibility] = useMutation(TEACHER_UPDATE_LESSON_VISIBILITY);
+  const client = useApolloClient();
   const [remove, removal] = useMutation(DELETE[(work?.typename ?? 'OqylymAssignment') as keyof typeof DELETE]);
 
   if (school.loading) {
@@ -139,22 +141,38 @@ export function AssignmentDetailScreen() {
   const attempts = new Map(work.attempts.map((a) => [a.studentId, a]));
   const previewHref: Href | null =
     textId && (work.kind === 'oqylym' || work.kind === 'tyndalym')
-      ? ({ pathname: '/teacher/material/[id]', params: { id: `${work.kind}:${textId}` } } as unknown as Href)
+      ? ({ pathname: '/teacher/material/[id]', params: { id: `${work.kind}:${textId}` } })
       : work.durysTitleId
-        ? ({ pathname: '/teacher/material/[id]', params: { id: `grammar:${work.durysTitleId}` } } as unknown as Href)
+        ? ({ pathname: '/teacher/material/[id]', params: { id: `grammar:${work.durysTitleId}` } })
         : null;
   const canToggle = work.kind === 'oqylym' || work.kind === 'tyndalym' || work.kind === 'lesson';
   const visible = work.status !== 'draft';
   const toggling = assignmentVisibility.loading || lessonVisibility.loading;
 
   const toggleVisibility = () => {
-    if (work.kind === 'lesson') void setLessonVisible({ variables: { id: work.id, visible: !visible } });
-    else void setAssignmentVisible({ variables: { id: work.id, visible: !visible } });
+    if (work.kind === 'lesson') {
+      // updateLesson answers a Boolean, so the new value is written into the cached lesson by hand.
+      void setLessonVisible({
+        variables: { id: work.id, visible: !visible },
+        optimisticResponse: { updateLesson: true },
+        update: (cache, { data }) => {
+          if (!data?.updateLesson) return;
+          cache.modify({ id: cache.identify({ __typename: 'Lesson', id: work.id }), fields: { visible: () => !visible } });
+        },
+      });
+    } else {
+      void setAssignmentVisible({
+        variables: { id: work.id, visible: !visible },
+        optimisticResponse: { updateAssignment: { __typename: work.typename as 'OqylymAssignment', id: work.id, visible: !visible } },
+      });
+    }
   };
   const deleteWork = async () => {
-    const result = await remove({ variables: { id: work.id }, refetchQueries: ['TeacherSchool'], awaitRefetchQueries: true }).catch(() => null);
+    const result = await remove({ variables: { id: work.id } }).catch(() => null);
     setConfirmDelete(false);
-    if (result?.data) router.back();
+    if (!result?.data) return;
+    router.back();
+    evictEntity(client.cache, work.typename, work.id);
   };
   const openReview = () => {
     setClassFilter('review', work.classId);

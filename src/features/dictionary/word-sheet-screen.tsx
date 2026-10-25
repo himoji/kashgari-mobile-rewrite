@@ -7,7 +7,7 @@ import { useProfile, useSession } from '@/features/auth/session';
 import { DialogCard } from '@/features/dictionary/dialog-card';
 import { DICTIONARY_REQUEST_DEFINITION, DICTIONARY_WORD } from '@/features/dictionary/gql';
 import { useWordAudio } from '@/features/dictionary/word-audio';
-import type { DictionaryWordQueryQuery } from '@/graphql/graphql';
+import type { DictionaryWordQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
@@ -15,7 +15,7 @@ import { NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 
-type Word = NonNullable<DictionaryWordQueryQuery['word']>;
+type Word = NonNullable<DictionaryWordQuery['word']>;
 type Params = { word: string; def?: string; assignmentId?: string };
 
 function AudioButton({ word }: { word: Word }) {

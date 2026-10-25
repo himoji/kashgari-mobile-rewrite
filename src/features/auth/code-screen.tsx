@@ -22,7 +22,7 @@ export function CodeScreen() {
   const [busy, setBusy] = useState(false);
   const [resendAt, setResendAt] = useState(() => Date.now() + RESEND_SECONDS * 1000);
   const [now, setNow] = useState(() => Date.now());
-  const [verify] = useMutation(VERIFY_CODE);
+  const [verify] = useMutation(VERIFY_CODE, { fetchPolicy: 'no-cache' });
   const [requestCode] = useMutation(REQUEST_CODE);
 
   useEffect(() => {

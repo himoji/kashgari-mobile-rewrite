@@ -5,7 +5,7 @@ import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useProfile } from '@/features/auth/session';
-import { ADD_CHILD } from '@/features/children/gql';
+import { ADD_CHILD, CHILDREN } from '@/features/children/gql';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Sheet } from '@/ui/sheet';
@@ -16,7 +16,7 @@ export function AddChildScreen() {
   const { profileId } = useProfile();
   const [studentId, setStudentId] = useState('');
   const [error, setError] = useState<string>();
-  const [addChild, { loading }] = useMutation(ADD_CHILD, { refetchQueries: ['ChildrenQuery'], awaitRefetchQueries: true });
+  const [addChild, { loading }] = useMutation(ADD_CHILD, { refetchQueries: [CHILDREN], awaitRefetchQueries: true });
 
   const submit = async () => {
     const id = studentId.trim();

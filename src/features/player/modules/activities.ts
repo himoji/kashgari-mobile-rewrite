@@ -10,12 +10,11 @@ import type { FreeTextStep, Step } from '../engine/types';
 import { assignmentSteps } from './assignment';
 import { durysSteps } from './durys';
 
-/** One submittable piece of work: a whole assignment, or one activity of a lesson. */
-export type Activity =
-  | { kind: 'assignment'; id: string; group: string; steps: Step[] }
-  | { kind: 'zhazylym'; id: string; group: string; steps: Step[] }
-  | { kind: 'durys'; id: string; group: string; steps: Step[] }
-  | { kind: 'oyna'; id: string; group: string; steps: Step[] };
+/**
+ * One submittable piece of work: a whole assignment, or one activity of a lesson. `typename` is the
+ * API type of the work, so a submit can drop its cached submission.
+ */
+export type Activity = { kind: 'assignment' | 'zhazylym' | 'durys' | 'oyna'; id: string; typename: string; group: string; steps: Step[] };
 
 export function zhazylymStep(z: PlayerZhazylymFieldsFragment, group: string): FreeTextStep {
   const images = z.__typename === 'ImageZhazylym' ? z.imagesDownload.filter((u): u is string => !!u) : [];
@@ -35,6 +34,7 @@ export function zhazylymStep(z: PlayerZhazylymFieldsFragment, group: string): Fr
 export const assignmentActivity = (a: PlayerAssignmentFieldsFragment, lang: UiLanguage, group = 'a'): Activity => ({
   kind: 'assignment',
   id: a.id,
+  typename: a.__typename,
   group,
   steps: assignmentSteps(a, group, lang),
 });
@@ -42,6 +42,7 @@ export const assignmentActivity = (a: PlayerAssignmentFieldsFragment, lang: UiLa
 export const zhazylymActivity = (z: PlayerZhazylymFieldsFragment, group = 'z'): Activity => ({
   kind: 'zhazylym',
   id: z.id,
+  typename: z.__typename,
   group,
   steps: [zhazylymStep(z, group)],
 });
@@ -49,6 +50,7 @@ export const zhazylymActivity = (z: PlayerZhazylymFieldsFragment, group = 'z'): 
 export const durysActivity = (d: PlayerDurysFieldsFragment, group = 'd'): Activity => ({
   kind: 'durys',
   id: d.id,
+  typename: 'DurysAssignment',
   group,
   steps: durysSteps(d.durysTitle.xmls, group),
 });
@@ -78,6 +80,7 @@ export function lessonActivities(lesson: Lesson, lang: UiLanguage): Activity[] {
           out.push({
             kind: 'oyna',
             id: game.id,
+            typename: game.__typename,
             group,
             steps: [{ id: `${group}:oyna`, kind: 'link', label: 'oyna', group, name: game.name, href: `/student/play/oyna/${game.id}?game=${game.__typename}` }],
           });

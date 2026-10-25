@@ -21,6 +21,7 @@ import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
+import { evictSubmission } from '@/lib/cache';
 import type { OynaWordleGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
@@ -31,7 +32,7 @@ type Game = NonNullable<OynaWordleGameQuery['wordleGame']>;
 
 export function WordlePlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_WORDLE_GAME, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
+  const { data, loading, error, refetch } = useQuery(OYNA_WORDLE_GAME, { variables: { id, studentId: profileId } });
   if (loading) return <PlayerLoading />;
   if (error || !data?.wordleGame) return <PlayerError onRetry={() => void refetch()} />;
   if (data.wordleGame.submission) return <OynaResultView kind="wordle" id={id} />;
@@ -121,7 +122,9 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
   const [checking, setChecking] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [submit, { loading: submitting }] = useMutation(OYNA_WORDLE_SUBMIT, { refetchQueries: 'active' });
+  const [submit, { loading: submitting }] = useMutation(OYNA_WORDLE_SUBMIT, {
+    update: (cache) => evictSubmission(cache, { __typename: 'OynaGameWordle', id: game.id }, studentId),
+  });
 
   const clock = useSessionClock(game.duration > 0 ? game.duration : null, !submitted, () => {
     showToast(t('oyna.timeUp'));
@@ -163,7 +166,7 @@ function WordleRun({ game, studentId }: { game: Game; studentId: string }) {
     setChecking(true);
     let valid = true;
     try {
-      const { data } = await client.query({ query: OYNA_WORDLE_CHECK, variables: { word: typed }, fetchPolicy: 'network-only' });
+      const { data } = await client.query({ query: OYNA_WORDLE_CHECK, variables: { word: typed } });
       valid = data?.wordleCheckWord !== false;
     } catch {
       // the old app accepted the guess when the dictionary check failed

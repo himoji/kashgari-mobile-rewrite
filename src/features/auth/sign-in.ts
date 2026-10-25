@@ -22,8 +22,8 @@ async function signInWithIdToken(provider: 'google' | 'apple', idToken: string) 
       try {
         const { data } =
           provider === 'google'
-            ? await apolloClient.mutate({ mutation: LOGIN_GOOGLE, variables: { idToken }, context: { language } })
-            : await apolloClient.mutate({ mutation: LOGIN_APPLE, variables: { idToken }, context: { language } });
+            ? await apolloClient.mutate({ mutation: LOGIN_GOOGLE, variables: { idToken }, context: { language }, fetchPolicy: 'no-cache' })
+            : await apolloClient.mutate({ mutation: LOGIN_APPLE, variables: { idToken }, context: { language }, fetchPolicy: 'no-cache' });
         const info = data && ('loginGoogle' in data ? data.loginGoogle : data.loginApple);
         return info ? ({ language, ...info } satisfies Credentials) : null;
       } catch {

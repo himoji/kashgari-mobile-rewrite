@@ -1,4 +1,4 @@
-import type { ClassWorkFragment } from '@/graphql/graphql';
+import type { ClassWorkFragment, FreeResponseGradesFragment } from '@/graphql/graphql';
 import { className, percent } from '@/features/classes/format';
 
 /** Route segment of /teacher/assignment/[kind]/[id]. */
@@ -82,7 +82,7 @@ export function assignmentScore(parts: Scored[]): number | null {
 }
 
 /** An open question the student answered and the teacher has not scored yet. */
-export function hasUngradedAnswer(fr: { questions: { answer?: string | null; grade?: number | null }[] } | null | undefined): boolean {
+export function hasUngradedAnswer(fr: FreeResponseGradesFragment | null | undefined): boolean {
   return !!fr?.questions.some((q) => q.answer != null && q.answer.trim() !== '' && q.grade == null);
 }
 
@@ -120,6 +120,18 @@ function latestPerStudent(attempts: Attempt[], studentIds: string[]): Attempt[] 
   }
   // Roster order, like the design's lists.
   return studentIds.flatMap((id) => byStudent.get(id) ?? []);
+}
+
+const mapped = new WeakMap<ClassWorkFragment, ClassWork>();
+
+/**
+ * `mapClassWork`, once per class object. Apollo keeps unchanged classes the same object between
+ * results, so after a grade or delete only the class that changed is mapped again.
+ */
+export function mapClassWorkCached(c: ClassWorkFragment): ClassWork {
+  let result = mapped.get(c);
+  if (!result) mapped.set(c, (result = mapClassWork(c)));
+  return result;
 }
 
 /** Turns one class (ClassWork fragment) into the flat work list every School screen reads. */

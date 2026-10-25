@@ -1,7 +1,7 @@
-import type { MaterialsGradeQueryQuery } from '@/graphql/graphql';
+import type { MaterialsGradeQuery } from '@/graphql/graphql';
 import { levelOf, type Level, type MaterialKind, type MaterialRef } from '@/features/materials/material-ref';
 
-type Grade = NonNullable<MaterialsGradeQueryQuery['grade']>;
+type Grade = NonNullable<MaterialsGradeQuery['grade']>;
 type Section = Grade['sections'][number];
 type Name = Section['name'];
 

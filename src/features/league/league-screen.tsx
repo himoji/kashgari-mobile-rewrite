@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { skipToken, useSuspenseQuery } from '@apollo/client/react';
 import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
@@ -11,8 +11,9 @@ import { paginate } from '@/features/reader/book';
 import type { Level } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 import { colors } from '@/theme/colors';
-import { EmptyState, ErrorState, Skeleton } from '@/ui/feedback';
+import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
+import { QueryBoundary, useRefresh, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -74,49 +75,58 @@ function BookRow({ id, title, pages }: { id: string; title: string; pages: numbe
 /** League tab: league points (acorns), the way to the rankings, and free texts to read. */
 export function LeagueScreen() {
   const { t } = useTranslation();
+  const { refreshing, refresh } = useRefresh(LEAGUE_STUDENT, LEAGUE_BOOKS);
+  return (
+    <TabScreen title={t('league.title')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
+      <QueryBoundary fallback={<LeagueSkeleton />}>
+        <League />
+      </QueryBoundary>
+    </TabScreen>
+  );
+}
+
+function LeagueSkeleton() {
+  return (
+    <View>
+      <PointsCard points={null} />
+      <View className="mt-[18px] gap-1.5">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-[84px]" />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function League() {
+  const { t } = useTranslation();
   const profile = useProfile();
   const content = useContentText();
-  const student = useQuery(LEAGUE_STUDENT, { variables: { studentId: profile.profileId } });
-  const level = student.data?.student?.account.languageLevel;
-  const books = useQuery(LEAGUE_BOOKS, {
-    variables: { complexity: level ? COMPLEXITY[level] : 1 },
-    skip: !level,
-  });
+  const queryKey = useRetryKey();
+  const { data: student } = useSuspenseQuery(LEAGUE_STUDENT, { variables: { studentId: profile.profileId }, queryKey });
+  const level = student.student?.account.languageLevel;
+  const { data: books } = useSuspenseQuery(LEAGUE_BOOKS, level ? { variables: { complexity: COMPLEXITY[level] }, queryKey } : skipToken);
 
   const list = useMemo(
     () =>
-      (books.data?.oqylymTextsByComplexity ?? []).map((b) => ({
+      (books?.oqylymTextsByComplexity ?? []).map((b) => ({
         id: b.id,
         title: content(b.title),
         pages: paginate(b.paragraphs).length,
       })),
-    [books.data, content],
+    [books, content],
   );
 
-  const error = student.error ?? books.error;
-  const loading = student.loading || books.loading;
-  const refetch = () => void Promise.all([student.refetch(), level ? books.refetch() : null]);
-
   return (
-    <TabScreen title={t('league.title')} mascot="learning" refreshing={false} onRefresh={refetch}>
-      <View>
-        <PointsCard points={student.data?.student?.acorns ?? null} />
-        <View className="mt-[18px] gap-1.5">
-          {error ? (
-            <ErrorState onRetry={refetch} />
-          ) : loading ? (
-            [0, 1, 2].map((i) => <Skeleton key={i} className="h-[84px]" />)
-          ) : list.length ? (
-            list.map((b) => <BookRow key={b.id} {...b} />)
-          ) : (
-            <EmptyState
-              title={t('league.emptyTitle')}
-              body={t('league.emptyBody')}
-              illustration="materials"
-            />
-          )}
-        </View>
+    <View>
+      <PointsCard points={student.student?.acorns ?? null} />
+      <View className="mt-[18px] gap-1.5">
+        {list.length ? (
+          list.map((b) => <BookRow key={b.id} {...b} />)
+        ) : (
+          <EmptyState title={t('league.emptyTitle')} body={t('league.emptyBody')} illustration="materials" />
+        )}
       </View>
-    </TabScreen>
+    </View>
   );
 }

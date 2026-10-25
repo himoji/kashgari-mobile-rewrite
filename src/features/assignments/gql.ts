@@ -49,7 +49,7 @@ export const STUDENT_ASSIGNMENTS = gql(`
         durysAssignments {
           id
           createdAt
-          durysTitle { title }
+          durysTitle { id title }
           submission(studentId: $studentId)
         }
         lessons {

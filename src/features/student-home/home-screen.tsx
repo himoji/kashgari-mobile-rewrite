@@ -1,4 +1,4 @@
-import { router, type Href } from 'expo-router';
+import { router } from 'expo-router';
 import { Hourglass } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ function ProgressCard({ done, total }: { done: number; total: number }) {
         <Text className="mb-3 mt-1.5 font-body text-[12px] leading-[18px] text-white/95">{t('studentHome.completed')}</Text>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/student/results' as Href)}
+          onPress={() => router.push('/student/results')}
           className="self-start rounded-[11px] bg-white px-[14px] py-2 active:opacity-90"
           style={{ boxShadow: 'inset 0 1px 3px rgba(109,160,230,0.44), 0 2px 5px rgba(22,88,180,0.07)' }}
         >
@@ -73,7 +73,7 @@ export function StudentHomeScreen() {
         icon="solid-book"
         title={t('studentHome.continueReading')}
         subtitle={t('studentHome.readingHint')}
-        onPress={() => router.push('/student/league' as Href)}
+        onPress={() => router.push('/student/league')}
       />
       {next ? (
         <ListRow
@@ -87,7 +87,7 @@ export function StudentHomeScreen() {
         icon="solid-star"
         title={t('studentHome.reviewWords')}
         subtitle={t('studentHome.reviewWordsHint')}
-        onPress={() => router.push('/student/words' as Href)}
+        onPress={() => router.push('/student/words')}
       />
     </TabScreen>
   );

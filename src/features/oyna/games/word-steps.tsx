@@ -1,14 +1,13 @@
-import { useMutation, useQuery } from '@apollo/client/react';
-import { useAudioPlayer } from 'expo-audio';
+import { useMutation } from '@apollo/client/react';
 import { Image } from 'expo-image';
 import { Heart } from 'lucide-react-native';
 import { useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { useProfile, useSession } from '@/features/auth/session';
-import { wordAudioUrl } from '@/features/dictionary/audio';
-import { OYNA_WORD_AUDIO, OYNA_WORD_GAME_CAPTCHA_SUBMIT } from '@/features/oyna/gql';
+import { useSession } from '@/features/auth/session';
+import { useWordTextAudio } from '@/features/dictionary/word-audio';
+import { OYNA_WORD_GAME_CAPTCHA_SUBMIT } from '@/features/oyna/gql';
 import { sameWord, shuffled } from '@/features/oyna/logic/shuffle';
 import { displayTranslation } from '@/features/oyna/logic/translation';
 import {
@@ -58,21 +57,8 @@ function FlashButton({ icon, label, onPress, disabled }: { icon: 'back' | 'arrow
 
 function AudioButton({ word }: { word: string }) {
   const { t } = useTranslation();
-  const language = useProfile().language;
-  const { data } = useQuery(OYNA_WORD_AUDIO, { variables: { word } });
-  const url = data?.word ? wordAudioUrl(language, data.word) : null;
-  const player = useAudioPlayer(url ? { uri: url } : null);
-  return (
-    <FlashButton
-      icon="audio"
-      label={t('oyna.pronunciation')}
-      disabled={!url}
-      onPress={() => {
-        player.seekTo(0);
-        player.play();
-      }}
-    />
-  );
+  const play = useWordTextAudio(word);
+  return <FlashButton icon="audio" label={t('oyna.pronunciation')} disabled={!play} onPress={() => play?.()} />;
 }
 
 // ---------------- Flashcards ----------------

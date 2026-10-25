@@ -1,14 +1,28 @@
 import { gql } from '@/graphql';
 
+/** What a class is called on screen ("7А"): see `className`. */
+export const CLASS_LABEL = gql(`
+  fragment ClassLabel on Class {
+    id
+    grade
+    letter
+  }
+`);
+
+/** Open-question answers with the teacher's grade (null until graded): see `hasUngradedAnswer`. */
+export const FREE_RESPONSE_GRADES = gql(`
+  fragment FreeResponseGrades on SubmissionFreeResponse {
+    questions { answer grade }
+  }
+`);
+
 /**
  * A class with its roster, every kind of work and each submission's score: the input of
  * `mapClassWork` (class-data.ts). Spread it into any query that lists classes (teacher, principal).
  */
 export const CLASS_WORK = gql(`
   fragment ClassWork on Class {
-    id
-    grade
-    letter
+    ...ClassLabel
     students {
       id
       name
@@ -32,7 +46,7 @@ export const CLASS_WORK = gql(`
         multipleChoice { correct total }
         wordGrid { correct total }
         crossword { correct total }
-        freeResponse { questions { answer grade } }
+        freeResponse { ...FreeResponseGrades }
       }
     }
     zhazylymAssignments {

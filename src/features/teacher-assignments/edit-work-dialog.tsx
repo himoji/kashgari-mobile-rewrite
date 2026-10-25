@@ -25,7 +25,7 @@ export function EditWorkDialog({ work, visible, onClose }: { work: Work; visible
   const { t } = useTranslation();
   const [name, setName] = useState(work.name);
   const [days, setDays] = useState<number | null>(null);
-  const [save, { loading, error }] = useMutation(TEACHER_EDIT_ASSIGNMENT, { refetchQueries: 'active' });
+  const [save, { loading, error }] = useMutation(TEACHER_EDIT_ASSIGNMENT);
 
   const submit = async () => {
     await save({ variables: { id: work.id, name: name.trim() || work.name, deadline: days ? deadlineIn(days) : work.date } });

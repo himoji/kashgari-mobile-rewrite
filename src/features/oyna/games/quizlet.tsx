@@ -14,6 +14,7 @@ import { ConfirmSubmit, PlayerActions, PlayerFrame, useToast } from '@/features/
 import { PlayerError, PlayerLoading } from '@/features/oyna/player-states';
 import { OynaResultView } from '@/features/oyna/result/oyna-result';
 import { useSessionClock } from '@/features/oyna/use-session-clock';
+import { evictSubmission } from '@/lib/cache';
 import type { OynaQuizletGameQuery } from '@/graphql/graphql';
 import { useContentText } from '@/lib/i18n';
 
@@ -21,7 +22,7 @@ type Game = NonNullable<OynaQuizletGameQuery['quizletGame']>;
 
 export function QuizletPlayer({ id }: { id: string }) {
   const { profileId } = useProfile();
-  const { data, loading, error, refetch } = useQuery(OYNA_QUIZLET_GAME, { variables: { id, studentId: profileId }, fetchPolicy: 'network-only' });
+  const { data, loading, error, refetch } = useQuery(OYNA_QUIZLET_GAME, { variables: { id, studentId: profileId } });
   if (loading) return <PlayerLoading />;
   if (error || !data?.quizletGame) return <PlayerError onRetry={() => void refetch()} />;
   if (data.quizletGame.submission) return <OynaResultView kind="quizlet" id={id} />;
@@ -87,7 +88,9 @@ function QuizletRun({ game, studentId }: { game: Game; studentId: string }) {
   const [matched, setMatched] = useState<string[][]>(() => all.map(() => []));
   const [confirm, setConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [submit, { loading: submitting }] = useMutation(OYNA_QUIZLET_SUBMIT, { refetchQueries: 'active' });
+  const [submit, { loading: submitting }] = useMutation(OYNA_QUIZLET_SUBMIT, {
+    update: (cache) => evictSubmission(cache, { __typename: 'OynaGameQuizlet', id: game.id }, studentId),
+  });
 
   const clock = useSessionClock(quizletSeconds(game.duration), !submitted, () => {
     showToast(t('oyna.timeUp'));

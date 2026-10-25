@@ -38,10 +38,10 @@ export const ACCOUNT_PROFILES = gql(`
     account(id: $accountId) {
       id
       email
-      studentProfiles { id name class { id grade letter teacher { school { name } } } }
-      teacherProfiles { id name school { name } }
+      studentProfiles { id name class { ...ClassLabel teacher { id school { id name } } } }
+      teacherProfiles { id name school { id name } }
       parentProfile { id name }
-      principalProfiles { id name school { name } }
+      principalProfiles { id name school { id name } }
     }
   }
 `);

@@ -1,4 +1,5 @@
 import type { UiLanguage } from '@/features/auth/session';
+import type { ClassLabelFragment } from '@/graphql/graphql';
 
 const MONTHS: Record<UiLanguage, string[]> = {
   kk: ['қаң.', 'ақп.', 'нау.', 'сәу.', 'мам.', 'мау.', 'шіл.', 'там.', 'қыр.', 'қаз.', 'қар.', 'жел.'],
@@ -20,6 +21,6 @@ export function dayMonth(seconds: number): string {
 }
 
 /** "7А" from the API's grade + letter (grade is optional for tutor groups). */
-export const className = (c: { grade?: number | null; letter: string }) => `${c.grade ?? ''}${c.letter}`;
+export const className = (c: Pick<ClassLabelFragment, 'grade' | 'letter'>) => `${c.grade ?? ''}${c.letter}`;
 
 export const percent = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 100) : 0);

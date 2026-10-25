@@ -1,7 +1,7 @@
 import { gql } from '@/graphql';
 
 export const RANKINGS_CLASSMATES = gql(`
-  query RankingsClassmatesQuery($studentId: ID!) {
+  query RankingsClassmates($studentId: ID!) {
     student(id: $studentId) {
       id
       class {
@@ -16,9 +16,20 @@ export const RANKINGS_CLASSMATES = gql(`
   }
 `);
 
+/** One class on the school board: its label and each student's acorns (input of `classRows`). */
+export const RANKINGS_CLASS = gql(`
+  fragment RankingsClass on Class {
+    ...ClassLabel
+    students {
+      id
+      acorns
+    }
+  }
+`);
+
 /** Every class of the student's school (through its teachers), with each student's acorns. */
 export const RANKINGS_CLASSES = gql(`
-  query RankingsClassesQuery($studentId: ID!) {
+  query RankingsClasses($studentId: ID!) {
     student(id: $studentId) {
       id
       class {
@@ -30,13 +41,7 @@ export const RANKINGS_CLASSES = gql(`
             teachers {
               id
               classes {
-                id
-                grade
-                letter
-                students {
-                  id
-                  acorns
-                }
+                ...RankingsClass
               }
             }
           }

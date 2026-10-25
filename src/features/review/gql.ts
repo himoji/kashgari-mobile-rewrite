@@ -8,7 +8,7 @@ export const REVIEW_ZHAZYLYM_SUBMISSION = gql(`
       createdAt
       text
       points
-      student { id name class { id grade letter } }
+      student { id name class { ...ClassLabel } }
       assignment {
         __typename
         id
@@ -28,7 +28,7 @@ export const REVIEW_MINI_STORY_SUBMISSION = gql(`
       createdAt
       text
       points
-      student { id name class { id grade letter } }
+      student { id name class { ...ClassLabel } }
       game { id name words maxPoints }
     }
   }
@@ -39,7 +39,7 @@ export const REVIEW_ASSIGNMENT_SUBMISSION = gql(`
     submission(id: $id) {
       id
       createdAt
-      student { id name class { id grade letter } }
+      student { id name class { ...ClassLabel } }
       assignment { id name }
       multipleChoice { correct total questions { question { question } answer } }
       trueFalse { correct total questions { question { question answer } answer } }

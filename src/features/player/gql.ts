@@ -1,7 +1,7 @@
 import { gql } from '@/graphql';
 
 /** Everything a student needs to play one reading/listening assignment (games come without answers). */
-export const PlayerAssignmentFields = gql(`
+export const PLAYER_ASSIGNMENT_FIELDS = gql(`
   fragment PlayerAssignmentFields on Assignment {
     __typename
     id
@@ -63,7 +63,7 @@ export const PlayerAssignmentFields = gql(`
 `);
 
 /** A submitted attempt with the right answers (options[0], wordGroup[0], question.word…) for review. */
-export const PlayerSubmissionFields = gql(`
+export const PLAYER_SUBMISSION_FIELDS = gql(`
   fragment PlayerSubmissionFields on Submission {
     id
     createdAt
@@ -113,7 +113,7 @@ export const PlayerSubmissionFields = gql(`
   }
 `);
 
-export const PlayerZhazylymFields = gql(`
+export const PLAYER_ZHAZYLYM_FIELDS = gql(`
   fragment PlayerZhazylymFields on Zhazylym {
     __typename
     id
@@ -131,7 +131,7 @@ export const PlayerZhazylymFields = gql(`
   }
 `);
 
-export const PlayerDurysFields = gql(`
+export const PLAYER_DURYS_FIELDS = gql(`
   fragment PlayerDurysFields on DurysAssignment {
     id
     durysTitle {
@@ -142,7 +142,7 @@ export const PlayerDurysFields = gql(`
   }
 `);
 
-export const PlayerAssignmentQuery = gql(`
+export const PLAYER_ASSIGNMENT = gql(`
   query PlayerAssignment($id: ID!, $studentId: ID!) {
     assignment(id: $id) {
       ...PlayerAssignmentFields
@@ -151,7 +151,7 @@ export const PlayerAssignmentQuery = gql(`
   }
 `);
 
-export const PlayerZhazylymQuery = gql(`
+export const PLAYER_ZHAZYLYM = gql(`
   query PlayerZhazylym($id: ID!, $studentId: ID!) {
     zhazylym(id: $id) {
       ...PlayerZhazylymFields
@@ -160,7 +160,7 @@ export const PlayerZhazylymQuery = gql(`
   }
 `);
 
-export const PlayerDurysQuery = gql(`
+export const PLAYER_DURYS = gql(`
   query PlayerDurys($id: ID!, $studentId: ID!) {
     durysAssignment(id: $id) {
       ...PlayerDurysFields
@@ -170,7 +170,7 @@ export const PlayerDurysQuery = gql(`
 `);
 
 /** A lesson is a sequence of activities; each one is played and submitted on its own. */
-export const PlayerLessonQuery = gql(`
+export const PLAYER_LESSON = gql(`
   query PlayerLesson($id: ID!, $studentId: ID!, $classId: ID!) {
     lesson(id: $id) {
       id
@@ -214,7 +214,7 @@ export const PlayerLessonQuery = gql(`
   }
 `);
 
-export const PlayerStudentClassQuery = gql(`
+export const PLAYER_STUDENT_CLASS = gql(`
   query PlayerStudentClass($studentId: ID!) {
     student(id: $studentId) {
       id
@@ -223,19 +223,19 @@ export const PlayerStudentClassQuery = gql(`
   }
 `);
 
-export const PlayerSubmitAssignment = gql(`
+export const PLAYER_SUBMIT_ASSIGNMENT = gql(`
   mutation PlayerSubmitAssignment($assignmentId: ID!, $studentId: ID!, $answers: SubmissionInput!, $stats: SubmissionStatsInput) {
     submitAssignment(assignmentId: $assignmentId, studentId: $studentId, answers: $answers, stats: $stats) { id }
   }
 `);
 
-export const PlayerSubmitZhazylym = gql(`
+export const PLAYER_SUBMIT_ZHAZYLYM = gql(`
   mutation PlayerSubmitZhazylym($zhazylymId: ID!, $studentId: ID!, $data: ZhazylymSubmissionInput!) {
     submitZhazylym(zhazylymId: $zhazylymId, studentId: $studentId, data: $data) { id }
   }
 `);
 
-export const PlayerSubmitDurys = gql(`
+export const PLAYER_SUBMIT_DURYS = gql(`
   mutation PlayerSubmitDurys($durysAssignmentId: ID!, $studentId: ID!) {
     submitDurysAssignment(durysAssignmentId: $durysAssignmentId, studentId: $studentId) { id }
   }
@@ -243,7 +243,7 @@ export const PlayerSubmitDurys = gql(`
 
 // ---------- results ----------
 
-export const ResultAssignmentQuery = gql(`
+export const RESULT_ASSIGNMENT = gql(`
   query ResultAssignment($id: ID!, $studentId: ID!) {
     assignment(id: $id) {
       ...PlayerAssignmentFields
@@ -252,7 +252,7 @@ export const ResultAssignmentQuery = gql(`
   }
 `);
 
-export const ResultZhazylymQuery = gql(`
+export const RESULT_ZHAZYLYM = gql(`
   query ResultZhazylym($id: ID!, $studentId: ID!) {
     zhazylym(id: $id) {
       ...PlayerZhazylymFields
@@ -261,7 +261,7 @@ export const ResultZhazylymQuery = gql(`
   }
 `);
 
-export const ResultDurysQuery = gql(`
+export const RESULT_DURYS = gql(`
   query ResultDurys($id: ID!, $studentId: ID!) {
     durysAssignment(id: $id) {
       ...PlayerDurysFields
@@ -270,7 +270,7 @@ export const ResultDurysQuery = gql(`
   }
 `);
 
-export const ResultLessonQuery = gql(`
+export const RESULT_LESSON = gql(`
   query ResultLesson($id: ID!, $studentId: ID!, $classId: ID!) {
     lesson(id: $id) {
       id
@@ -310,15 +310,6 @@ export const ResultLessonQuery = gql(`
           }
         }
       }
-    }
-  }
-`);
-
-export const PlayerWordAudioQuery = gql(`
-  query PlayerWordAudio($word: String!) {
-    word(wordCyrillic: $word) {
-      id
-      url
     }
   }
 `);

@@ -42,6 +42,8 @@ import {
   ASSIGN_GAMES,
   ASSIGN_MATERIAL,
 } from '@/features/assign/gql';
+import { className } from '@/features/classes/format';
+import { evictFields } from '@/lib/cache';
 import { useProfile } from '@/features/auth/session';
 import { kindFlags, parseMaterialParam } from '@/features/materials/material-ref';
 import { colors } from '@/theme/colors';
@@ -202,7 +204,7 @@ export function AssignScreen() {
     setNotice(null);
     try {
       if (source.ref.kind === 'grammar') {
-        await createGrammar({ variables: { classId, titleId: source.ref.id }, refetchQueries: 'active' });
+        await createGrammar({ variables: { classId, titleId: source.ref.id }, update: (cache) => evictFields(cache, 'Class', classId, ['durysAssignments']) });
       } else {
         const assignment = {
           type: 'HW' as const,
@@ -214,8 +216,8 @@ export function AssignScreen() {
           hasFlashcards: blocks.some((b) => b.type === 'cards'),
         };
         if (source.ref.kind === 'tyndalym')
-          await createTyndalym({ variables: { classId, visible, assignment: { ...assignment, listenType } }, refetchQueries: 'active' });
-        else await createOqylym({ variables: { classId, visible, assignment }, refetchQueries: 'active' });
+          await createTyndalym({ variables: { classId, visible, assignment: { ...assignment, listenType } }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) });
+        else await createOqylym({ variables: { classId, visible, assignment }, update: (cache) => evictFields(cache, 'Class', classId, ['assignments']) });
       }
       setDone(visible ? 'assigned' : 'draft');
     } catch {
@@ -308,7 +310,7 @@ export function AssignScreen() {
             >
               <Icon name="classes" size={18} color="#687f9f" />
               <Text className="flex-1 font-body text-[14px] leading-[21px] text-[#687f9f]">
-                {chosenClass ? `${chosenClass.grade ?? ''}${chosenClass.letter}` : t('assign.chooseClass')}
+                {chosenClass ? className(chosenClass) : t('assign.chooseClass')}
               </Text>
               <Icon name="down" size={18} color={colors.ink} />
             </Pressable>
@@ -412,7 +414,7 @@ export function AssignScreen() {
           {classes.map((c) => (
             <ChoiceRow
               key={c.id}
-              label={`${c.grade ?? ''}${c.letter}`}
+              label={className(c)}
               selected={c.id === classId}
               onPress={() => (setClassId(c.id), setErrors((e) => ({ ...e, class: false })), setDialog(null))}
             />

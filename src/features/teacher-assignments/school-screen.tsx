@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams, type Href } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -71,7 +71,7 @@ export function TeacherSchoolScreen() {
           <Button
             icon="plus"
             label={t('teacherAssignments.assignWork')}
-            onPress={() => router.push('/teacher/assign/new' as Href)}
+            onPress={() => router.push('/teacher/assign/new')}
             className="h-[46px] rounded-[13px] bg-primary-strong"
           />
         </View>

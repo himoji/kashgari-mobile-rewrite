@@ -1,9 +1,7 @@
 import { apolloClient } from '@/lib/apollo';
 import { ACCOUNT_PROFILES } from '@/features/auth/gql';
+import { className } from '@/features/classes/format';
 import { profileKey, type Credentials, type Profile } from '@/features/auth/session';
-
-const className = (c?: { grade?: number | null; letter: string } | null) =>
-  c ? `${c.grade ?? ''}${c.letter}` : undefined;
 
 /** Every role profile across the accounts a phone or social login returned. */
 export async function resolveProfiles(credentials: Credentials[]): Promise<Profile[]> {
@@ -13,7 +11,8 @@ export async function resolveProfiles(credentials: Credentials[]): Promise<Profi
         query: ACCOUNT_PROFILES,
         variables: { accountId: cred.accountId },
         context: { credentials: cred },
-        fetchPolicy: 'network-only',
+        // One account per language database: their ids can collide, so these never enter the cache.
+        fetchPolicy: 'no-cache',
       });
       const account = data?.account;
       if (!account) return [];

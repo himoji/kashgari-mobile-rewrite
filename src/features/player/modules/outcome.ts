@@ -17,7 +17,6 @@ export type Outcome = {
   review: { steps: Step[]; answers: Answers } | null;
 };
 
-
 type Assignment = NonNullable<ResultAssignmentQuery['assignment']>;
 type Zhazylym = NonNullable<ResultZhazylymQuery['zhazylym']>;
 type Lesson = NonNullable<ResultLessonQuery['lesson']>;
@@ -48,9 +47,9 @@ export function lessonOutcome(lesson: Lesson, lang: UiLanguage): Outcome {
   const steps: Step[] = [];
   const answers: Answers = {};
   let submittedAt = lesson.submission?.createdAt ?? null;
-  let any = false;
+  let touched = false;
   const seen = (at: number | null | undefined) => {
-    any = true;
+    touched = true;
     if (at && (!submittedAt || at > submittedAt)) submittedAt = at;
   };
   lesson.activities.forEach((act, i) => {
@@ -88,7 +87,7 @@ export function lessonOutcome(lesson: Lesson, lang: UiLanguage): Outcome {
   });
   return {
     title: lesson.name,
-    submitted: any,
+    submitted: touched,
     submittedAt,
     score: total.pending ? null : percent(total),
     pending: total.pending,

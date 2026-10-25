@@ -15,7 +15,7 @@ import { Icon } from '@/ui/icon';
 import { SearchField } from '@/ui/search-field';
 
 export const workHref = (w: Pick<Work, 'kind' | 'id'>): Href =>
-  ({ pathname: '/teacher/assignment/[kind]/[id]', params: { kind: w.kind, id: w.id } }) as unknown as Href;
+  ({ pathname: '/teacher/assignment/[kind]/[id]', params: { kind: w.kind, id: w.id } });
 
 /** "Тапсырмалар" segment: search, class filter and every work with its completion. */
 export function AssignmentsSegment({ classes }: { classes: ClassWork[] }) {

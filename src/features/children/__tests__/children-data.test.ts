@@ -1,10 +1,10 @@
-import childrenFixture from '@/dev/mocks/ChildrenQuery';
+import childrenFixture from '@/dev/mocks/Children';
 import assignmentsFixture from '@/dev/mocks/StudentAssignments';
 import { mapAssignments, type StudentAssignment } from '@/features/assignments/map';
 import { mapChildren, moduleAssignments, moduleBreakdown, recentAssignments, splitWords } from '@/features/children/children-data';
-import type { ChildrenQueryQuery, StudentAssignmentsQuery } from '@/graphql/graphql';
+import type { ChildrenQuery, StudentAssignmentsQuery } from '@/graphql/graphql';
 
-const parent = (childrenFixture() as unknown as ChildrenQueryQuery).parent!;
+const parent = (childrenFixture() as unknown as ChildrenQuery).parent!;
 const now = Date.now() / 1000;
 const all = mapAssignments((assignmentsFixture() as unknown as StudentAssignmentsQuery).student!.class, now);
 

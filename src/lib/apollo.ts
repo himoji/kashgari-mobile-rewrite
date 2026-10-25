@@ -1,10 +1,7 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { SetContextLink } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
-import { getMainDefinition } from '@apollo/client/utilities';
-import { createClient } from 'graphql-ws';
 import { jwtDecode } from 'jwt-decode';
 import { map } from 'rxjs';
 
@@ -73,34 +70,50 @@ const errorLink = new ErrorLink(({ error }) => {
   }
 });
 
-const wsLink = new GraphQLWsLink(
-  createClient({
-    url: env.graphqlWsUrl,
-    lazy: true,
-    retryAttempts: 5,
-    connectionParams: () => headersFor(activeCredentials()),
-  }),
-);
-
 const httpLink = new HttpLink({ uri: env.graphqlUrl });
 
-const isSubscription = ({ query }: ApolloLink.Operation) => {
-  const definition = getMainDefinition(query);
-  return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-};
+/**
+ * Types without an id live inside their parent (exercise content, a submission's answers). Merging
+ * keeps fields one query selected when another query writes the same parent with fewer fields.
+ */
+const EMBEDDED = [
+  'Games',
+  'GameCompleteV2',
+  'GameCrossword',
+  'GameFreeResponse',
+  'GameMultipleChoice',
+  'GameTrueFalse',
+  'GameWordGrid',
+  'GameWordMatch',
+  'GameWordShuffle',
+  'SubmissionCompleteV2',
+  'SubmissionCrossword',
+  'SubmissionFreeResponse',
+  'SubmissionMultipleChoice',
+  'SubmissionTrueFalse',
+  'SubmissionWordGrid',
+  'SubmissionWordMatch',
+  'SubmissionWordShuffle',
+];
 
 const networkLink = env.mocks
   ? (require('@/dev/mock-link') as typeof import('@/dev/mock-link')).mockLink
-  : ApolloLink.split(isSubscription, wsLink, ApolloLink.from([authLink, refreshLink, httpLink]));
+  : ApolloLink.from([authLink, refreshLink, httpLink]);
 
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([errorLink, networkLink]),
   cache: new InMemoryCache({
     possibleTypes: introspection.possibleTypes,
+    typePolicies: Object.fromEntries(EMBEDDED.map((type) => [type, { merge: true }])),
   }),
+  defaultOptions: {
+    // Show what is cached at once, refresh in the background, then answer from the cache on re-render.
+    watchQuery: { fetchPolicy: 'cache-and-network', nextFetchPolicy: 'cache-first' },
+  },
 });
 
-/** Different accounts must never share cached data. */
+/** Different accounts must never share cached data: clear on every profile switch and on sign-out. */
 useSession.subscribe((state, prev) => {
-  if (state.activeKey !== prev.activeKey) void apolloClient.clearStore();
+  const signedOut = state.credentials.length === 0 && prev.credentials.length > 0;
+  if (state.activeKey !== prev.activeKey || signedOut) void apolloClient.clearStore();
 });

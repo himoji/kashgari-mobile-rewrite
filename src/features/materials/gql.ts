@@ -2,7 +2,7 @@ import { gql } from '@/graphql';
 
 /** The teacher's classes (default grade) and the grades that have a curriculum. */
 export const MATERIALS_CONTEXT = gql(`
-  query MaterialsContextQuery($teacherId: ID!) {
+  query MaterialsContext($teacherId: ID!) {
     teacher(id: $teacherId) {
       id
       classes {
@@ -19,7 +19,7 @@ export const MATERIALS_CONTEXT = gql(`
 
 /** One grade's curriculum: sections (topics) with their reading and listening texts. */
 export const MATERIALS_GRADE = gql(`
-  query MaterialsGradeQuery($grade: Int!, $teacherId: ID!) {
+  query MaterialsGrade($grade: Int!, $teacherId: ID!) {
     grade(grade: $grade) {
       grade
       sections {
@@ -48,7 +48,7 @@ export const MATERIALS_GRADE = gql(`
 
 /** Grammar materials are the "Дұрыс" exercise sets. */
 export const MATERIALS_GRAMMAR = gql(`
-  query MaterialsGrammarQuery {
+  query MaterialsGrammar {
     allDurysTitles {
       id
       title
@@ -57,7 +57,7 @@ export const MATERIALS_GRAMMAR = gql(`
 `);
 
 export const MATERIALS_TEXT = gql(`
-  query MaterialsTextQuery($id: ID!, $oqylym: Boolean!, $tyndalym: Boolean!, $grammar: Boolean!) {
+  query MaterialsText($id: ID!, $oqylym: Boolean!, $tyndalym: Boolean!, $grammar: Boolean!) {
     oqylymText(id: $id) @include(if: $oqylym) {
       id
       title
@@ -109,7 +109,7 @@ export const MATERIALS_TEXT = gql(`
 `);
 
 export const MATERIALS_WORD_BANK = gql(`
-  query MaterialsWordBankQuery {
+  query MaterialsWordBank {
     topics {
       name
       levels {
@@ -123,7 +123,7 @@ export const MATERIALS_WORD_BANK = gql(`
 `);
 
 export const MATERIALS_WORD_TRANSLATION = gql(`
-  query MaterialsWordTranslationQuery($word: String!) {
+  query MaterialsWordTranslation($word: String!) {
     word(wordCyrillic: $word) {
       id
       definitions {
