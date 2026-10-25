@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
-import { SegmentedTabs } from '@/ui/segmented-tabs';
+import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { TabScreen } from '@/ui/tab-screen';
 
 import { AssignmentCard } from './assignment-card';
@@ -37,6 +37,7 @@ export function SchoolScreen() {
   return (
     <TabScreen title={t('common.tabs.school')} mascot="learning" refreshing={refreshing} onRefresh={refresh}>
       <QueryBoundary
+        fade={false}
         fallback={
           <>
             <Segments value={segment} onChange={setSegment} />
@@ -62,19 +63,21 @@ function School({ segment, onSegment }: { segment: Segment; onSegment: (s: Segme
   return (
     <>
       <Segments value={segment} onChange={onSegment} counts={{ new: fresh.length, completed: completed.length }} />
-      {list.length === 0 ? (
-        segment === 'new' ? (
-          <EmptyState illustration="classroom" title={t('assignments.empty.new')} body={t('assignments.empty.newBody')} />
+      <SegmentPanel id={segment}>
+        {list.length === 0 ? (
+          segment === 'new' ? (
+            <EmptyState illustration="classroom" title={t('assignments.empty.new')} body={t('assignments.empty.newBody')} />
+          ) : (
+            <EmptyState illustration="progress" title={t('assignments.empty.completed')} />
+          )
         ) : (
-          <EmptyState illustration="progress" title={t('assignments.empty.completed')} />
-        )
-      ) : (
-        <View className="gap-2.5">
-          {list.map((a) => (
-            <AssignmentCard key={`${a.kind}:${a.id}`} item={a} />
-          ))}
-        </View>
-      )}
+          <View className="gap-2.5">
+            {list.map((a) => (
+              <AssignmentCard key={`${a.kind}:${a.id}`} item={a} />
+            ))}
+          </View>
+        )}
+      </SegmentPanel>
     </>
   );
 }

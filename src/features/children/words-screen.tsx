@@ -15,7 +15,7 @@ import { BackBar } from '@/ui/back-bar';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
-import { SegmentedTabs } from '@/ui/segmented-tabs';
+import { SegmentedTabs, SegmentPanel } from '@/ui/segmented-tabs';
 import { Text } from '@/ui/text';
 
 type Tab = 'learned' | 'learning';
@@ -81,24 +81,26 @@ function Words({ childId, tab, onTabChange }: { childId: string; tab: Tab; onTab
   return (
     <>
       <WordTabs tab={tab} onChange={onTabChange} learned={lists.learned.length} learning={lists.learning.length} />
-      {list.length === 0 ? (
-        <EmptyState title={t(tab === 'learned' ? 'parent.noLearned' : 'parent.noLearning')} illustration="materials" />
-      ) : (
-        <View className="gap-2.5">
-          {list.map((w) => (
-            <Pressable
-              key={w.word}
-              accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
-              className="min-h-[58px] flex-row items-center gap-3 rounded-[16.5px] bg-surface px-[14px] py-3 shadow-item active:opacity-80"
-            >
-              <Text className="flex-1 font-body-semibold text-[16px] leading-[22px]" numberOfLines={1}>{content(w.word)}</Text>
-              <Chip label={t('parent.wordLevel', { level: w.level })} />
-              <Icon name="arrow" size={18} color={colors.ink} />
-            </Pressable>
-          ))}
-        </View>
-      )}
+      <SegmentPanel id={tab}>
+        {list.length === 0 ? (
+          <EmptyState title={t(tab === 'learned' ? 'parent.noLearned' : 'parent.noLearning')} illustration="materials" />
+        ) : (
+          <View className="gap-2.5">
+            {list.map((w) => (
+              <Pressable
+                key={w.word}
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: '/word', params: { word: w.word } })}
+                className="press-row min-h-[58px] flex-row items-center gap-3 rounded-[16.5px] bg-surface px-[14px] py-3 shadow-item active:opacity-80"
+              >
+                <Text className="flex-1 font-body-semibold text-[16px] leading-[22px]" numberOfLines={1}>{content(w.word)}</Text>
+                <Chip label={t('parent.wordLevel', { level: w.level })} />
+                <Icon name="arrow" size={18} color={colors.ink} />
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </SegmentPanel>
     </>
   );
 }
