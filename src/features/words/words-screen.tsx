@@ -4,12 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { useSavedWords } from '@/features/words/saved-words';
 import { useContentText } from '@/lib/i18n';
-import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { NotReady } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
-import { IconButton } from '@/ui/icon-button';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
 
@@ -49,16 +47,6 @@ export function WordsScreen() {
     <TabScreen
       title={t('words.title')}
       mascot="learning"
-      actions={
-        <View className="flex-1 flex-row">
-          <IconButton
-            icon="back"
-            tone="glass"
-            label={t('common.actions.back')}
-            onPress={() => goBack()}
-          />
-        </View>
-      }
     >
       <View>
         <View className="mb-3.5 flex-row items-center gap-2 px-[5px]">

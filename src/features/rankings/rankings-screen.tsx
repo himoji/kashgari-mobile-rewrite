@@ -7,10 +7,8 @@ import { useProfile } from '@/features/auth/session';
 import { RANKINGS_CLASSES, RANKINGS_CLASSMATES } from '@/features/rankings/gql';
 import { Podium } from '@/features/rankings/podium';
 import { classRows, rankRows, type RankRow } from '@/features/rankings/rank';
-import { goBack } from '@/lib/navigation';
 import { cn } from '@/ui/cn';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
-import { IconButton } from '@/ui/icon-button';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -188,16 +186,6 @@ export function RankingsScreen() {
     <TabScreen
       title={t('rankings.title')}
       mascot="learning"
-      actions={
-        <View className="flex-1 flex-row">
-          <IconButton
-            icon="back"
-            tone="glass"
-            label={t('common.actions.back')}
-            onPress={() => goBack()}
-          />
-        </View>
-      }
     >
       <View>
         <Tabs value={tab} onChange={setTab} />

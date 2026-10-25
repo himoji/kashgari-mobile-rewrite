@@ -9,6 +9,11 @@ export default function Tabs() {
         { name: 'school', title: 'school', icon: 'solid-classes' },
         { name: 'profile', title: 'profile', icon: 'solid-profile' },
       ]}
+      pages={[
+        { name: 'words', parent: 'index' },
+        { name: 'rankings', parent: 'league' },
+        { name: 'results', parent: 'school' },
+      ]}
     />
   );
 }

@@ -1,6 +1,6 @@
 import { mapClassWork } from '@/features/classes/class-data';
 import { activityBuckets, periodStart } from '@/features/reports/period';
-import { pointsPercent, workReport } from '@/features/reports/report-data';
+import { pointsPercent, reportCsv, workReport } from '@/features/reports/report-data';
 import type { ClassWorkFragment } from '@/graphql/graphql';
 
 const at = (y: number, m: number, d: number) => Math.floor(new Date(y, m, d).getTime() / 1000);
@@ -52,5 +52,21 @@ describe('workReport', () => {
   it('converts points to a percentage', () => {
     expect(pointsPercent({ points: 7, maxPoints: 10 })).toBe(70);
     expect(pointsPercent({ points: 0, maxPoints: 0 })).toBeNull();
+  });
+});
+
+describe('reportCsv', () => {
+  it('writes one row per submission since the period start and quotes commas', () => {
+    const work = (attempts: { studentId: string; createdAt: number; score: number | null; pending: boolean }[]) => ({
+      key: 'oqylym:w1', kind: 'oqylym' as const, id: 'w1', typename: 'OqylymAssignment', name: 'Табиғат, біздің үй', classId: 'c1', className: '5A',
+      date: 0, createdAt: 0, status: 'published' as const, studentIds: ['s1', 's2'],
+      attempts: attempts.map((a, i) => ({ id: `a${i}`, reviewKind: null, ...a })),
+    });
+    const classes = [{ id: 'c1', name: '5A', students: [{ id: 's1', name: 'Аружан' }, { id: 's2', name: 'Ерлан' }], works: [work([
+      { studentId: 's1', createdAt: 200, score: 80, pending: false },
+      { studentId: 's2', createdAt: 50, score: null, pending: true },
+    ])] }] as unknown as Parameters<typeof reportCsv>[0];
+    const csv = reportCsv(classes, 100, { header: ['S', 'C', 'A', 'P', 'St', 'D'], pending: 'wait', done: 'ok', date: String });
+    expect(csv).toBe('S,C,A,P,St,D\nАружан,5A,"Табиғат, біздің үй",80,ok,200');
   });
 });

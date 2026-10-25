@@ -9,6 +9,10 @@ export default function Tabs() {
         { name: 'school', title: 'school', icon: 'solid-classes' },
         { name: 'profile', title: 'profile', icon: 'solid-profile' },
       ]}
+      pages={[
+        { name: 'library', parent: 'materials' },
+        { name: 'reports', parent: 'school' },
+      ]}
     />
   );
 }

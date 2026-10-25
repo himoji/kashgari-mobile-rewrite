@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme/colors';
+import { Backdrop } from '@/ui/backdrop';
 import { cn } from '@/ui/cn';
 import { Icon } from '@/ui/icon';
 import { useEscape } from '@/ui/use-escape';
@@ -21,11 +22,7 @@ export function DialogCard({
   useEscape(onClose);
   return (
     <View className="flex-1 items-center justify-center px-10">
-      <Pressable
-        accessibilityLabel={t('common.actions.close')}
-        className="absolute inset-0 bg-[#30415a38]"
-        onPress={onClose}
-      />
+      <Backdrop color="#30415a38" blur={8} label={t('common.actions.close')} onPress={onClose} />
       <View
         accessibilityViewIsModal
         className={cn('w-full max-w-[310px] rounded-sheet bg-surface px-5 pb-5 pt-12', className)}

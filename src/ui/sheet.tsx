@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Backdrop } from '@/ui/backdrop';
 import { Text } from '@/ui/text';
 import { useEscape } from '@/ui/use-escape';
 
@@ -13,7 +14,7 @@ export function Sheet({ title, description, onClose, children }: Props) {
   useEscape(onClose);
   return (
     <View className="flex-1 justify-end">
-      <Pressable accessibilityLabel="close" className="absolute inset-0 bg-[#24263155]" onPress={onClose} disabled={!onClose} />
+      <Backdrop color="#24263155" blur={3} label="close" onPress={onClose} />
       <View className="max-h-[85%] rounded-t-sheet bg-surface px-5 pt-3" style={{ paddingBottom: insets.bottom + 24 }}>
         <View className="mb-5 h-1 w-10 self-center rounded bg-[#dce1eb]" />
         <ScrollView bounces={false}>

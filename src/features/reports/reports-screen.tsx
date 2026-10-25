@@ -7,18 +7,18 @@ import { useProfile } from '@/features/auth/session';
 import { dayMonth } from '@/features/classes/format';
 import { TEACHER_REPORTS } from '@/features/reports/gql';
 import { activityBuckets, PERIODS, periodStart, type Period } from '@/features/reports/period';
-import { pointsPercent, workReport } from '@/features/reports/report-data';
+import { pointsPercent, reportCsv, workReport } from '@/features/reports/report-data';
 import { Bars, ModuleUsage, Panel, ReportSelect, Stat } from '@/features/reports/report-parts';
 import type { ClassWork } from '@/features/classes/class-data';
 import { ALL_CLASSES, useSchoolFilters } from '@/features/teacher-assignments/filters';
 import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
-import { goBack } from '@/lib/navigation';
+import { shareTextFile } from '@/lib/share-file';
 import { colors } from '@/theme/colors';
+import { Button } from '@/ui/button';
 import { cn } from '@/ui/cn';
 import { Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
-import { IconButton } from '@/ui/icon-button';
 import { QueryBoundary, useRetryKey, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -50,7 +50,6 @@ export function ReportsScreen() {
   return (
     <TabScreen
       title={t('reports.title')}
-      actions={<IconButton icon="back" tone="glass" label={t('reports.back')} onPress={() => goBack()} />}
       refreshing={refreshing}
       onRefresh={refresh}
     >
@@ -79,6 +78,16 @@ function ReportFilters({ period, setPeriod, openSelect, setOpenSelect, classes }
   const { t } = useTranslation();
   const classFilter = useSchoolFilters((s) => s.classFilter.reports);
   const setClassFilter = useSchoolFilters((s) => s.setClassFilter);
+  const exportCsv = () => {
+    const shown = classes.filter((c) => classFilter === ALL_CLASSES || c.id === classFilter);
+    const csv = reportCsv(shown, periodStart(period), {
+      header: (['student', 'class', 'assignment', 'score', 'status', 'date'] as const).map((k) => t(`reports.csv.${k}`)),
+      pending: t('reports.csv.pending'),
+      done: t('reports.csv.done'),
+      date: (s) => new Date(s * 1000).toLocaleDateString('ru-RU'),
+    });
+    void shareTextFile('dana-tiin-report.csv', csv);
+  };
   return (
     <>
       <View className={cn('mb-[14px]', openSelect === 'period' && 'z-20')}>
@@ -91,6 +100,7 @@ function ReportFilters({ period, setPeriod, openSelect, setOpenSelect, classes }
           onChange={setPeriod}
         />
       </View>
+      <Button variant="soft" icon="file" label={t('reports.export')} className="mb-[14px]" disabled={!classes.length} onPress={exportCsv} />
       <View className={cn('mb-[14px] gap-1.5', openSelect === 'class' && 'z-20')}>
         <Text className="font-body-semibold text-[14px] leading-[21px] text-meta">{t('reports.class')}</Text>
         <ReportSelect

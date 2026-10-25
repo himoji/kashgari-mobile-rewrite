@@ -10,7 +10,8 @@ import { Avatar } from '@/ui/avatar';
 import { Sheet } from '@/ui/sheet';
 import { Text } from '@/ui/text';
 
-function AccountOption({ profile, onPress }: { profile: Profile; onPress: () => void }) {
+/** `showLanguage`: the login owns accounts in several learning languages, so each row names its own. */
+function AccountOption({ profile, showLanguage, onPress }: { profile: Profile; showLanguage: boolean; onPress: () => void }) {
   const { t } = useTranslation();
   return (
     <Pressable
@@ -22,7 +23,7 @@ function AccountOption({ profile, onPress }: { profile: Profile; onPress: () => 
       <View className="flex-1">
         <Text variant="strong" numberOfLines={1}>{profile.name}</Text>
         <Text className="mt-[3px] font-body text-[11px] text-muted" numberOfLines={1}>
-          {[t(`common.roles.${profile.role}`), profile.className, profile.school].filter(Boolean).join(' · ')}
+          {[showLanguage && t(`auth.learning.${profile.language}`), t(`common.roles.${profile.role}`), profile.className, profile.school].filter(Boolean).join(' · ')}
         </Text>
       </View>
       <Text className="font-body text-[24px] text-link">›</Text>
@@ -37,6 +38,7 @@ export function AccountsScreen() {
   const setActive = useSession((s) => s.setActive);
   const signOut = useSession((s) => s.signOut);
   const switching = !!useActiveProfile();
+  const manyLanguages = new Set(profiles.map((p) => p.language)).size > 1;
 
   const choose = (key: string) => {
     setActive(key);
@@ -51,7 +53,7 @@ export function AccountsScreen() {
     >
       <View className="gap-2.5">
         {profiles.map((p) => (
-          <AccountOption key={p.key} profile={p} onPress={() => choose(p.key)} />
+          <AccountOption key={p.key} profile={p} showLanguage={manyLanguages} onPress={() => choose(p.key)} />
         ))}
       </View>
       <Pressable onPress={signOut} className="mt-2 min-h-11 justify-center">

@@ -1,10 +1,7 @@
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { goBack } from '@/lib/navigation';
 import { EmptyState, Skeleton } from '@/ui/feedback';
-import { IconButton } from '@/ui/icon-button';
 import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -36,7 +33,6 @@ function Summary({ completed, average }: { completed?: number; average?: number 
 /** Pushed from Home: completed work with a summary of how many are done and the average score. */
 export function ResultsScreen() {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const { refreshing, refresh } = useRefresh(STUDENT_ASSIGNMENTS);
 
   return (
@@ -56,9 +52,6 @@ export function ResultsScreen() {
           <Results />
         </QueryBoundary>
       </TabScreen>
-      <View className="absolute left-5" style={{ top: Math.max(insets.top, 20) + 10 }}>
-        <IconButton tone="glass" icon="back" label={t('common.actions.back')} onPress={() => goBack()} />
-      </View>
     </View>
   );
 }

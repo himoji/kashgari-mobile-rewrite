@@ -14,14 +14,12 @@ import { LEVEL_OPTIONS, materialParam, type Level, type MaterialKind } from '@/f
 import { Select } from '@/features/materials/select';
 import { useGrades } from '@/features/materials/use-grades';
 import { useContentText } from '@/lib/i18n';
-import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Dialog } from '@/ui/dialog';
 import { EmptyState, NotReady, Skeleton } from '@/ui/feedback';
 import { Icon } from '@/ui/icon';
-import { IconButton } from '@/ui/icon-button';
 import { QueryBoundary, useRetryKey } from '@/ui/query-boundary';
 import { TabScreen } from '@/ui/tab-screen';
 import { Text } from '@/ui/text';
@@ -101,10 +99,7 @@ export function LibraryScreen() {
   const controls: Controls = { filter, setFilter, open, setOpen, setPickedGrade, onSaved: () => setNotReady(true) };
 
   return (
-    <TabScreen
-      title={t('materials.title')}
-      actions={<IconButton tone="glass" icon="back" label={t('common.actions.back')} onPress={() => goBack()} />}
-    >
+    <TabScreen title={t('materials.title')}>
       <View className="flex-row gap-2">
         <Button variant="soft" className="flex-1" label={t('materials.wordBank')} onPress={() => router.push('/teacher/word-bank')} />
         <Button variant="strong" className="flex-1" icon="plus" label={t('materials.createAssignment')} onPress={() => router.push('/teacher/assign/new')} />

@@ -6,9 +6,11 @@ import { colors } from '@/theme/colors';
 import { cn } from '@/ui/cn';
 import { Text } from '@/ui/text';
 
-/** The floating dock from the design: the active tab grows into a blue pill with its label. */
-export function PillTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+/** The floating dock from the design: the active tab grows into a blue pill with its label. `parents` maps dock pages to their tab. */
+export function PillTabBar({ state, descriptors, navigation, parents = {} }: BottomTabBarProps & { parents?: Record<string, string> }) {
   const insets = useSafeAreaInsets();
+  const current = state.routes[state.index]!.name;
+  const active = parents[current] ?? current;
   const bottom = Math.max(insets.bottom, 14);
   return (
     <>
@@ -17,14 +19,14 @@ export function PillTabBar({ state, descriptors, navigation }: BottomTabBarProps
         className="bg-dock absolute inset-x-[14px] h-[66px] flex-row items-center justify-between gap-1 rounded-[14px] border border-white/60 p-2 shadow-dock"
         style={{ bottom }}
       >
-        {state.routes.map((route, index) => {
+        {state.routes.map((route) => {
           const { options } = descriptors[route.key]!;
           if ((options as { href?: unknown }).href === null) return null;
-          const focused = state.index === index;
+          const focused = route.name === active;
           const label = typeof options.title === 'string' ? options.title : route.name;
           const onPress = () => {
             const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-            if (!focused && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+            if (route.name !== current && !event.defaultPrevented) navigation.navigate(route.name, route.params);
           };
           return (
             <Pressable

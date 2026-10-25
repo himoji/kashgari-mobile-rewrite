@@ -29,5 +29,16 @@
   "students": "Students",
   "teachers": "Teachers",
   "memberHint": "Teachers and students connected to the school.",
-  "back": "School"
+  "back": "School",
+  "export": "Download CSV",
+  "csv": {
+    "student": "Student",
+    "class": "Class",
+    "assignment": "Assignment",
+    "score": "Score",
+    "status": "Status",
+    "date": "Date",
+    "pending": "Waiting for review",
+    "done": "Submitted"
+  }
 }

@@ -34,6 +34,28 @@ export function workReport(classes: ClassWork[], after: number | null): WorkRepo
   };
 }
 
+const csvCell = (v: string | number) => (/[",\n;]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+
+/** "CSV жүктеу": one row per submission since `after`, like the design's export. */
+export function reportCsv(
+  classes: ClassWork[],
+  after: number | null,
+  labels: { header: string[]; pending: string; done: string; date: (unix: number) => string },
+): string {
+  const since = after ?? 0;
+  const rows = classes.flatMap((c) => {
+    const names = new Map(c.students.map((s) => [s.id, s.name]));
+    return c.works
+      .filter((w) => w.status !== 'draft')
+      .flatMap((w) =>
+        w.attempts
+          .filter((a) => a.createdAt >= since)
+          .map((a) => [names.get(a.studentId) ?? '', c.name, w.name, a.score ?? '', a.pending ? labels.pending : labels.done, labels.date(a.createdAt)]),
+      );
+  });
+  return [labels.header, ...rows].map((r) => r.map(csvCell).join(',')).join('\n');
+}
+
 /** Average score from the stats resolver, null when nothing was scored. */
 export const pointsPercent = (p: { points: number; maxPoints: number } | undefined) =>
   p && p.maxPoints > 0 ? Math.round((p.points / p.maxPoints) * 100) : null;
