@@ -24,13 +24,13 @@ const mascots = {
 };
 export type MascotPose = keyof typeof mascots;
 
-/** The white dot grid that fades out from the top right of the hero. */
+/** The white dot grid that fades out from the top right of the hero, starting a little above it. */
 function HeroPattern() {
   return (
     <Svg
       width="100%"
-      height={210}
-      style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
+      height={258}
+      style={{ position: 'absolute', top: -48, left: 0, right: 0 }}
       pointerEvents="none"
     >
       <Defs>
@@ -90,13 +90,14 @@ export function TabScreen({
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
   const paddingBottom = dockBottom(insets.bottom) + DOCK_HEIGHT + 24;
+  // The content is white and fills the screen; the scroll view behind it is orange at the top, so a
+  // pull-to-refresh opens onto orange with the white spinner showing.
+  const contentStyle = { paddingBottom, flexGrow: 1, backgroundColor: colors.white };
   const refreshControl = onRefresh ? (
     <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor="#fff" />
   ) : undefined;
   const hero = (
     <>
-      {/* Orange also runs above the content, so a pull-to-refresh or an inset top never shows white. */}
-      <View className="absolute inset-x-0 -top-[1000px] h-[1000px] bg-workspace" />
       <View className="absolute inset-x-0 top-0 h-[284px]" style={gradient('workspace')} />
       <HeroPattern />
       <View
@@ -144,7 +145,8 @@ export function TabScreen({
       <View className="flex-1 bg-surface">
         <VirtualList
           ref={scroll as never}
-          contentContainerStyle={{ paddingBottom }}
+          style={gradient('overscroll')}
+          contentContainerStyle={contentStyle}
           contentInsetAdjustmentBehavior="never"
           refreshControl={refreshControl}
           raiseHeader={raiseHeader}
@@ -167,7 +169,8 @@ export function TabScreen({
     <View className="flex-1 bg-surface">
       <ScrollView
         ref={scroll}
-        contentContainerStyle={{ paddingBottom }}
+        style={gradient('overscroll')}
+        contentContainerStyle={contentStyle}
         contentInsetAdjustmentBehavior="never"
         refreshControl={refreshControl}
       >
