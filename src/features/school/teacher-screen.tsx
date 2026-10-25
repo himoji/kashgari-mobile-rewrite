@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -7,10 +7,11 @@ import { ClassCard } from '@/features/classes/class-card';
 import { Stat } from '@/features/reports/report-parts';
 import { averageScore, isActiveTeacher, publishedWorks } from '@/features/school/school-data';
 import { StaffAvatar } from '@/features/school/school-parts';
+import { SCHOOL_PRINCIPAL } from '@/features/school/gql';
 import { useSchool } from '@/features/school/use-school';
 import { BackBar } from '@/ui/back-bar';
 import { EmptyState, Skeleton } from '@/ui/feedback';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { StatusMark } from '@/ui/status-mark';
 import { Text } from '@/ui/text';
 
@@ -19,11 +20,12 @@ export function PrincipalTeacherScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { refreshing, refresh } = useRefresh(SCHOOL_PRINCIPAL);
 
   return (
     <View className="flex-1 bg-surface">
       <BackBar label={t('principal.schoolTitle')} fallback="/principal/school?tab=teachers" />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <QueryBoundary
           fallback={
             <View className="gap-3">

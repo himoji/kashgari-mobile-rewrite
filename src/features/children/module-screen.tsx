@@ -1,15 +1,16 @@
 import { useLocalSearchParams } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AssignmentCard } from '@/features/assignments/assignment-card';
+import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
 import type { AssignmentKind } from '@/features/assignments/routes';
 import { moduleAssignments, moduleBreakdown } from '@/features/children/children-data';
 import { useChildAssignments, useChildName } from '@/features/children/use-children';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { BackBar } from '@/ui/back-bar';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 /** One module of a child's work: every assignment with its status and score, read-only. */
@@ -18,11 +19,12 @@ export function ChildModuleScreen() {
   const insets = useSafeAreaInsets();
   const { child: childId, kind } = useLocalSearchParams<{ child: string; kind: AssignmentKind }>();
   const childName = useChildName(childId);
+  const { refreshing, refresh } = useRefresh(STUDENT_ASSIGNMENTS);
 
   return (
     <View className="flex-1 bg-surface">
       <BackBar label={childName ?? t('common.actions.back')} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <Text className="mb-[3px] font-body-semibold text-[21px] leading-[28px]">{t(`assignments.modules.${kind}`)}</Text>
         <QueryBoundary
           fallback={

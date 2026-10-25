@@ -1,16 +1,17 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { studentAttempts, studentSummaries } from '@/features/classes/class-data';
 import { ClassDetailView } from '@/features/classes/class-detail-view';
 import { StudentProgressDialog } from '@/features/classes/student-progress-dialog';
+import { SCHOOL_PRINCIPAL } from '@/features/school/gql';
 import { useSchool } from '@/features/school/use-school';
 import { BackBar } from '@/ui/back-bar';
 import { EmptyState, Skeleton } from '@/ui/feedback';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 /** Principal's class page: the teacher's roster view, read-only (no grading, no assignment shortcuts). */
@@ -49,10 +50,11 @@ function ClassPage({ id, bottom }: { id: string; bottom: number }) {
   const [studentId, setStudentId] = useState<string | null>(null);
   const classWork = school?.classes.find((c) => c.id === id);
   const student = classWork?.students.find((s) => s.id === studentId);
+  const { refreshing, refresh } = useRefresh(SCHOOL_PRINCIPAL);
 
   return (
     <>
-      <ScrollView contentContainerStyle={scrollStyle(bottom)}>
+      <ScrollView contentContainerStyle={scrollStyle(bottom)} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         {!classWork ? (
           <EmptyState title={t('classes.noClasses')} illustration="classroom" />
         ) : (

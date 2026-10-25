@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -9,20 +9,22 @@ import { ClassDetailView } from '@/features/classes/class-detail-view';
 import { StudentProgressDialog } from '@/features/classes/student-progress-dialog';
 import { submissionHref } from '@/features/review/routes';
 import { useSchoolFilters, type FilterScope } from '@/features/teacher-assignments/filters';
+import { TEACHER_SCHOOL } from '@/features/teacher-assignments/gql';
 import { useTeacherSchool } from '@/features/teacher-assignments/use-teacher-school';
 import { BackBar } from '@/ui/back-bar';
 import { Button } from '@/ui/button';
 import { EmptyState, Skeleton } from '@/ui/feedback';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 
 /** Teacher's class page: roster grades, a student's progress dialog, shortcuts to the class's work and answers. */
 export function ClassDetailScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { refreshing, refresh } = useRefresh(TEACHER_SCHOOL);
   return (
     <View className="flex-1 bg-surface">
       <BackBar label={t('classes.school')} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <QueryBoundary
           fallback={
             <View className="gap-3">

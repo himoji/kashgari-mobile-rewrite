@@ -1,7 +1,7 @@
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,7 @@ import {
   TEACHER_DELETE_WORD_GAME,
   TEACHER_DELETE_WORDLE,
   TEACHER_DELETE_ZHAZYLYM,
+  TEACHER_SCHOOL,
   TEACHER_UPDATE_ASSIGNMENT_VISIBILITY,
   TEACHER_UPDATE_LESSON_VISIBILITY,
 } from '@/features/teacher-assignments/gql';
@@ -36,7 +37,7 @@ import { Button } from '@/ui/button';
 import { Dialog } from '@/ui/dialog';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { Icon, type IconName } from '@/ui/icon';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { StatusMark } from '@/ui/status-mark';
 import { Text } from '@/ui/text';
 
@@ -134,6 +135,7 @@ function AssignmentDetail() {
   const [setLessonVisible, lessonVisibility] = useMutation(TEACHER_UPDATE_LESSON_VISIBILITY);
   const client = useApolloClient();
   const [remove, removal] = useMutation(DELETE[(work?.typename ?? 'OqylymAssignment') as keyof typeof DELETE]);
+  const { refreshing, refresh } = useRefresh(TEACHER_SCHOOL);
 
   if (!work || !found) return <EmptyState title={t('teacherAssignments.notFound')} />;
 
@@ -182,7 +184,7 @@ function AssignmentDetail() {
 
   return (
     <>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 38 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 13, paddingBottom: insets.bottom + 38 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         <View className="flex-row items-center justify-between gap-2.5">
           <Text className="font-body text-[11px] leading-[16.5px] text-[#96a4b8]">
             {work.className} · {shortDate(work.date, t)}

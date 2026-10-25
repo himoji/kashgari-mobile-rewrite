@@ -1,19 +1,21 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AssignmentCard } from '@/features/assignments/assignment-card';
+import { STUDENT_ASSIGNMENTS } from '@/features/assignments/gql';
 import { averageScore, isCompleted } from '@/features/assignments/map';
 import { childLine, ChildProgressCard, ModuleRow } from '@/features/children/child-parts';
 import { moduleBreakdown, recentAssignments } from '@/features/children/children-data';
+import { CHILDREN } from '@/features/children/gql';
 import { useChildAssignments, useChildren } from '@/features/children/use-children';
 import { Stat } from '@/features/reports/report-parts';
 import { Avatar } from '@/ui/avatar';
 import { BackBar } from '@/ui/back-bar';
 import { EmptyState, Skeleton } from '@/ui/feedback';
 import { ListRow } from '@/ui/list-row';
-import { QueryBoundary } from '@/ui/query-boundary';
+import { QueryBoundary, useRefresh } from '@/ui/query-boundary';
 import { Text } from '@/ui/text';
 
 function SectionTitle({ title }: { title: string }) {
@@ -25,11 +27,12 @@ export function ChildScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { refreshing, refresh } = useRefresh(CHILDREN, STUDENT_ASSIGNMENTS);
 
   return (
     <View className="flex-1 bg-surface">
       <BackBar label={t('common.tabs.home')} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         {/* Two boundaries: the header comes from the cached children list, the work from its own query. */}
         <QueryBoundary fallback={<Skeleton className="h-14" />}>
           <ChildHeader id={id} />
