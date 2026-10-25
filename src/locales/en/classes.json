@@ -8,7 +8,6 @@
   "searchClasses": "Search classes",
   "classGrades": "Class grades",
   "classGradesHint": "Choose a class, then a student.",
-  "viewGrades": "View grades",
   "studentGrades": "Student grades",
   "submittedOf": "{{done}}/{{total}} submitted",
   "assignments": "Assignments",

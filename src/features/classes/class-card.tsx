@@ -8,7 +8,7 @@ import { Text } from '@/ui/text';
 
 type Props = { name: string; studentCount: number; workCount: number; onPress: () => void };
 
-/** A class in the class list: "7А", "8 оқушы", "Бағаларды көру · 10 тапсырма", arrow. */
+/** A class in the class list: its tile, the class name, "8 оқушы · 10 тапсырма", arrow. */
 export function ClassCard({ name, studentCount, workCount, onPress }: Props) {
   const { t } = useTranslation();
   return (
@@ -20,9 +20,9 @@ export function ClassCard({ name, studentCount, workCount, onPress }: Props) {
     >
       <ClassAvatar name={name} />
       <View className="flex-1">
-        <Text className="font-body-medium text-[14px] leading-[20px]">{t('classes.studentCount', { count: studentCount })}</Text>
+        <Text className="font-body-medium text-[14px] leading-[20px]" numberOfLines={2}>{name}</Text>
         <Text className="mt-1 font-body text-[11px] leading-[16px] text-subtle" numberOfLines={1}>
-          {t('classes.viewGrades')} · {t('classes.workCount', { count: workCount })}
+          {t('classes.studentCount', { count: studentCount })} · {t('classes.workCount', { count: workCount })}
         </Text>
       </View>
       <Icon name="arrow" size={18} color={colors.ink} />

@@ -4,11 +4,16 @@ import { initials } from '@/ui/avatar';
 import { cn } from '@/ui/cn';
 import { Text } from '@/ui/text';
 
-/** "7А" in a pale blue rounded tile (class cards and the class page title). */
+/**
+ * "7А" in a pale blue rounded tile (class cards and the class page title). A longer name shows its
+ * initials; the full name is the title next to the tile.
+ */
 export function ClassAvatar({ name, className }: { name: string; className?: string }) {
   return (
     <View className={cn('h-12 w-12 items-center justify-center rounded-[14px] bg-[#eef5ff]', className)}>
-      <Text className="font-body-semibold text-[20px] leading-[30px] text-[#6d94c9]" numberOfLines={1}>{name}</Text>
+      <Text className="font-body-semibold text-[20px] leading-[30px] text-[#6d94c9]" numberOfLines={1} maxFontSizeMultiplier={1.2}>
+        {name.length <= 3 ? name : initials(name)}
+      </Text>
     </View>
   );
 }

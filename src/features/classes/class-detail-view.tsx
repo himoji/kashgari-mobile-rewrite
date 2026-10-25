@@ -24,7 +24,9 @@ export function ClassDetailView({ className, summaries, onOpenStudent, footer }:
         <ClassAvatar name={className} />
         <View className="flex-1">
           <Text className="mb-[3px] font-body-semibold text-[21px] leading-[28px]">{t('classes.studentGrades')}</Text>
-          <Text className="font-body text-[12px] leading-[18px] text-subtle">{t('classes.studentCount', { count: summaries.length })}</Text>
+          <Text className="font-body text-[12px] leading-[18px] text-subtle" numberOfLines={2}>
+            {className} · {t('classes.studentCount', { count: summaries.length })}
+          </Text>
         </View>
       </View>
       <View className="gap-1.5">

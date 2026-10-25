@@ -8,7 +8,6 @@
   "searchClasses": "Найти класс",
   "classGrades": "Оценки по классам",
   "classGradesHint": "Выберите класс, затем ученика.",
-  "viewGrades": "Посмотреть оценки",
   "studentGrades": "Оценки учеников",
   "submittedOf": "{{done}}/{{total}} сдано",
   "assignments": "Задания",
