@@ -98,9 +98,11 @@ const EMBEDDED = [
   'SubmissionWordShuffle',
 ];
 
-const networkLink = env.mocks
-  ? (require('@/dev/mock-link') as typeof import('@/dev/mock-link')).mockLink
-  : ApolloLink.from([authLink, refreshLink, httpLink]);
+// The condition is written out here, not read from `env`, so Metro folds it and release bundles drop src/dev.
+const networkLink =
+  __DEV__ && process.env.EXPO_PUBLIC_MOCKS === '1'
+    ? (require('@/dev/mock-link') as typeof import('@/dev/mock-link')).mockLink
+    : ApolloLink.from([authLink, refreshLink, httpLink]);
 
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([errorLink, networkLink]),
