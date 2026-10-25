@@ -1,10 +1,12 @@
 import { Image } from 'expo-image';
-import type { ReactNode } from 'react';
+import { useScrollToTop } from 'expo-router';
+import { useRef, type ReactNode } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Mask, Pattern, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { cn } from '@/ui/cn';
+import { DOCK_HEIGHT, dockBottom } from '@/ui/pill-tab-bar';
 import { Text } from '@/ui/text';
 
 const mascots = {
@@ -65,10 +67,13 @@ export function TabScreen({
 }: Props) {
   const insets = useSafeAreaInsets();
   const top = Math.max(insets.top, 20) + 10;
+  const scroll = useRef<ScrollView>(null);
+  useScrollToTop(scroll);
   return (
     <View className="flex-1 bg-surface">
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 110 + insets.bottom }}
+        ref={scroll}
+        contentContainerStyle={{ paddingBottom: dockBottom(insets.bottom) + DOCK_HEIGHT + 24 }}
         refreshControl={
           onRefresh ? (
             <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor="#fff" />
