@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +10,7 @@ import { goBack } from '@/lib/navigation';
 import { colors } from '@/theme/colors';
 import { Avatar } from '@/ui/avatar';
 import { cn } from '@/ui/cn';
+import { ConfirmDialog } from '@/ui/dialog';
 import { Icon } from '@/ui/icon';
 import { Sheet } from '@/ui/sheet';
 import { Text } from '@/ui/text';
@@ -50,6 +52,7 @@ export function AccountsScreen() {
   const signOut = useSession((s) => s.signOut);
   const switching = !!useActiveProfile();
   const manyLanguages = new Set(profiles.map((p) => p.language)).size > 1;
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   const choose = (key: string) => {
     setActive(key);
@@ -67,9 +70,19 @@ export function AccountsScreen() {
           <AccountOption key={p.key} profile={p} showLanguage={manyLanguages} active={p.key === activeKey} onPress={() => choose(p.key)} />
         ))}
       </View>
-      <Pressable onPress={signOut} className="press mt-2 min-h-11 justify-center">
+      <Pressable accessibilityRole="button" onPress={() => setConfirmSignOut(true)} className="press mt-2 min-h-11 justify-center active:opacity-70">
         <Text className="font-body text-[13px] text-link">{t('auth.otherNumber')}</Text>
       </Pressable>
+      {/* "Use another number" signs out of every account on this number. */}
+      <ConfirmDialog
+        visible={confirmSignOut}
+        title={t('auth.otherNumberTitle')}
+        body={t('auth.otherNumberBody')}
+        confirmLabel={t('common.actions.signOut')}
+        destructive
+        onConfirm={() => (setConfirmSignOut(false), signOut())}
+        onClose={() => setConfirmSignOut(false)}
+      />
     </Sheet>
   ) : null;
 

@@ -8,5 +8,8 @@ export function formatPhone(input: string) {
   return d ? `+7 ${parts.join(' ')}` : '';
 }
 
+/** The 6-digit sign-in code from what was typed or pasted ("123 456", "123-456"): digits first, then the length. */
+export const codeDigits = (input: string) => input.replace(/\D/g, '').slice(0, 6);
+
 export const phoneDigits = (formatted: string) => `+${formatted.replace(/\D/g, '')}`;
 export const isValidPhone = (formatted: string) => /^\+7\d{10}$/.test(phoneDigits(formatted));

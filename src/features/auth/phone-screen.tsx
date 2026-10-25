@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Platform, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ import { REQUEST_CODE, REQUEST_ID } from '@/features/auth/gql';
 import { LoginLayout } from '@/features/auth/login-layout';
 import { formatPhone, isValidPhone, phoneDigits } from '@/features/auth/phone';
 import { useSession } from '@/features/auth/session';
-import { signInAsDemo, signInWithApple, signInWithGoogle } from '@/features/auth/sign-in';
+import { NoAccountError, signInAsDemo, signInWithApple, signInWithGoogle } from '@/features/auth/sign-in';
 import { colors } from '@/theme/colors';
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
@@ -20,10 +20,17 @@ export function PhoneScreen() {
   const expired = useSession((s) => s.expired);
   const [social, setSocial] = useState<'apple' | 'google' | 'demo' | null>(null);
   const [requestId] = useMutation(REQUEST_ID);
-  const [requestCode, { loading }] = useMutation(REQUEST_CODE);
+  const [requestCode] = useMutation(REQUEST_CODE);
+  // One sign-in at a time: the code request (two calls) and each provider block the others.
+  const [sending, setSending] = useState(false);
+  const inFlight = useRef(false);
+  const busy = sending || social !== null;
 
   const submit = async () => {
+    if (inFlight.current) return;
     if (!isValidPhone(phone)) return setError(t('auth.phoneInvalid'));
+    inFlight.current = true;
+    setSending(true);
     setError('');
     try {
       const { data } = await requestId({ variables: { data: { isMobile: true, token: null } } });
@@ -33,17 +40,23 @@ export function PhoneScreen() {
       router.push({ pathname: '/code', params: { phone, requestId: id } });
     } catch {
       setError(t('auth.sendFailed'));
+    } finally {
+      inFlight.current = false;
+      setSending(false);
     }
   };
 
   const socialSignIn = async (provider: 'apple' | 'google' | 'demo') => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setSocial(provider);
     setError('');
     try {
       await (provider === 'apple' ? signInWithApple() : provider === 'google' ? signInWithGoogle() : signInAsDemo());
-    } catch {
-      setError(t('auth.socialFailed'));
+    } catch (e) {
+      setError(t(e instanceof NoAccountError ? 'auth.noAccount' : 'auth.socialFailed'));
     } finally {
+      inFlight.current = false;
       setSocial(null);
     }
   };
@@ -52,14 +65,14 @@ export function PhoneScreen() {
     <LoginLayout
       footer={
         <>
-          <Button size="lg" variant="strong" label={t('auth.getCode')} loading={loading} onPress={submit} />
+          <Button size="lg" variant="strong" label={t('auth.getCode')} loading={sending} disabled={busy} onPress={submit} />
           <View className="flex-row gap-2 pt-2">
             {Platform.OS === 'ios' ? (
-              <Button className="flex-1" variant="ghost" label={t('auth.apple')} loading={social === 'apple'} onPress={() => socialSignIn('apple')} />
+              <Button className="flex-1" variant="ghost" label={t('auth.apple')} loading={social === 'apple'} disabled={busy} onPress={() => socialSignIn('apple')} />
             ) : null}
-            <Button className="flex-1" variant="ghost" label={t('auth.google')} loading={social === 'google'} onPress={() => socialSignIn('google')} />
+            <Button className="flex-1" variant="ghost" label={t('auth.google')} loading={social === 'google'} disabled={busy} onPress={() => socialSignIn('google')} />
           </View>
-          <Button size="sm" variant="ghost" label={t('auth.demo')} loading={social === 'demo'} onPress={() => socialSignIn('demo')} />
+          <Button size="sm" variant="ghost" label={t('auth.demo')} loading={social === 'demo'} disabled={busy} onPress={() => socialSignIn('demo')} />
         </>
       }
     >

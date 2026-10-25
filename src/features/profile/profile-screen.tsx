@@ -12,6 +12,7 @@ import { colors } from '@/theme/colors';
 import { Avatar } from '@/ui/avatar';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
+import { ConfirmDialog } from '@/ui/dialog';
 import { Facts } from '@/ui/facts';
 import { Icon } from '@/ui/icon';
 import { SegmentedTabs } from '@/ui/segmented-tabs';
@@ -43,6 +44,7 @@ export function ProfileScreen() {
 
   const [updateLanguage, languageState] = useMutation(UPDATE_LANGUAGE);
   const [failed, setFailed] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   // Script and explanation language stay on the device; the interface language is also saved to the account.
   const save = async () => {
@@ -132,7 +134,16 @@ export function ProfileScreen() {
         <Icon name="arrow" size={19} color={colors.ink} />
       </Pressable>
 
-      <Button variant="danger" label={t('profile.signOut')} onPress={signOut} />
+      <Button variant="danger" label={t('profile.signOut')} onPress={() => setConfirmSignOut(true)} />
+      <ConfirmDialog
+        visible={confirmSignOut}
+        title={t('profile.signOutTitle')}
+        body={t('profile.signOutBody')}
+        confirmLabel={t('profile.signOut')}
+        destructive
+        onConfirm={() => (setConfirmSignOut(false), signOut())}
+        onClose={() => setConfirmSignOut(false)}
+      />
     </TabScreen>
   );
 }

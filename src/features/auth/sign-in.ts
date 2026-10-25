@@ -1,3 +1,4 @@
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 
@@ -16,8 +17,17 @@ export async function finishSignIn(credentials: Credentials[]) {
   if (uiLanguage) useSession.getState().setPreferences({ uiLanguage });
 }
 
+/** The provider signed in, but no language database has an account for it. */
+export class NoAccountError extends Error {
+  constructor() {
+    super('No account for this sign-in');
+  }
+}
+
 /** Social providers log in per language database, unlike the phone flow which returns all at once. */
 async function signInWithIdToken(provider: 'google' | 'apple', idToken: string) {
+  // A database that answers with an error has no account; one that can't be reached says nothing.
+  let unreachable = false;
   const results = await Promise.all(
     CONTENT_LANGUAGES.map(async (language) => {
       try {
@@ -27,13 +37,14 @@ async function signInWithIdToken(provider: 'google' | 'apple', idToken: string) 
             : await apolloClient.mutate({ mutation: LOGIN_APPLE, variables: { idToken }, context: { language }, fetchPolicy: 'no-cache' });
         const info = data && ('loginGoogle' in data ? data.loginGoogle : data.loginApple);
         return info ? ({ language, ...info } satisfies Credentials) : null;
-      } catch {
+      } catch (error) {
+        if (!CombinedGraphQLErrors.is(error)) unreachable = true;
         return null;
       }
     }),
   );
   const credentials = results.filter((c) => c !== null);
-  if (!credentials.length) throw new Error('No account for this sign-in');
+  if (!credentials.length) throw unreachable ? new Error('Sign-in did not reach the server') : new NoAccountError();
   await finishSignIn(credentials);
 }
 
@@ -74,10 +85,15 @@ export async function signInWithGoogle() {
   await signInWithIdToken('google', response.data.idToken);
 }
 
+/** Resolves without signing in when the person closes the Apple sheet. */
 export async function signInWithApple() {
   const credential = await AppleAuthentication.signInAsync({
     requestedScopes: [AppleAuthentication.AppleAuthenticationScope.EMAIL],
+  }).catch((error: unknown) => {
+    if ((error as { code?: string }).code === 'ERR_REQUEST_CANCELED') return null;
+    throw error;
   });
+  if (!credential) return;
   if (!credential.identityToken) throw new Error('Apple returned no identity token');
   await signInWithIdToken('apple', credential.identityToken);
 }

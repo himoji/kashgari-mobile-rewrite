@@ -1,4 +1,14 @@
-import { formatPhone, isValidPhone, phoneDigits } from '@/features/auth/phone';
+import { codeDigits, formatPhone, isValidPhone, phoneDigits } from '@/features/auth/phone';
+
+describe('codeDigits', () => {
+  it.each([
+    ['123456', '123456'],
+    ['123 456', '123456'],
+    ['123-456', '123456'],
+    [' 1234567', '123456'],
+    ['12a', '12'],
+  ])('%s → %s', (input, out) => expect(codeDigits(input)).toBe(out));
+});
 
 describe('formatPhone', () => {
   it.each([

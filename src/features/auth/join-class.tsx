@@ -29,14 +29,18 @@ export function JoinClass() {
   const signOut = useSession((s) => s.signOut);
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<{ code?: string; name?: string }>({});
   const [busy, setBusy] = useState(false);
 
   const join = async () => {
     const classId = code.trim();
-    if (!classId || name.trim().length < 2) return;
+    const invalid = {
+      code: classId ? undefined : t('auth.codeRequired'),
+      name: name.trim().length < 2 ? t('auth.nameTooShort') : undefined,
+    };
+    setErrors(invalid);
+    if (invalid.code || invalid.name) return;
     setBusy(true);
-    setError('');
     try {
       // The class lives in exactly one language database; find which.
       const found = await Promise.all(
@@ -48,7 +52,7 @@ export function JoinClass() {
         ),
       );
       const owner = found.find((c) => c !== null);
-      if (!owner) return setError(t('auth.classNotFound'));
+      if (!owner) return setErrors({ code: t('auth.classNotFound') });
       await apolloClient.mutate({
         mutation: ADD_STUDENT,
         variables: { accountId: owner.accountId, studentName: name.trim(), classId },
@@ -58,7 +62,7 @@ export function JoinClass() {
       const { profiles } = await resolveProfiles(credentials);
       useSession.getState().signIn(credentials, profiles);
     } catch {
-      setError(t('auth.joinFailed'));
+      setErrors({ name: t('auth.joinFailed') });
     } finally {
       setBusy(false);
     }
@@ -70,8 +74,21 @@ export function JoinClass() {
         <Text variant="display" className="text-[28px] leading-[34px]">{t('auth.joinTitle')}</Text>
         <Text variant="body" tone="muted">{t('auth.joinBody')}</Text>
       </View>
-      <Input label={t('auth.classCode')} value={code} onChangeText={setCode} autoCapitalize="none" autoCorrect={false} />
-      <Input label={t('auth.yourName')} value={name} onChangeText={setName} textContentType="name" error={error || undefined} />
+      <Input
+        label={t('auth.classCode')}
+        value={code}
+        onChangeText={(v) => (setCode(v), setErrors((e) => ({ ...e, code: undefined })))}
+        autoCapitalize="none"
+        autoCorrect={false}
+        error={errors.code}
+      />
+      <Input
+        label={t('auth.yourName')}
+        value={name}
+        onChangeText={(v) => (setName(v), setErrors((e) => ({ ...e, name: undefined })))}
+        textContentType="name"
+        error={errors.name}
+      />
       <Button size="lg" variant="strong" label={t('auth.join')} loading={busy} onPress={join} />
       <Pressable onPress={signOut} className="press min-h-11 justify-center">
         <Text className="font-body text-[13px] text-link">{t('auth.otherNumber')}</Text>

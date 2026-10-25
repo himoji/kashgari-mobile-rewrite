@@ -14,5 +14,7 @@
   "saved": "Saved",
   "switchAccount": "Switch account",
   "signOut": "Sign out",
-  "saveFailed": "Couldn't save. Try again."
+  "saveFailed": "Couldn't save. Try again.",
+  "signOutTitle": "Sign out?",
+  "signOutBody": "To sign in again you'll need your phone number and a code."
 }
